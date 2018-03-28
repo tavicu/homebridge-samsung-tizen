@@ -1,0 +1,28 @@
+{
+  "name": "homebridge-samsung-tv",
+  "version": "1.0.0",
+  "description": "Plugin to control Samsung TV for homebridge: https://github.com/nfarina/homebridge",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tavicu/homebridge-samsung-tv.git"
+  },
+  "keywords": [
+    "homebridge-plugin",
+    "homekit",
+    "samsung"
+  ],
+  "author": "Octavian Ruda",
+  "license": "MIT",
+  "homepage": "https://github.com/tavicu/homebridge-samsung-tv#readme",
+  "bugs": {
+    "url": "https://github.com/tavicu/homebridge-samsung-tv/issues"
+  },
+  "engines": {
+    "node": ">=4.3.0",
+    "homebridge": ">=0.4.0"
+  }
+}
