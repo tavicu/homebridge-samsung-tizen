@@ -2,8 +2,8 @@ let Service, Characteristic;
 let SamsungRemote = require('./lib/SamsungRemote.js');
 
 module.exports = (homebridge) => {
-    Service = homebridge.hap.Service;
-    Characteristic = homebridge.hap.Characteristic;
+    // Service = homebridge.hap.Service;
+    // Characteristic = homebridge.hap.Characteristic;
 
     homebridge.registerAccessory('homebridge-samsung-tv', 'SamsungTVV', SamsungTV);
 }
@@ -21,7 +21,9 @@ class SamsungTV {
 
         this.service = new Service.Switch(this.TV.name);
 
-        this.service.getCharacteristic(Characteristic.On);
+        this.service.getCharacteristic(Characteristic.On)
+            .on('get', this._getOn.bind(this))
+            .on('set', this._setOn.bind(this));
     }
 
     getInformationService() {
@@ -35,4 +37,28 @@ class SamsungTV {
     getServices() {
         return [this.service, this.getInformationService()];
     }
+
+
+
+    async _getOn(callback) {
+        let status = await this.TV.isOn();
+
+        callback(null, status);
+    }
+
+    async _setOn(value, callback) {
+        try {
+            if (value) {
+                await this.TV.turnOn();
+            } else {
+                await this.TV.turnOff();
+            }
+
+            callback(null, value);
+        } catch (err) {
+            callback(err, !!value);
+        }
+    }
+
+
 }
