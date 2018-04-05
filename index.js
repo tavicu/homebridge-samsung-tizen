@@ -2,8 +2,8 @@ let Service, Characteristic;
 let SamsungRemote = require('./lib/SamsungRemote.js');
 
 module.exports = (homebridge) => {
-    // Service = homebridge.hap.Service;
-    // Characteristic = homebridge.hap.Characteristic;
+    Service = homebridge.hap.Service;
+    Characteristic = homebridge.hap.Characteristic;
 
     homebridge.registerAccessory('homebridge-samsung-tv', 'SamsungTVV', SamsungTV);
 }
