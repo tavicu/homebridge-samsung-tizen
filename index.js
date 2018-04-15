@@ -30,7 +30,7 @@ class SamsungTV {
         return new Service.AccessoryInformation()
             .setCharacteristic(Characteristic.Name, this.TV.name)
             .setCharacteristic(Characteristic.Manufacturer, 'Samsung TV')
-            .setCharacteristic(Characteristic.Model, 'Tizen2016')
+            .setCharacteristic(Characteristic.Model, 'Tizen')
             .setCharacteristic(Characteristic.SerialNumber, this.TV.ip);
     }
 
@@ -55,10 +55,8 @@ class SamsungTV {
             }
 
             callback(null, value);
-        } catch (err) {
-            callback(err, !!value);
+        } catch (error) {
+            callback(error, !!value);
         }
     }
-
-
 }
