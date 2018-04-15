@@ -54,9 +54,11 @@ class SamsungTV {
                 await this.TV.turnOff();
             }
 
-            callback(null, value);
+            callback();
         } catch (error) {
-            callback(error, !!value);
+            callback(error);
+
+            setTimeout(() => this.service.getCharacteristic(Characteristic.On).updateValue(!value), 50);
         }
     }
 }
