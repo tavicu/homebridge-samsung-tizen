@@ -5,7 +5,7 @@ module.exports = (homebridge) => {
     Service = homebridge.hap.Service;
     Characteristic = homebridge.hap.Characteristic;
 
-    homebridge.registerAccessory('homebridge-samsung-tv', 'SamsungTVV', SamsungTV);
+    homebridge.registerAccessory('homebridge-samsung-tv', 'SamsungTV', SamsungTV);
 }
 
 
