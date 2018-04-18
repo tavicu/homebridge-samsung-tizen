@@ -12,8 +12,10 @@
   },
   "keywords": [
     "homebridge-plugin",
+    "homebridge",
     "homekit",
-    "samsung"
+    "samsung",
+    "remote"
   ],
   "author": "Octavian Ruda",
   "license": "MIT",
@@ -26,7 +28,6 @@
     "homebridge": ">=0.4.0"
   },
   "dependencies": {
-    "http-server": "^0.11.1",
     "wake_on_lan": "0.0.4",
     "ws": "^5.1.0"
   }
