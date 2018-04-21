@@ -1,3 +1,3 @@
-let SamsungTV = require('./lib/SamsungTV.js');
-
-module.exports = SamsungTV;
+module.exports = function(homebridge) {
+    require('./lib/SamsungPlatform')(homebridge);
+}
