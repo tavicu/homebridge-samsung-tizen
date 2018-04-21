@@ -9,14 +9,24 @@
     "description": "This is an example configuration file.",
 
     "accessories": [
-        {
-            "accessory": "SamsungTV",
-            "name": "Bedroom TV",
-            "ip": "192.168.1.10",
-            "mac": "A0:B1:C2:D3:E4:F5"
-        }
     ],
 
     "platforms": [
+        {
+            "platform": "SamsungTV",
+            "devices": [
+                {
+                    "name": "Bedroom TV",
+                    "ip": "10.20.30.40",
+                    "mac": "A0:B1:C2:D3:E4:F5",
+                    "switches": [
+                        {"name": "Mute", "type": "mute"},
+                        {"name": "Command", "type": "command", "command": "KEY_VOLUP"},
+                        {"name": "Command", "type": "command", "command": ["KEY_VOLUP", "KEY_VOLDOWN"]},
+                        {"name": "Channel", "type": "channel", "channel": 12}
+                    ]
+                }
+            ]
+        }
     ]
 }
