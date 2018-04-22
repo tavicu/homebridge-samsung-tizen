@@ -66,7 +66,7 @@ By default the ON / OFF switch will be created for the TV. If you want you can a
 
 | Name | Description |
 | :------------ | :------------ |
-| name | Name of the switch in HomeKit. The device name will be prepended |
+| name | Name of the switch in HomeKit. The device name will be append |
 | type | Type of the switch. It can be `sleep`, `channel` or `command` |
 | time | This is **required** only if `type` is **sleep**. The time is in minutes |
 | channel | This is **required** only if `type` is **channel** |
