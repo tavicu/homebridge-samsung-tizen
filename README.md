@@ -18,12 +18,12 @@ This plugins resolve some of the most important problems:
 
 ## Configuration
 - Edit your configuration file from `~/.homebridge/config.json`
-- Platform should always be **SamsungTV** then on the devices you can add your Samsung TV's.
+- Platform should always be **SamsungTizen** then on the devices you can add your Samsung TV's.
 - The **IP address** and **MAC address** are required in order to send the commands and wake the TV with **WOL** (Wake on lan) protocol.
 
 ```
 "platforms": [ {
-        "platform": "SamsungTV",
+        "platform": "SamsungTizen",
         "devices": [{
             "name": "Bedroom TV",
             "ip": "10.20.30.40",
@@ -36,7 +36,7 @@ By default the ON / OFF switch will be created for the TV. If you want you can a
 
 ```
 "platforms": [ {
-        "platform": "SamsungTV",
+        "platform": "SamsungTizen",
         "devices": [{
             "name": "Bedroom TV",
             "ip": "10.20.30.40",

@@ -13,7 +13,7 @@
 
     "platforms": [
         {
-            "platform": "SamsungTV",
+            "platform": "SamsungTizen",
             "devices": [
                 {
                     "name": "Bedroom TV",
