@@ -73,7 +73,7 @@ By default the ON / OFF switch will be created for the TV. If you want you can a
 | sleep | This option will turn the TV off after a specific time. Value is in **minutes** |
 | mute | This option will send the mute command to TV |
 | channel | The channel number to switch the TV |
-| command | This option can be **string** or **array**. You can use `*` for sending repetitive command. For example `KEY_VOLUP*5` |
+| command | Send a command(s) to TV. This option can be **string** or **array**. You can use `*` for sending repetitive commands. For example `KEY_VOLUP*5` |
 
 ### A switch can take all commands
 This for example will:
