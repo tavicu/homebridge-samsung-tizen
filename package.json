@@ -1,5 +1,5 @@
 {
-  "name": "homebridge-samsung-tv",
+  "name": "homebridge-samsung-tizen",
   "version": "1.0.0",
   "description": "Plugin to control Samsung TV with Tizen for homebridge: https://github.com/nfarina/homebridge",
   "main": "index.js",
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tavicu/homebridge-samsung-tv.git"
+    "url": "git+https://github.com/tavicu/homebridge-samsung-tizen.git"
   },
   "keywords": [
     "homebridge-plugin",
@@ -20,9 +20,9 @@
   ],
   "author": "Octavian Ruda",
   "license": "MIT",
-  "homepage": "https://github.com/tavicu/homebridge-samsung-tv#readme",
+  "homepage": "https://github.com/tavicu/homebridge-samsung-tizen#readme",
   "bugs": {
-    "url": "https://github.com/tavicu/homebridge-samsung-tv/issues"
+    "url": "https://github.com/tavicu/homebridge-samsung-tizen/issues"
   },
   "engines": {
     "node": ">=8.0.0",
@@ -30,6 +30,6 @@
   },
   "dependencies": {
     "wake_on_lan": "0.0.4",
-    "ws": "^5.1.0"
+    "ws": "^5k.1.0"
   }
 }

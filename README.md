@@ -1,6 +1,6 @@
 **NOTE: This plugin works only with Samsung TV's that have Tizen Operating System.**
 ***
-# homebridge-samsung-tv
+# homebridge-samsung-tizen
 This is a plugin for [homebridge](https://github.com/nfarina/homebridge). It allows you to control your Samsung TV with HomeKit and Siri.
 
 I have created this plugin because the existing ones are usign old/depreciate dependencies having problems with some of the key functions.
@@ -13,7 +13,7 @@ This plugins resolve some of the most important problems:
 
 ## Installation
 - Install HomeBridge, please follow it's [README](https://github.com/nfarina/homebridge/blob/master/README.md).
-- Install this plugin using: `npm install -g --unsafe-perm homebridge-samsung-tv`
+- Install this plugin using: `npm install -g --unsafe-perm homebridge-samsung-tizen`
 - Update your configuration file. See below for a sample.
 
 ## Configuration
