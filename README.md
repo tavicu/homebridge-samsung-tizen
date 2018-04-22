@@ -12,14 +12,14 @@ This plugins resolve some of the most important problems:
 - Option to turn ON and OFF the TV right after the switch was toggled
 
 ## Installation
-1. Install HomeBridge, please follow it's [README](https://github.com/nfarina/homebridge/blob/master/README.md).
-2. Install this plugin using: `npm install -g --unsafe-perm homebridge-samsung-tv`
-3. Update your configuration file. See below for a sample.
+- Install HomeBridge, please follow it's [README](https://github.com/nfarina/homebridge/blob/master/README.md).
+- Install this plugin using: `npm install -g --unsafe-perm homebridge-samsung-tv`
+- Update your configuration file. See below for a sample.
 
 ## Configuration
 - Edit your configuration file from `~/.homebridge/config.json`
 - Platform should always be **SamsungTV** then on the devices you can add your Samsung TV's.
-- The **IP address** and **MAC address** are required in order to send the commands and wake the TV with **WOL** (Wake on lan) protocol..
+- The **IP address** and **MAC address** are required in order to send the commands and wake the TV with **WOL** (Wake on lan) protocol.
 
 ```
 "platforms": [ {
@@ -46,7 +46,9 @@ By default the ON / OFF switch will be created for the TV. If you want you can a
                 {"name": "Sleep",     "sleep": 60},
                 {"name": "Channel",   "channel": 13},
                 {"name": "Command 1", "command": "KEY_VOLUP"},
-                {"name": "Command 2", "command": ["KEY_VOLUP", "KEY_VOLDOWN"]},
+                {"name": "Command 2", "command": "KEY_VOLUP*5"},
+                {"name": "Command 3", "command": ["KEY_VOLUP", "KEY_VOLDOWN"]},
+                {"name": "Command 4", "command": ["KEY_VOLUP*5", "KEY_VOLDOWN*3"]},
                 {"name": "All", "sleep": 60, "mute": true, "command": ["KEY_VOLUP", "KEY_VOLDOWN"], "channel": 13}
             ]
         }]
@@ -68,29 +70,26 @@ By default the ON / OFF switch will be created for the TV. If you want you can a
 | Name | Description |
 | :------------ | :------------ |
 | name | Name of the switch in HomeKit. The device name will be appended |
-| sleep | This option must be a number of minutes after the TV to be turned OFF |
+| sleep | This option will turn the TV off after a specific time. Value is in **minutes** |
 | mute | This option will send the mute command to TV |
 | channel | The channel number to switch the TV |
-| command | The command can be **string** or **array** |
+| command | This option can be **string** or **array**. You can use `*` for sending repetitive command. For example `KEY_VOLUP*5` |
 
-#### A switch can take all commands
+### A switch can take all commands
 This for example will:
-- Set a sleep time for 60 minutes
-- Mute the TV
-- Change the aspect ration to 16:9
-- Switch the TV to channel 13
+- Set a sleep time for 60 minutes, Mute the TV, Change the aspect ration to 16:9, Switch the TV to channel 13
 ```
 {"name": "All", "sleep": 60, "mute": true, "command": "KEY_16_9", "channel": 13}
 ```
 
-#### Example of repetitive commands
+### Example of repetitive commands
 Send `KEY_VOLUP` **five** times
 ```
 {"name": "5 Up", "command": "KEY_VOLUP*5"}
 ```
 Send `KEY_VOLUP` **five** times then `KEY_VOLDOWN` **three** times
 ```
-{"name": "5 Up 3 Down", "command": ["KEY_VOLUP*5", "KEY_VOLUP*3"]}
+{"name": "5 Up 3 Down", "command": ["KEY_VOLUP*5", "KEY_VOLDOWN*3"]}
 ```
 
 ## Important Notes

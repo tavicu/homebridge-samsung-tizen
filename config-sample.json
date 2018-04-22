@@ -24,7 +24,9 @@
                         {"name": "Sleep",     "sleep": 60},
                         {"name": "Channel",   "channel": 13},
                         {"name": "Command 1", "command": "KEY_VOLUP"},
-                        {"name": "Command 2", "command": ["KEY_VOLUP", "KEY_VOLDOWN"]},
+                        {"name": "Command 2", "command": "KEY_VOLUP*5"},
+                        {"name": "Command 3", "command": ["KEY_VOLUP", "KEY_VOLDOWN"]},
+                        {"name": "Command 4", "command": ["KEY_VOLUP*5", "KEY_VOLDOWN*3"]},
                         {"name": "All", "sleep": 60, "mute": true, "command": ["KEY_VOLUP", "KEY_VOLDOWN"], "channel": 13}
                     ]
                 }
