@@ -43,6 +43,7 @@ By default the ON / OFF switch will be created for the TV. If you want you can a
             "mac": "A0:B1:C2:D3:E4:F5"
             "switches": [
                 {"name": "Mute", "type": "mute"},
+                {"name": "Sleep", "type": "sleep", "time": 30},
                 {"name": "Command", "type": "command", "command": "KEY_VOLUP"},
                 {"name": "Command", "type": "command", "command": ["KEY_VOLUP", "KEY_VOLDOWN"]},
                 {"name": "Channel", "type": "channel", "channel": 12}
@@ -66,14 +67,15 @@ By default the ON / OFF switch will be created for the TV. If you want you can a
 | Name | Description |
 | :------------ | :------------ |
 | name | Name of the switch in HomeKit. The device name will be prepended |
-| type | Type of the switch. It can be `channel` or `command` |
+| type | Type of the switch. It can be `sleep`, `channel` or `command` |
+| time | This is **required** only if `type` is **sleep**. The time is in minutes |
 | channel | This is **required** only if `type` is **channel** |
 | command | This is **required** only if `type` is **command** and can be **string** or **array** |
 
 ## Important Notes
 - The Tizen API will not work if the TV is powered down. In order to turn the TV on we send a WOL (Wake on lan) command to the **MAC address**. That's why the **IP address** and **MAC address** are **required**.
 
-- Unfortunately the Tizen API will not offer information about the TV, like the current channel, volume or if the TV is on mute or not. That's why the custom switches are stateless switches. This means the switch will always be OFF.
+- Unfortunately the Tizen API will not offer information about the TV, like the current channel, volume or if the TV is on mute or not. That's why the custom switches are stateless switches (except sleep). This means the switch will always be OFF.
 
 - The custom switches that are sending a list of commands will have a delay between them. By default the delay is set to 400 ms but it can be changed in the config file. Setting it to a lower value may result in not sending some of the commands.
 

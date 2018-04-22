@@ -21,6 +21,7 @@
                     "mac": "A0:B1:C2:D3:E4:F5",
                     "switches": [
                         {"name": "Mute", "type": "mute"},
+                        {"name": "Sleep", "type": "sleep", "time": 30},
                         {"name": "Command", "type": "command", "command": "KEY_VOLUP"},
                         {"name": "Command", "type": "command", "command": ["KEY_VOLUP", "KEY_VOLDOWN"]},
                         {"name": "Channel", "type": "channel", "channel": 12}
