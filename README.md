@@ -42,18 +42,19 @@ By default the ON / OFF switch will be created for the TV. If you want you can a
             "ip": "10.20.30.40",
             "mac": "A0:B1:C2:D3:E4:F5"
             "switches": [
-                {"name": "Mute", "type": "mute"},
-                {"name": "Sleep", "type": "sleep", "time": 30},
-                {"name": "Command", "type": "command", "command": "KEY_VOLUP"},
-                {"name": "Command", "type": "command", "command": ["KEY_VOLUP", "KEY_VOLDOWN"]},
-                {"name": "Channel", "type": "channel", "channel": 12}
+                {"name": "Mute",      "mute": true},
+                {"name": "Sleep",     "sleep": 60},
+                {"name": "Channel",   "channel": 13},
+                {"name": "Command 1", "command": "KEY_VOLUP"},
+                {"name": "Command 2", "command": ["KEY_VOLUP", "KEY_VOLDOWN"]},
+                {"name": "All", "sleep": 60, "mute": true, "command": ["KEY_VOLUP", "KEY_VOLDOWN"], "channel": 13}
             ]
         }]
 }]
 ```
 
 ## Device settings
-**All these settings are required**
+**All settings (except delay) are required**
 
 | Name | Description |
 | :------------ | :------------ |
@@ -66,11 +67,31 @@ By default the ON / OFF switch will be created for the TV. If you want you can a
 
 | Name | Description |
 | :------------ | :------------ |
-| name | Name of the switch in HomeKit. The device name will be append |
-| type | Type of the switch. It can be `sleep`, `channel` or `command` |
-| time | This is **required** only if `type` is **sleep**. The time is in minutes |
-| channel | This is **required** only if `type` is **channel** |
-| command | This is **required** only if `type` is **command** and can be **string** or **array** |
+| name | Name of the switch in HomeKit. The device name will be appended |
+| sleep | This option must be a number of minutes after the TV to be turned OFF |
+| mute | This option will send the mute command to TV |
+| channel | The channel number to switch the TV |
+| command | The command can be **string** or **array** |
+
+#### A switch can take all commands
+This for example will:
+- Set a sleep time for 60 minutes
+- Mute the TV
+- Change the aspect ration to 16:9
+- Switch the TV to channel 13
+```
+{"name": "All", "sleep": 60, "mute": true, "command": "KEY_16_9", "channel": 13}
+```
+
+#### Example of repetitive commands
+Send `KEY_VOLUP` **five** times
+```
+{"name": "5 Up", "command": "KEY_VOLUP*5"}
+```
+Send `KEY_VOLUP` **five** times then `KEY_VOLDOWN` **three** times
+```
+{"name": "5 Up 3 Down", "command": ["KEY_VOLUP*5", "KEY_VOLUP*3"]}
+```
 
 ## Important Notes
 - The Tizen API will not work if the TV is powered down. In order to turn the TV on we send a WOL (Wake on lan) command to the **MAC address**. That's why the **IP address** and **MAC address** are **required**.
