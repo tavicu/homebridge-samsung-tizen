@@ -1,4 +1,5 @@
 **NOTE: This plugin works only with Samsung TV's that have Tizen Operating System.**
+
 ***
 # homebridge-samsung-tizen
 This is a plugin for [homebridge](https://github.com/nfarina/homebridge). It allows you to control your Samsung TV with HomeKit and Siri.
@@ -10,6 +11,8 @@ This plugins resolve some of the most important problems:
 - Waiting for commands to send before updating the state
 - Keep the socket with TV open for faster communication
 - Option to turn ON and OFF the TV right after the switch was toggled
+
+**I don't need donations, but a Star will motivate me ;)**
 
 ## Installation
 - Install HomeBridge, please follow it's [README](https://github.com/nfarina/homebridge/blob/master/README.md).
