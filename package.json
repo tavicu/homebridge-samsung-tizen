@@ -1,6 +1,6 @@
 {
   "name": "homebridge-samsung-tizen",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Plugin to control Samsung TV with Tizen for homebridge: https://github.com/nfarina/homebridge",
   "main": "index.js",
   "directories": {
