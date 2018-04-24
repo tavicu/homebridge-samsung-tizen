@@ -22,36 +22,36 @@ This plugins resolve some of the most important problems:
 - The **IP address** and **MAC address** are required in order to send the commands and wake the TV with **WOL** (Wake on lan) protocol.
 
 ```
-"platforms": [ {
-        "platform": "SamsungTizen",
-        "devices": [{
-            "name": "Bedroom TV",
-            "ip": "10.20.30.40",
-            "mac": "A0:B1:C2:D3:E4:F5"
-        }]
+"platforms": [{
+    "platform": "SamsungTizen",
+    "devices": [{
+        "name": "Bedroom TV",
+        "ip": "10.20.30.40",
+        "mac": "A0:B1:C2:D3:E4:F5"
+    }]
 }]
 ```
 
 By default the ON / OFF switch will be created for the TV. If you want you can also add new custom switches.
 
 ```
-"platforms": [ {
-        "platform": "SamsungTizen",
-        "devices": [{
-            "name": "Bedroom TV",
-            "ip": "10.20.30.40",
-            "mac": "A0:B1:C2:D3:E4:F5"
-            "switches": [
-                {"name": "Mute",      "mute": true},
-                {"name": "Sleep",     "sleep": 60},
-                {"name": "Channel",   "channel": 13},
-                {"name": "Command 1", "command": "KEY_VOLUP"},
-                {"name": "Command 2", "command": "KEY_VOLUP*5"},
-                {"name": "Command 3", "command": ["KEY_VOLUP", "KEY_VOLDOWN"]},
-                {"name": "Command 4", "command": ["KEY_VOLUP*5", "KEY_VOLDOWN*3"]},
-                {"name": "All", "sleep": 60, "mute": true, "command": ["KEY_VOLUP", "KEY_VOLDOWN"], "channel": 13}
-            ]
-        }]
+"platforms": [{
+    "platform": "SamsungTizen",
+    "devices": [{
+        "name": "Bedroom TV",
+        "ip": "10.20.30.40",
+        "mac": "A0:B1:C2:D3:E4:F5",
+        "switches": [
+            {"name": "Mute",      "mute": true},
+            {"name": "Sleep",     "sleep": 60},
+            {"name": "Channel",   "channel": 13},
+            {"name": "Command 1", "command": "KEY_VOLUP"},
+            {"name": "Command 2", "command": "KEY_VOLUP*5"},
+            {"name": "Command 3", "command": ["KEY_VOLUP", "KEY_VOLDOWN"]},
+            {"name": "Command 4", "command": ["KEY_VOLUP*5", "KEY_VOLDOWN*3"]},
+            {"name": "All", "sleep": 60, "mute": true, "command": ["KEY_VOLUP", "KEY_VOLDOWN"], "channel": 13}
+        ]
+    }]
 }]
 ```
 
@@ -70,14 +70,22 @@ By default the ON / OFF switch will be created for the TV. If you want you can a
 | Name | Description |
 | :------------ | :------------ |
 | name | Name of the switch in HomeKit. The device name will be appended |
-| sleep | This option will turn the TV off after a specific time. Value is in **minutes** |
+| power | A switch will not work if the TV is OFF. Setting this option to true it will turn the TV ON first then run the commands |
+| sleep | This option will turn the TV OFF after a specific time. Value is in **minutes** |
 | mute | This option will send the mute command to TV |
 | channel | The channel number to switch the TV |
 | command | Send a command(s) to TV. This option can be **string** or **array**. You can use `*` for sending repetitive commands. For example `KEY_VOLUP*5` |
 
+### Switch when TV is OFF
+By default a switch will throw an error if the TV is OFF. If you add the `power` parameter first we check if the TV is OFF and turn it ON.
+After the TV will turn ON it will be a **delay** of `1500 ms` before sending the commands.
+```
+{"name": "Command 1", "power": true, "command": "KEY_VOLUP"}
+```
+
 ### A switch can take all commands
 This for example will:
-- Set a sleep time for 60 minutes, Mute the TV, Change the aspect ration to 16:9, Switch the TV to channel 13
+- Set a sleep time for 60 minutes, Mute the TV, Change the aspect ratio to 16:9, Switch the TV to channel 13
 ```
 {"name": "All", "sleep": 60, "mute": true, "command": "KEY_16_9", "channel": 13}
 ```
@@ -103,23 +111,28 @@ Send `KEY_VOLUP` **five** times then `KEY_VOLDOWN` **three** times
 
 ## Commands List
 ```
+KEY_ENTER
 KEY_MENU
 KEY_UP
 KEY_DOWN
 KEY_LEFT
 KEY_RIGHT
+KEY_0
+KEY_1
+KEY_2
 KEY_3
-KEY_VOLUP
 KEY_4
 KEY_5
 KEY_6
-KEY_VOLDOWN
 KEY_7
 KEY_8
 KEY_9
+KEY_11
+KEY_12
+KEY_VOLUP
+KEY_VOLDOWN
 KEY_MUTE
 KEY_CHDOWN
-KEY_0
 KEY_CHUP
 KEY_PRECH
 KEY_GREEN
@@ -146,8 +159,6 @@ KEY_DEVICE_CONNECT
 KEY_HELP
 KEY_ANTENA
 KEY_CONVERGENCE
-KEY_11
-KEY_12
 KEY_AUTO_PROGRAM
 KEY_FACTORY
 KEY_3SPEED
@@ -188,10 +199,8 @@ KEY_OPEN
 KEY_WHEEL_LEFT
 KEY_POWER
 KEY_SLEEP
-KEY_2
 KEY_DMA
 KEY_TURBO
-KEY_1
 KEY_FM_RADIO
 KEY_DVR_MENU
 KEY_MTS
@@ -223,6 +232,8 @@ KEY_SCALE
 KEY_ZOOM_MOVE
 KEY_CLOCK_DISPLAY
 KEY_AV1
+KEY_AV2
+KEY_AV3
 KEY_SVIDEO1
 KEY_COMPONENT1
 KEY_SETUP_CLOCK_TIMER
@@ -230,6 +241,10 @@ KEY_COMPONENT2
 KEY_MAGIC_BRIGHT
 KEY_DVI
 KEY_HDMI
+KEY_HDMI1
+KEY_HDMI2
+KEY_HDMI3
+KEY_HDMI4
 KEY_W_LINK
 KEY_DTV_LINK
 KEY_APP_LIST
@@ -254,8 +269,6 @@ KEY_PANNEL_VOLDOW
 KEY_PANNEL_ENTER
 KEY_PANNEL_MENU
 KEY_PANNEL_SOURCE
-KEY_AV2
-KEY_AV3
 KEY_SVIDEO2
 KEY_SVIDEO3
 KEY_ZOOM2
@@ -273,7 +286,6 @@ KEY_AUTO_ARC_ANYNET_MODE_OK
 KEY_AUTO_ARC_ANYNET_AUTO_START
 KEY_AUTO_FORMAT
 KEY_DNET
-KEY_HDMI1
 KEY_AUTO_ARC_CAPTION_ON
 KEY_AUTO_ARC_CAPTION_OFF
 KEY_AUTO_ARC_PIP_DOUBLE
@@ -294,12 +306,9 @@ KEY_NINE_SEPERATE
 KEY_ZOOM_IN
 KEY_ZOOM_OUT
 KEY_MIC
-KEY_HDMI2
-KEY_HDMI3
 KEY_AUTO_ARC_CAPTION_KOR
 KEY_AUTO_ARC_CAPTION_ENG
 KEY_AUTO_ARC_PIP_SOURCE_CHANGE
-KEY_HDMI4
 KEY_AUTO_ARC_ANTENNA_AIR
 KEY_AUTO_ARC_ANTENNA_CABLE
 KEY_AUTO_ARC_ANTENNA_SATELLITE
