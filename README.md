@@ -35,7 +35,8 @@ This plugins resolve some of the most important problems:
 }]
 ```
 
-By default the ON / OFF switch will be created for the TV. If you want you can also add new custom switches.
+### By default only the ON / OFF switch will be created for the TV. If you can create more custom switches. 
+**Adding custom switches will not remove the default one (ON/OFF)**
 
 ```
 "platforms": [{
