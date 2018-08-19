@@ -22,7 +22,7 @@ This plugins resolve some of the most important problems:
 ## Configuration
 - Edit your configuration file from `~/.homebridge/config.json`
 - Platform should always be **SamsungTizen** then on the devices you can add your Samsung TV's.
-- The **IP address** and **MAC address** are required in order to send the commands and wake the TV with **WOL** (Wake on lan) protocol.
+- The **IP address** and **MAC address** are required in order to send the commands and wake the TV with **WoL** (Wake on LAN) protocol.
 
 ```
 "platforms": [{
@@ -35,7 +35,7 @@ This plugins resolve some of the most important problems:
 }]
 ```
 
-### By default only the ON / OFF switch will be created for the TV. You do have the option to create more custom switches with different actions. 
+### By default only the ON / OFF switch will be created for the TV. You do have the option to create more custom switches with different actions.
 **Adding custom switches will not remove the default one (ON/OFF)**
 
 ```
@@ -81,15 +81,15 @@ This plugins resolve some of the most important problems:
 | command | Send a command(s) to TV. This option can be **string** or **array**. You can use `*` for sending repetitive commands. For example `KEY_VOLUP*5` |
 
 ### Switch when TV is OFF
-By default a switch will throw an error if the TV is OFF. If you add the `power` parameter first we check if the TV is OFF and turn it ON.
-After the TV will turn ON it will be a **delay** of `1500 ms` before sending the commands.
+By default a switch will throw an error if the TV is OFF. If you add the `power` parameter, first we check if the TV is OFF and turn it ON.
+Then will send the command with a **delay** of `1500 ms`.
 ```
 {"name": "Command 1", "power": true, "command": "KEY_VOLUP"}
 ```
 
 ### A switch can take all commands
 This for example will:
-- Set a sleep time for 60 minutes, Mute the TV, Change the aspect ratio to 16:9, Switch the TV to channel 13
+- Set a sleep time for 60 minutes, Mute the TV, Change the aspect ratio to 16:9 and Switch the TV to channel 13
 ```
 {"name": "All", "sleep": 60, "mute": true, "command": "KEY_16_9", "channel": 13}
 ```
@@ -105,13 +105,13 @@ Send `KEY_VOLUP` **five** times then `KEY_VOLDOWN` **three** times
 ```
 
 ## Important Notes
-- The Tizen API will not work if the TV is powered down. In order to turn the TV on we send a WOL (Wake on lan) command to the **MAC address**. That's why the **IP address** and **MAC address** are **required**.
+- The Tizen API will not work if the TV is powered down. In order to turn the TV on we send a WoL (Wake on LAN) command to the **MAC address**. That's why the **IP address** and **MAC address** are **required**.
 
-- Unfortunately the Tizen API will not offer information about the TV, like the current channel, volume or if the TV is on mute or not. That's why the custom switches are stateless switches (except sleep). This means the switch will always be OFF.
+- Unfortunately the Tizen API will not offer information about the TV, like the current channel, volume or if the TV is on mute or not. That's why the custom switches are stateless switches (except sleep). *This means the switch will always be OFF.*
 
-- The custom switches that are sending a list of commands will have a delay between them. By default the delay is set to 400 ms but it can be changed in the config file. Setting it to a lower value may result in not sending some of the commands.
+- The custom switches that are sending a list of commands will have a delay between them. By default the delay is set to `400 ms` but it can be changed in the config file. *Setting it to a lower value may result in not sending some of the commands.*
 
-- When you are turning ON or OFF the TV there is a delay of three seconds until you can send another command. That's why if you will try to toggle the switch right away after you already did, it will come back to the previous state and in the console you will get a message that the TV is in powering ON/OFF process.
+- When you are turning the TV ON or OFF there is a delay of three seconds until you can send another command. That's why if you will try to toggle the switch right away after you already did, it will come back to the previous state and in the console you will get a message that the TV is in powering ON/OFF process.
 
 ## Commands List
 ```
