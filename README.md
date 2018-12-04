@@ -15,14 +15,20 @@ This plugins resolve some of the most important problems:
 **I don't need donations, but a Star will motivate me ;)**
 
 ## Installation
-- Install HomeBridge, please follow it's [README](https://github.com/nfarina/homebridge/blob/master/README.md).
+- Install HomeBridge, please follow it's [README](https://github.com/nfarina/homebridge/blob/master/README.md)
+- On TV go to `Settings` - `General` - `External Device Manager` - `Device Connection Manager` and set `Access Notification` to `Off`
 - Install this plugin using: `npm install -g --unsafe-perm homebridge-samsung-tizen`
-- Update your configuration file. See below for a sample.
+- Update your configuration file. See below for a sample. **Leave the `token` field empty!**
+- Make sure your TV is ON and run the HomeBridge server
+- On the TV you will have a popup that will ask your permission. Click `Allow`
+- After that on the HomeBridge server you will get a message with a `token`
+- Update the configuration file with the `token` from the previous step
+
 
 ## Configuration
 - Edit your configuration file from `~/.homebridge/config.json`
-- Platform should always be **SamsungTizen** then on the devices you can add your Samsung TV's.
-- The **IP address** and **MAC address** are required in order to send the commands and wake the TV with **WoL** (Wake on LAN) protocol.
+- Platform should always be **SamsungTizen** then on the devices you can add your Samsung TV's
+- The **IP address** and **MAC address** are required in order to send the commands and wake the TV with **WoL** (Wake on LAN) protocol
 
 ```
 "platforms": [{
@@ -30,7 +36,8 @@ This plugins resolve some of the most important problems:
     "devices": [{
         "name": "Bedroom TV",
         "ip": "10.20.30.40",
-        "mac": "A0:B1:C2:D3:E4:F5"
+        "mac": "A0:B1:C2:D3:E4:F5",
+        "token": ""
     }]
 }]
 ```
@@ -45,6 +52,7 @@ This plugins resolve some of the most important problems:
         "name": "Bedroom TV",
         "ip": "10.20.30.40",
         "mac": "A0:B1:C2:D3:E4:F5",
+        "token": "",
         "switches": [
             {"name": "Mute",      "mute": true},
             {"name": "Sleep",     "sleep": 60},
@@ -68,6 +76,7 @@ This plugins resolve some of the most important problems:
 | ip | The IP address of the device. I recommend setting a static IP for the device on your router settings |
 | mac | The MAC address of the device. This is required to turn the TV ON |
 | delay | This is the delay between commands and is `optional`. By default it is `400 ms` |
+| token | Pairing token returned by TV |
 
 ## Switch settings
 
@@ -104,12 +113,33 @@ Send `KEY_VOLUP` **five** times then `KEY_VOLDOWN` **three** times
 {"name": "5 Up 3 Down", "command": ["KEY_VOLUP*5", "KEY_VOLDOWN*3"]}
 ```
 
+## Common Issues
+
+### TV is not showing the pair popup
+- First make sure that the `token` field from configuration file it's empty. The plugin will not try to pair with TV if the field is set.
+
+- Make sure your TV is compatible with the plugin.
+
+- On TV go to `Settings` - `General` - `External Device Manager` - `Device Connection Manager` - `Device List` and make sure you didn't select `Deny`.
+
+- Try to hard reset your TV. To do this turn ON the TV then press on power off key from the remote for 3 seconds until TV restarts and show Samsung logo.
+
+### TV is always asking for permissions
+On TV go to `Settings` - `General` - `External Device Manager` - `Device Connection Manager` and set `Access Notification` to `Off`.
+
+### Check if TV is compatible with the plugin
+In order to check access the folowing url `http://TV_IP:8001/api/v2/` (replace TV_IP with your TV IP).
+The page should return informations regarding your TV.
+If the endpoint is not working then your TV is not compatible with the plugin.
+
+You can read more on [Samsung Developers page](https://developer.samsung.com/tv/develop/extension-libraries/smart-view-sdk/receiver-apps/debugging).
+
 ## Important Notes
 - The Tizen API will not work if the TV is powered down. In order to turn the TV on we send a WoL (Wake on LAN) command to the **MAC address**. That's why the **IP address** and **MAC address** are **required**.
 
-- Unfortunately the Tizen API will not offer information about the TV, like the current channel, volume or if the TV is on mute or not. That's why the custom switches are stateless switches (except sleep). *This means the switch will always be OFF.*
+- Unfortunately the Tizen API will not offer information about the TV, like the current channel, volume or if the TV is on mute or not. That's why the custom switches are stateless switches (except sleep). *This means the switch will always be OFF*.
 
-- The custom switches that are sending a list of commands will have a delay between them. By default the delay is set to `400 ms` but it can be changed in the config file. *Setting it to a lower value may result in not sending some of the commands.*
+- The custom switches that are sending a list of commands will have a delay between them. By default the delay is set to `400 ms` but it can be changed in the config file. *Setting it to a lower value may result in not sending some of the commands*.
 
 - When you are turning the TV ON or OFF there is a delay of three seconds until you can send another command. That's why if you will try to toggle the switch right away after you already did, it will come back to the previous state and in the console you will get a message that the TV is in powering ON/OFF process.
 
