@@ -16,7 +16,7 @@ This plugins resolve some of the most important problems:
 
 ## Installation
 - Install HomeBridge, please follow it's [README](https://github.com/nfarina/homebridge/blob/master/README.md)
-- On TV go to `Settings` - `General` - `External Device Manager` - `Device Connection Manager` and set `Access Notification` to `Off`
+- On TV go to `Settings` - `General` - `External Device Manager` - `Device Connection Manager` and set `Access Notification` to **`Off`**
 - Install this plugin using: `npm install -g --unsafe-perm homebridge-samsung-tizen`
 - Update your configuration file. See below for a sample. **Leave the `token` field empty!**
 - Make sure your TV is ON and run the HomeBridge server
@@ -43,7 +43,7 @@ This plugins resolve some of the most important problems:
 ```
 
 ### By default only the ON / OFF switch will be created for the TV. You do have the option to create more custom switches with different actions.
-**Adding custom switches will not remove the default one (ON/OFF)**
+Adding custom switches will not remove the default one (ON/OFF)
 
 ```
 "platforms": [{
@@ -68,7 +68,7 @@ This plugins resolve some of the most important problems:
 ```
 
 ## Device settings
-**All settings (except delay) are required**
+All settings (except delay) are required
 
 | Name | Description |
 | :------------ | :------------ |
@@ -129,7 +129,7 @@ Update your **Node** to a newer version.
 
 - On TV go to `Settings` - `General` - `External Device Manager` - `Device Connection Manager` - `Device List` and make sure you didn't select `Deny`.
 
-- Try to hard reset your TV. To do this turn ON the TV then press on power off key from the remote for 3 seconds until TV restarts and show Samsung logo.
+- Try to hard reset your TV. To do this turn ON the TV then press on power key from the remote for 3 seconds until TV restarts and show Samsung logo.
 
 ### TV is always asking for permissions
 On TV go to `Settings` - `General` - `External Device Manager` - `Device Connection Manager` and set `Access Notification` to `Off`.
