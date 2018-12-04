@@ -115,6 +115,13 @@ Send `KEY_VOLUP` **five** times then `KEY_VOLDOWN` **three** times
 
 ## Common Issues
 
+### TV is turning ON but no other command works
+Check if you tv TV is compatible with the plugin. Turning ON the TV is working because is using a general protocol that works on most of the devices.
+
+### HomeBridge is crashing because of the plugin
+The server is crashing at load with the folowing error `SyntaxError: Unexpected token ...`
+Update your **Node** to a newer version.
+
 ### TV is not showing the pair popup
 - First make sure that the `token` field from configuration file it's empty. The plugin will not try to pair with TV if the field is set.
 
@@ -133,6 +140,9 @@ The page should return informations regarding your TV.
 If the endpoint is not working then your TV is not compatible with the plugin.
 
 You can read more on [Samsung Developers page](https://developer.samsung.com/tv/develop/extension-libraries/smart-view-sdk/receiver-apps/debugging).
+
+### Other
+If you have other problem run HomeBridge with debug mode `DEBUG=* homebridge` and [open a new Issue](https://github.com/tavicu/homebridge-samsung-tizen/issues/new) and we will try to figure it out together :)
 
 ## Important Notes
 - The Tizen API will not work if the TV is powered down. In order to turn the TV on we send a WoL (Wake on LAN) command to the **MAC address**. That's why the **IP address** and **MAC address** are **required**.
