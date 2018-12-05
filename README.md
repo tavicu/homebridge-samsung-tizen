@@ -142,7 +142,7 @@ If the endpoint is not working then your TV is not compatible with the plugin.
 You can read more on [Samsung Developers page](https://developer.samsung.com/tv/develop/extension-libraries/smart-view-sdk/receiver-apps/debugging).
 
 ### Other
-If you have other problem run HomeBridge with debug mode `DEBUG=* homebridge` and [open a new Issue](https://github.com/tavicu/homebridge-samsung-tizen/issues/new) and we will try to figure it out together :)
+If you have other problem run HomeBridge with debug mode `DEBUG=* homebridge -D` and [open a new Issue](https://github.com/tavicu/homebridge-samsung-tizen/issues/new) and we will try to figure it out together :)
 
 ## Important Notes
 - The Tizen API will not work if the TV is powered down. In order to turn the TV on we send a WoL (Wake on LAN) command to the **MAC address**. That's why the **IP address** and **MAC address** are **required**.
