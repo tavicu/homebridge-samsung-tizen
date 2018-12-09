@@ -182,19 +182,24 @@ If you have other problem run HomeBridge with debug mode `DEBUG=* homebridge -D`
 
 - When you are turning the TV ON or OFF there is a delay of three seconds until you can send another command. That's why if you will try to toggle the switch right away after you already did, it will come back to the previous state and in the console you will get a message that the TV is in powering ON/OFF process.
 
+## Release Notes
+
+### v2.1.0
+* **Open applications** - Now you have the option to open applications with a switch. [Details](https://github.com/tavicu/homebridge-samsung-tizen#open-application)
+* **Refresh in real time** - New support to update the switches with state in real time. [Details](https://github.com/tavicu/homebridge-samsung-tizen#update-in-real-time-on-the-background)
+
 ## Applications
 Some applications may not be in the list. Please create an Issue and will find a solution :)
 
 | Application | ID |
 | :------------ | :------------ |
 | YouTube | 111299001912 |
+| Netflix | 11101200001 |
+| HBO GO | 3201706012478 |
+| Internet | org.tizen.browser |
 | Steam Link | 3201702011851 |
 | AntenaPlay.ro | 3201611011005 |
-| Netflix | 11101200001 |
-| Internet | org.tizen.browser |
 | Prime Video | 3201512006785 |
-| HBO GO | 3201706012478 |
-
 
 ## Commands List
 ```
