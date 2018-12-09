@@ -29,6 +29,7 @@
     "homebridge": ">=0.4.0"
   },
   "dependencies": {
+    "request": "^2.88.0",
     "wake_on_lan": "0.0.4",
     "ws": "^5.1.0"
   }
