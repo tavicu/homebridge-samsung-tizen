@@ -11,6 +11,7 @@ This plugins resolve some of the most important problems:
 - Waiting for commands to send before updating the state
 - Keep the socket with TV open for faster communication
 - Option to turn ON and OFF the TV right after the switch was toggled
+- Update switch status in real time (optional)
 
 **I don't need donations, but a Star will motivate me ;)**
 
@@ -33,6 +34,28 @@ This plugins resolve some of the most important problems:
 ```
 "platforms": [{
     "platform": "SamsungTizen",
+    "devices": [{
+        "name": "Bedroom TV",
+        "ip": "10.20.30.40",
+        "mac": "A0:B1:C2:D3:E4:F5",
+        "token": ""
+    }]
+}]
+```
+
+## Update in real time on the background
+Setting this option to true will allow you to create automations based on switch status.
+For example to turn ON the lights when the TV will turn ON.
+
+**By default this option is OFF** because is using **more resources** to check all accessories status every **500ms**.
+There will be a delay of a few seconds when you turn OFF the TV because it will enter in a sleep period and then it will actually turn OFF.
+
+**I recommend to enable this option only if you want to create automations!**
+
+```
+"platforms": [{
+    "platform": "SamsungTizen",
+    "refresh": true,
     "devices": [{
         "name": "Bedroom TV",
         "ip": "10.20.30.40",
@@ -84,6 +107,7 @@ All settings (except delay) are required
 | :------------ | :------------ |
 | name | Name of the switch in HomeKit. The device name will be appended |
 | power | A switch will not work if the TV is OFF. Setting this option to true it will turn the TV ON first then run the commands |
+| app | This option will open the selected application. You must instet the application id which you will find it below |
 | sleep | This option will turn the TV OFF after a specific time. Value is in **minutes** |
 | mute | This option will send the mute command to TV |
 | channel | The channel number to switch the TV |
@@ -94,6 +118,11 @@ By default a switch will throw an error if the TV is OFF. If you add the `power`
 Then will send the command with a **delay** of `1500 ms`.
 ```
 {"name": "Command 1", "power": true, "command": "KEY_VOLUP"}
+```
+
+### Open application
+```
+{"name": "Netflix", "app": "11101200001"}
 ```
 
 ### A switch can take all commands
@@ -152,6 +181,20 @@ If you have other problem run HomeBridge with debug mode `DEBUG=* homebridge -D`
 - The custom switches that are sending a list of commands will have a delay between them. By default the delay is set to `400 ms` but it can be changed in the config file. *Setting it to a lower value may result in not sending some of the commands*.
 
 - When you are turning the TV ON or OFF there is a delay of three seconds until you can send another command. That's why if you will try to toggle the switch right away after you already did, it will come back to the previous state and in the console you will get a message that the TV is in powering ON/OFF process.
+
+## Applications
+Some applications may not be in the list. Please create an Issue and will find a solution :)
+
+| Application | ID |
+| :------------ | :------------ |
+| YouTube | 111299001912 |
+| Steam Link | 3201702011851 |
+| AntenaPlay.ro | 3201611011005 |
+| Netflix | 11101200001 |
+| Internet | org.tizen.browser |
+| Prime Video | 3201512006785 |
+| HBO GO | 3201706012478 |
+
 
 ## Commands List
 ```
