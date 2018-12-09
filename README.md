@@ -188,6 +188,8 @@ If you have other problem run HomeBridge with debug mode `DEBUG=* homebridge -D`
 * **Open applications** - Now you have the option to open applications with a switch. [Details](https://github.com/tavicu/homebridge-samsung-tizen#open-application)
 * **Refresh in real time** - New support to update the switches with state in real time. [Details](https://github.com/tavicu/homebridge-samsung-tizen#update-in-real-time-on-the-background)
 
+***
+
 ## Applications
 Some applications may not be in the list. Please create an Issue and will find a solution :)
 
