@@ -168,10 +168,14 @@ In order to check access the folowing url `http://TV_IP:8001/api/v2/` (replace T
 The page should return informations regarding your TV.
 If the endpoint is not working then your TV is not compatible with the plugin.
 
+Please understand that some TV's are not compatible even if the endpoint is working. Some use a different type of pairing (with PIN) that it's not supported at the momennt.
+
 You can read more on [Samsung Developers page](https://developer.samsung.com/tv/develop/extension-libraries/smart-view-sdk/receiver-apps/debugging).
 
 ### Other
 If you have other problem run HomeBridge with debug mode `DEBUG=* homebridge -D` and [open a new Issue](https://github.com/tavicu/homebridge-samsung-tizen/issues/new) and we will try to figure it out together :)
+
+Issues that are opened without logs from debug mode will have less priority because it means that you didn't read this documentation for which I have worked hard :P
 
 ## Important Notes
 - The Tizen API will not work if the TV is powered down. In order to turn the TV on we send a WoL (Wake on LAN) command to the **MAC address**. That's why the **IP address** and **MAC address** are **required**.
@@ -191,7 +195,9 @@ If you have other problem run HomeBridge with debug mode `DEBUG=* homebridge -D`
 ***
 
 ## Applications
-Some applications may not be in the list. Please create an Issue and will find a solution :)
+Below you can find a table with most common apps. If you don't find what you are looking for you can start the homebridge server with tizen-apps as parameter (`homebridge tizen-apps`) and it will show a table with all the apps that are installed on the TV.
+
+Please make sure your TV is ON and paired.
 
 | Application | ID |
 | :------------ | :------------ |
@@ -200,7 +206,6 @@ Some applications may not be in the list. Please create an Issue and will find a
 | HBO GO | 3201706012478 |
 | Internet | org.tizen.browser |
 | Steam Link | 3201702011851 |
-| AntenaPlay.ro | 3201611011005 |
 | Prime Video | 3201512006785 |
 
 ## Commands List
@@ -335,10 +340,6 @@ KEY_COMPONENT2
 KEY_MAGIC_BRIGHT
 KEY_DVI
 KEY_HDMI
-KEY_HDMI1
-KEY_HDMI2
-KEY_HDMI3
-KEY_HDMI4
 KEY_W_LINK
 KEY_DTV_LINK
 KEY_APP_LIST
