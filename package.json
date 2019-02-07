@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "request": "^2.88.0",
-    "wake_on_lan": "0.0.4",
+    "wake_on_lan": "^1.0.0",
     "ws": "^5.1.0"
   }
 }
