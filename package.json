@@ -1,6 +1,6 @@
 {
   "name": "homebridge-samsung-tizen",
-  "version": "2.1.2",
+  "version": "3.0.0",
   "description": "Samsung TV plugin for Homebridge",
   "main": "index.js",
   "directories": {
@@ -29,8 +29,9 @@
     "homebridge": ">=0.4.0"
   },
   "dependencies": {
+    "ws": "^6.1.0",
     "request": "^2.88.0",
-    "wake_on_lan": "0.0.4",
-    "ws": "^5.1.0"
+    "fs-extra": "^7.0.1",
+    "wake_on_lan": "^1.0.0"
   }
 }
