@@ -18,6 +18,7 @@ class SamsungPlatform {
 
         this.config = {
             delay   : config.delay,
+            inputs  : config.inputs || [],
             method  : config.method,
             refresh : config.refresh,
             timeout : config.timeout
