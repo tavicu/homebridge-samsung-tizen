@@ -19,7 +19,6 @@
                     "name": "Bedroom TV",
                     "ip": "10.20.30.40",
                     "mac": "A0:B1:C2:D3:E4:F5",
-                    "token": "",
                     "switches": [
                         {"name": "Mute",      "mute": true},
                         {"name": "Sleep",     "sleep": 60},
