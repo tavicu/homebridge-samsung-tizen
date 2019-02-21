@@ -10,8 +10,8 @@ module.exports = (homebridge) => {
 
 class SamsungPlatform {
     constructor(log, config, api) {
-        this.log     = log;
-        this.api     = api;
+        this.log = log;
+        this.api = api;
 
         this.storage = new Storage(api);
         this.devices = config['devices'] || [];
@@ -23,12 +23,12 @@ class SamsungPlatform {
             refresh : config.refresh,
             timeout : config.timeout
         }
+
+        this.storage.init();
     }
 
-    async accessories(callback) {
+    accessories(callback) {
         let accessories = [];
-
-        await this.storage.init();
 
         for (let device of this.devices) {
             device = new Device(this, Hap, device);
