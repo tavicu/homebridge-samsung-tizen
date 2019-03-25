@@ -22,7 +22,7 @@ class SamsungPlatform {
             method  : config.method,
             refresh : config.refresh,
             timeout : config.timeout
-        }
+        };
 
         this.storage.init();
     }
