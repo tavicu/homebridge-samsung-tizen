@@ -1,4 +1,7 @@
 **NOTE: This plugin works only with Samsung TV's that have Tizen Operating System.**
+**v3 of the plugin is compatible only with iOS 12.2+**
+
+**I know the documentation is not very detailed but soon i want to make the Wiki section with information regarding everything**
 
 ***
 # homebridge-samsung-tizen
@@ -18,12 +21,10 @@ This plugins resolve some of the most important problems:
 ## Installation
 - Install HomeBridge, please follow it's [README](https://github.com/nfarina/homebridge/blob/master/README.md)
 - On TV go to `Settings` - `General` - `External Device Manager` - `Device Connection Manager` and set `Access Notification` to **`Off`**
-- Install this plugin using: `npm install -g --unsafe-perm homebridge-samsung-tizen`
-- Update your configuration file. See below for a sample. **Leave the `token` field empty!**
+- Install this plugin using: `sudo npm install -g --unsafe-perm homebridge-samsung-tizen`
+- Update your configuration file. See below for a sample.
 - Make sure your TV is ON and run the HomeBridge server
 - On the TV you will have a popup that will ask your permission. Click `Allow`
-- After that on the HomeBridge server you will get a message with a `token`
-- Update the configuration file with the `token` from the previous step
 
 
 ## Configuration
@@ -37,30 +38,24 @@ This plugins resolve some of the most important problems:
     "devices": [{
         "name": "Bedroom TV",
         "ip": "10.20.30.40",
-        "mac": "A0:B1:C2:D3:E4:F5",
-        "token": ""
+        "mac": "A0:B1:C2:D3:E4:F5"
     }]
 }]
 ```
 
-## Update in real time on the background
-Setting this option to true will allow you to create automations based on switch status.
-For example to turn ON the lights when the TV will turn ON.
-
-**By default this option is OFF** because is using **more resources** to check all accessories status every **500ms**.
-There will be a delay of a few seconds when you turn OFF the TV because it will enter in a sleep period and then it will actually turn OFF.
-
-**I recommend to enable this option only if you want to create automations!**
+### Since iOS 12.2 you can add custom inputs for TV
 
 ```
 "platforms": [{
     "platform": "SamsungTizen",
-    "refresh": true,
+    "inputs": [
+        {"name": "Live TV", "type": "command", "value": ["KEY_SOURCE", "KEY_LEFT*3", "KEY_ENTER"]},
+        {"name": "Netflix", "type": "app", "value": "11101200001"}
+    ],
     "devices": [{
         "name": "Bedroom TV",
         "ip": "10.20.30.40",
-        "mac": "A0:B1:C2:D3:E4:F5",
-        "token": ""
+        "mac": "A0:B1:C2:D3:E4:F5"
     }]
 }]
 ```
@@ -75,7 +70,6 @@ Adding custom switches will not remove the default one (ON/OFF)
         "name": "Bedroom TV",
         "ip": "10.20.30.40",
         "mac": "A0:B1:C2:D3:E4:F5",
-        "token": "",
         "switches": [
             {"name": "Mute",      "mute": true},
             {"name": "Sleep",     "sleep": 60},
@@ -99,7 +93,6 @@ All settings (except delay) are required
 | ip | The IP address of the device. I recommend setting a static IP for the device on your router settings |
 | mac | The MAC address of the device. This is required to turn the TV ON |
 | delay | This is the delay between commands and is `optional`. By default it is `400 ms` |
-| token | Pairing token returned by TV |
 
 ## Switch settings
 
@@ -142,6 +135,16 @@ Send `KEY_VOLUP` **five** times then `KEY_VOLDOWN` **three** times
 {"name": "5 Up 3 Down", "command": ["KEY_VOLUP*5", "KEY_VOLDOWN*3"]}
 ```
 
+### Example of hold commands
+Hold `KEY_VOLUP` for **2 seconds**
+```
+{"name": "Volup", "command": "KEY_VOLUP*2s"}
+```
+You can also use float numbers. For half second for example you can use:
+```
+{"name": "Volup", "command": "KEY_VOLUP*0.5s"}
+```
+
 ## Common Issues
 
 ### TV is turning ON but no other command works
@@ -152,8 +155,6 @@ The server is crashing at load with the folowing error `SyntaxError: Unexpected 
 Update your **Node** to a newer version.
 
 ### TV is not showing the pair popup
-- First make sure that the `token` field from configuration file it's empty. The plugin will not try to pair with TV if the field is set.
-
 - Make sure your TV is compatible with the plugin.
 
 - On TV go to `Settings` - `General` - `External Device Manager` - `Device Connection Manager` - `Device List` and make sure you didn't select `Deny`.
@@ -186,7 +187,19 @@ Issues that are opened without logs from debug mode will have less priority beca
 
 - When you are turning the TV ON or OFF there is a delay of three seconds until you can send another command. That's why if you will try to toggle the switch right away after you already did, it will come back to the previous state and in the console you will get a message that the TV is in powering ON/OFF process.
 
+- Sometimes Inputs are not appearing right away in the Home app.
+
 ## Release Notes
+
+### v3.0.0
+* **Television** - Now the TV will have `Television` as type.
+* **Inputs** - With the latest iOS update you can add inputs for TV.
+* **Control center** - You can control your TV from the Remote Control Center.
+* **Token** - Now the token will be automaticaly saved on the server. No need for user interation excep clicking `Allow` on TV.
+* **Refresh** - More options for `refresh`
+* **Logging** - Better logging of errors in debug mode.
+* **Check active** - New method to check if TV is active.
+* **Hold command** - Option to hold a command key for a time.
 
 ### v2.1.0
 * **Open applications** - Now you have the option to open applications with a switch. [Details](https://github.com/tavicu/homebridge-samsung-tizen#open-application)
