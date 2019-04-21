@@ -20,6 +20,7 @@ class SamsungPlatform {
 
         this.config = {
             delay   : config.delay,
+            keys    : config.keys || {},
             inputs  : config.inputs || [],
             devices : config.devices || [],
             method  : config.method,
