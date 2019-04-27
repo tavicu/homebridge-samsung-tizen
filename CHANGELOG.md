@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.1.0
+
+* Bug fixing
+* Change default settings for `refresh` option
+* Option to change remote keys mapping
+
 ## 3.0.0
 
 * Use the new iOS 12.2 support for `Television` as accessory type
