@@ -189,22 +189,6 @@ Issues that are opened without logs from debug mode will have less priority beca
 
 - Sometimes Inputs are not appearing right away in the Home app.
 
-## Release Notes
-
-### v3.0.0
-* **Television** - Now the TV will have `Television` as type.
-* **Inputs** - With the latest iOS update you can add inputs for TV.
-* **Control center** - You can control your TV from the Remote Control Center.
-* **Token** - Now the token will be automaticaly saved on the server. No need for user interation excep clicking `Allow` on TV.
-* **Refresh** - More options for `refresh`
-* **Logging** - Better logging of errors in debug mode.
-* **Check active** - New method to check if TV is active.
-* **Hold command** - Option to hold a command key for a time.
-
-### v2.1.0
-* **Open applications** - Now you have the option to open applications with a switch. [Details](https://github.com/tavicu/homebridge-samsung-tizen#open-application)
-* **Refresh in real time** - New support to update the switches with state in real time. [Details](https://github.com/tavicu/homebridge-samsung-tizen#update-in-real-time-on-the-background)
-
 ***
 
 ## Applications
