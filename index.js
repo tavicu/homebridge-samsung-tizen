@@ -35,13 +35,10 @@ class SamsungPlatform {
         let accessories = [];
 
         for (let device of this.config.devices) {
-            device = new Device(this, Homebridge.hap, device);
+            device = new Device(this, device, Homebridge);
 
             // Add the new device accessories to the list
-            accessories = [
-                ...accessories,
-                ...device.accessories
-            ];
+            accessories.push(device.accessory);
         }
 
         // Return the accessories
