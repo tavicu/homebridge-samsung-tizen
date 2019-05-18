@@ -19,13 +19,14 @@ class SamsungPlatform {
         this.storage = new Storage(api);
 
         this.config = {
-            delay   : config.delay,
-            keys    : config.keys || {},
-            inputs  : config.inputs || [],
-            devices : config.devices || [],
-            method  : config.method,
-            refresh : config.refresh,
-            timeout : config.timeout
+            delay    : config.delay,
+            keys     : config.keys || {},
+            inputs   : config.inputs || [],
+            devices  : config.devices || [],
+            switches : config.switches || [],
+            method   : config.method,
+            refresh  : config.refresh,
+            timeout  : config.timeout
         };
 
         this.storage.init();
