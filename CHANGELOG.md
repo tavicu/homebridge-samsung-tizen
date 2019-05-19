@@ -1,5 +1,9 @@
 # Change Log
 
+## 3.1.3
+
+* Never fail custom switches for better working with automations
+
 ## 3.1.1
 
 * Fix a bug that didn't display installed apps when running `tizen-apps`
