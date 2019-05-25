@@ -7,7 +7,7 @@ const PLATFORM_NAME = 'SamsungTizen';
 
 module.exports = (homebridge) => {
     Homebridge = homebridge;
-    Homebridge.registerPlatform(PLUGIN_NAME, PLATFORM_NAME, SamsungPlatform);
+    Homebridge.registerPlatform(PLUGIN_NAME, PLATFORM_NAME, SamsungPlatform, true);
 }
 
 class SamsungPlatform {
@@ -24,25 +24,27 @@ class SamsungPlatform {
             inputs   : config.inputs || [],
             devices  : config.devices || [],
             switches : config.switches || [],
-            method   : config.method,
+            method   : config.method || 'wss',
             refresh  : config.refresh,
             timeout  : config.timeout
         };
 
-        this.storage.init();
+        if (this.api) {
+            this.api.on('didFinishLaunching', this.init.bind(this));
+        }
     }
 
-    accessories(callback) {
-        let accessories = [];
+    async init() {
+        await this.storage.init();
 
         for (let device of this.config.devices) {
             device = new Device(this, device, Homebridge);
 
-            // Add the new device accessories to the list
-            accessories.push(device.accessory);
+            this.api.publishExternalAccessories(PLUGIN_NAME, [device.accessory.platformAccessory]);
         }
+    }
 
-        // Return the accessories
-        callback(accessories);
+    configureAccessory(accessory) {
+
     }
 }

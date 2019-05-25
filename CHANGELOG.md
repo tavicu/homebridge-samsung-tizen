@@ -1,5 +1,17 @@
 # Change Log
 
+## 4.0.0
+
+* Bug fixing
+* New method for declaring accessories.
+
+**IMPORTANT!** With this release the TVs will be declared as external accessories.
+Updating from v3 to v4 will require you to add the TVs in Home app again.
+
+This is required because HomeKit expects only one TV per bridge and now every TV will act as a bridge.
+
+You can read how to add the TV in [Step 6 from Configuration page](https://github.com/tavicu/homebridge-samsung-tizen/wiki/Installation#6-adding-the-tv-to-home-app)
+
 ## 3.1.3
 
 * Never fail custom switches for better working with automations
