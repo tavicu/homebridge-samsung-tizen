@@ -19,6 +19,7 @@ class SamsungPlatform {
         this.storage = new Storage(api);
 
         this.config = {
+            uuid     : '',
             delay    : config.delay,
             keys     : config.keys || {},
             inputs   : config.inputs || [],
