@@ -18,6 +18,8 @@ class SamsungPlatform {
         this.api     = api;
         this.storage = new Storage(api);
 
+        this.cachedAccessories = [];
+
         this.config = {
             uuid     : '',
             delay    : config.delay,
@@ -41,11 +43,27 @@ class SamsungPlatform {
         for (let device of this.config.devices) {
             device = new Device(this, device, Homebridge);
 
-            this.api.publishExternalAccessories(PLUGIN_NAME, [device.accessory.platformAccessory]);
+            for (let index in device.accessories) {
+                let accessory = device.accessories[index];
+
+                if (accessory.type == 'television') {
+                    this.api.publishExternalAccessories(PLUGIN_NAME, [accessory.platformAccessory]);
+                }
+
+                if (accessory.type == 'switch' && !this.cachedAccessories.find(cachedAccessory => cachedAccessory.UUID == accessory.UUID)) {
+                    this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory.platformAccessory]);
+                }
+            }
+        }
+
+        for (let cachedAccessory of this.cachedAccessories) {
+            if (cachedAccessory.reachable !== true) {
+                this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [cachedAccessory]);
+            }
         }
     }
 
     configureAccessory(accessory) {
-
+        this.cachedAccessories.push(accessory);
     }
 }
