@@ -65,6 +65,8 @@ class SamsungPlatform {
     }
 
     configureAccessory(accessory) {
-        this.cachedAccessories.push(accessory);
+        if (this.cachedAccessories) {
+            this.cachedAccessories.push(accessory);
+        }
     }
 }
