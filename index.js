@@ -21,7 +21,6 @@ class SamsungPlatform {
         this.cachedAccessories = [];
 
         this.config = {
-            uuid     : '',
             delay    : config.delay,
             keys     : config.keys || {},
             inputs   : config.inputs || [],
@@ -35,13 +34,15 @@ class SamsungPlatform {
         if (this.api) {
             this.api.on('didFinishLaunching', this.init.bind(this));
         }
+
+        Homebridge.platform = this;
     }
 
     async init() {
         await this.storage.init();
 
         for (let device of this.config.devices) {
-            device = new Device(this, device, Homebridge);
+            device = new Device(device, Homebridge);
 
             for (let index in device.accessories) {
                 let accessory = device.accessories[index];
