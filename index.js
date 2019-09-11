@@ -34,15 +34,13 @@ class SamsungPlatform {
         if (this.api) {
             this.api.on('didFinishLaunching', this.init.bind(this));
         }
-
-        Homebridge.platform = this;
     }
 
     async init() {
         await this.storage.init();
 
         for (let device of this.config.devices) {
-            device = new Device(device, Homebridge);
+            device = new Device(device, this, Homebridge);
 
             for (let index in device.accessories) {
                 let accessory = device.accessories[index];
