@@ -1,5 +1,10 @@
 # Change Log
 
+## 4.1.0
+
+* Bug fixing
+* Compatible with iOS 13.
+
 ## 4.0.0
 
 * Bug fixing
