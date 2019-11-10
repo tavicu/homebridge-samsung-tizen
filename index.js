@@ -40,25 +40,27 @@ class SamsungPlatform {
         await this.storage.init();
 
         for (let device of this.config.devices) {
+            let externalAccessory = null;
+
             device = new Device(device, this, Homebridge);
 
             for (let index in device.accessories) {
                 let accessory = device.accessories[index];
 
                 if (accessory.type == 'television') {
-                    this.api.publishExternalAccessories(PLUGIN_NAME, [accessory.platformAccessory]);
+                    externalAccessory = accessory.platformAccessory;
                 }
 
-                if (accessory.type == 'switch' && !this.cachedAccessories.find(cachedAccessory => cachedAccessory.UUID == accessory.UUID)) {
-                    this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory.platformAccessory]);
+                if (accessory.type == 'switch' && externalAccessory) {
+                    externalAccessory.addService(accessory.services.main.service);
                 }
             }
+
+            this.api.publishExternalAccessories(PLUGIN_NAME, [externalAccessory]);
         }
 
         for (let cachedAccessory of this.cachedAccessories) {
-            if (cachedAccessory.reachable !== true) {
-                this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [cachedAccessory]);
-            }
+            this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [cachedAccessory]);
         }
     }
 
