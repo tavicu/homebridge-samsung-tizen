@@ -1,5 +1,10 @@
 # Change Log
 
+## 4.2.0
+
+* Bug fixing
+* Group switches with the main accessory since from iOS 13.2 you have the option to show them separately.
+
 ## 4.1.0
 
 * Bug fixing
