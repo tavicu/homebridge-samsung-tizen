@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.2.1
+
+* Fix open Apple TV application
+* Add Mute Characteristic for volume
+* Add a new method to display installed apps
+
 ## 4.2.0
 
 * Bug fixing
