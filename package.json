@@ -33,6 +33,6 @@
     "request": "^2.88.0",
     "fs-extra": "^8.0.1",
     "wakeonlan": "^0.1.0",
-    "is-port-reachable": "^2.0.0"
+    "is-port-reachable": "^3.0.0"
   }
 }
