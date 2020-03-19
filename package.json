@@ -29,10 +29,11 @@
     "homebridge": ">=0.4.0"
   },
   "dependencies": {
-    "ws": "^7.0.0",
-    "request": "^2.88.0",
+    "deepmerge": "^4.2.2",
     "fs-extra": "^8.0.1",
+    "is-port-reachable": "^3.0.0",
+    "request": "^2.88.0",
     "wakeonlan": "^0.1.0",
-    "is-port-reachable": "^3.0.0"
+    "ws": "^7.0.0"
   }
 }
