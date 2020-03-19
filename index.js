@@ -28,7 +28,8 @@ class SamsungPlatform {
             switches : config.switches || [],
             method   : config.method || 'wss',
             refresh  : config.refresh,
-            timeout  : config.timeout
+            timeout  : config.timeout,
+            app_list : config.app_list || false,
         };
 
         if (this.api) {
