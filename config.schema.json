@@ -3,7 +3,7 @@
   "pluginType": "platform",
   "headerDisplay": "In order to check if your TV is suspported, access the folowing url `http://TV_IP:8001/api/v2/` (replace TV_IP with your TV IP). The page should return information regarding your TV. If the endpoint is not working then your TV is not compatible with the plugin.",
   "footerDisplay": "See [homebridge-samsung-tizen/wiki/Configuration](https://github.com/tavicu/homebridge-samsung-tizen/wiki/Configuration) for more information and instructions.",
-  "singular": false,
+  "singular": true,
   "schema": {
     "name": {
       "title": "Name",
