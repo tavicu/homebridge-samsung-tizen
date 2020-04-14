@@ -1,5 +1,10 @@
 # Change Log
 
+## 4.3.0
+
+* Add support for WoL settings
+* @mxdanger helped us with adding option to customize the settings from Config UI X interface!
+
 ## 4.2.1
 
 * Fix open Apple TV application
