@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "deepmerge": "^4.2.2",
-    "fs-extra": "^9.0.0",
+    "fs-extra": "^8.0.1",
     "is-port-reachable": "^3.0.0",
     "request": "^2.88.0",
     "wakeonlan": "^0.1.0",
