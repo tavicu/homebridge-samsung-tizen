@@ -1,5 +1,10 @@
 # Change Log
 
+## 4.3.4
+
+* Add error message when TV is off and is trying to fetch installed apps
+* Fix warning message from Homebridge 1.3.0
+
 ## 4.3.0
 
 * Add support for WoL settings
