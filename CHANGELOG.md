@@ -1,6 +1,6 @@
 # Change Log
 
-## 4.3.5
+## 4.3.6
 
 * Update Readme
 * Add funding option for Config Ui X
