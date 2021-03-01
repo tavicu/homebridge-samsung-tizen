@@ -1,5 +1,11 @@
 # Change Log
 
+## 4.3.5
+
+* Update Readme
+* Add funding option for Config Ui X
+* Replace deprecated package
+
 ## 4.3.4
 
 * Add error message when TV is off and is trying to fetch installed apps
