@@ -1,5 +1,9 @@
 # Change Log
 
+## 4.3.7
+
+* Use POST method to open applications
+
 ## 4.3.6
 
 * Update Readme
