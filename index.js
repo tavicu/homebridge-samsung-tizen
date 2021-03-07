@@ -26,7 +26,7 @@ class SamsungPlatform {
             inputs   : config.inputs || [],
             devices  : config.devices || [],
             switches : config.switches || [],
-            method   : config.method || 'wss',
+            method   : config.method,
             refresh  : config.refresh,
             timeout  : config.timeout,
             app_list : config.app_list || false,
