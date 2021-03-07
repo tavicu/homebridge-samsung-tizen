@@ -9,16 +9,68 @@
         "properties": {
             "name": {"type": "string"},
             "delay": {"type": "integer"},
-            "keys": {"type": "object"},
-            "inputs": {"type": "array"},
-            "switches": {"type": "array"},
             "method": {"type": "string"},
-            "refresh": {"type": ["null", "boolean", "integer", "object"]},
             "timeout": {"type": "integer"},
 
             "app_list": {
                 "type": "boolean"
             },
+
+            "refresh": {
+                "type": "object",
+                "properties": {
+                    "main": {"type": ["integer", "boolean"]},
+                    "switch": {"type": ["integer", "boolean"]}
+                }
+            },
+
+            "inputs": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "type": {"type": "string"},
+                        "name": {"type": "string"},
+                        "value": {"type": "string"}
+                    }
+                }
+            },
+
+            "switches": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "name": {"type": "string"},
+                        "power": {"type": "boolean"},
+                        "app": {"type": "string"},
+                        "sleep": {"type": "integer"},
+                        "mute": {"type": "boolean"},
+                        "channel": {"type": "integer"},
+                        "command": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+
+            "keys": {
+                "type": "object",
+                "properties": {
+                    "ARROW_UP": {"type": "string"},
+                    "ARROW_DOWN": {"type": "string"},
+                    "ARROW_LEFT": {"type": "string"},
+                    "ARROW_RIGHT": {"type": "string"},
+                    "SELECT": {"type": "string"},
+                    "BACK": {"type": "string"},
+                    "PLAY_PAUSE": {"type": "string"},
+                    "INFORMATION": {"type": "string"}
+                }
+            },
+
             "devices": {
                 "type": "array",
                 "items": {
@@ -26,7 +78,6 @@
                     "properties": {
                         "wol": {"type": "object"},
                         "method": {"type": "string"},
-                        "refresh": {"type": ["boolean", "integer", "object"]},
                         "timeout": {"type": "integer"},
 
                         "name": {
@@ -49,6 +100,13 @@
                         "delay": {
                             "type": "integer"
                         },
+                        "refresh": {
+                            "type": "object",
+                            "properties": {
+                                "main": {"type": ["integer", "boolean"]},
+                                "switch": {"type": ["integer", "boolean"]}
+                            }
+                        },
                         "inputs": {
                             "type": "array",
                             "items": {
@@ -56,7 +114,6 @@
                                 "properties": {
                                     "type": {
                                         "type": "string",
-                                        "default": "app",
                                         "enum": ["app", "command"]
                                     },
                                     "name": {
