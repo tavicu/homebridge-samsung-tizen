@@ -61,6 +61,7 @@ class SamsungPlatform {
                 this.api.publishExternalAccessories(PLUGIN_NAME, [externalAccessory]);
             } catch(error) {
                 this.log.error(error.message);
+                this.log.debug(error.stack);
             }
         }
 
