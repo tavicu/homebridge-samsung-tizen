@@ -1,509 +1,169 @@
 {
     "pluginAlias": "SamsungTizen",
     "pluginType": "platform",
-    "headerDisplay": "See [homebridge-samsung-tizen/wiki/Configuration](https://github.com/tavicu/homebridge-samsung-tizen/wiki/Configuration) for more information and instructions.",
     "singular": true,
+    "headerDisplay": "Please [read the Wiki](https://github.com/tavicu/homebridge-samsung-tizen/wiki/) of the plugin for more informations and instructions on how to configure it.",
+
     "schema": {
-        "name": {
-            "title": "Name",
-            "type": "string",
-            "default": "SamsungTizen",
-            "description": "Plugin name as displayed in the homebridge log.",
-            "required": true
-        },
-        "keys": {
-            "title": "Global Keys",
-            "type": "object",
-            "properties": {
-                "REWIND": {
-                    "type": "array",
-                    "title": "Command",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "FAST_FORWARD": {
-                    "type": "array",
-                    "title": "Command",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "NEXT_TRACK": {
-                    "type": "array",
-                    "title": "Command",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "PREVIOUS_TRACK": {
-                    "type": "array",
-                    "title": "Command",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "ARROW_UP": {
-                    "type": "array",
-                    "title": "Command",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "ARROW_DOWN": {
-                    "type": "array",
-                    "title": "Command",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "ARROW_LEFT": {
-                    "type": "array",
-                    "title": "Command",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "ARROW_RIGHT": {
-                    "type": "array",
-                    "title": "Command",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "SELECT": {
-                    "type": "array",
-                    "title": "Command",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "BACK": {
-                    "type": "array",
-                    "title": "Command",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "EXIT": {
-                    "type": "array",
-                    "title": "Command",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "PLAY_PAUSE": {
-                    "type": "array",
-                    "title": "Command",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "INFORMATION": {
-                    "type": "array",
-                    "title": "Command",
-                    "items": {
-                        "type": "string"
-                    }
-                }
-            }
-        },
-        "app_list": {
-            "title": "Applications List",
-            "description": "Shows applications installed on the devices in the log. Make sure your TV is on and paired before restarting Homebridge.",
-            "type": "boolean"
-        },
-        "devices": {
-            "type": "array",
-            "title": "Device",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "name": {
-                        "title": "Device Name",
-                        "type": "string",
-                        "default": "Bedroom TV",
-                        "description": "Name of the device."
-                    },
-                    "ip": {
-                        "title": "IP Address",
-                        "type": "string",
-                        "placeholder": "10.20.30.40",
-                        "format": "ipv4",
-                        "description": "It's recommend to set a static IP for the device in your router settings."
-                    },
-                    "mac": {
-                        "title": "MAC Address",
-                        "type": "string",
-                        "placeholder": "A0:B1:C2:D3:E4:F5",
-                        "pattern": "^([A-Fa-f0-9]{2}:){5}[A-Fa-f0-9]{2}$",
-                        "description": "This is required to turn the TV on."
-                    },
-                    "keys": {
-                        "title": "Local Keys",
-                        "type": "object",
-                        "properties": {
-                            "REWIND": {
-                                "type": "array",
-                                "title": "Command",
-                                "items": {
-                                    "type": "string"
-                                }
-                            },
-                            "FAST_FORWARD": {
-                                "type": "array",
-                                "title": "Command",
-                                "items": {
-                                    "type": "string"
-                                }
-                            },
-                            "NEXT_TRACK": {
-                                "type": "array",
-                                "title": "Command",
-                                "items": {
-                                    "type": "string"
-                                }
-                            },
-                            "PREVIOUS_TRACK": {
-                                "type": "array",
-                                "title": "Command",
-                                "items": {
-                                    "type": "string"
-                                }
-                            },
-                            "ARROW_UP": {
-                                "type": "array",
-                                "title": "Command",
-                                "items": {
-                                    "type": "string"
-                                }
-                            },
-                            "ARROW_DOWN": {
-                                "type": "array",
-                                "title": "Command",
-                                "items": {
-                                    "type": "string"
-                                }
-                            },
-                            "ARROW_LEFT": {
-                                "type": "array",
-                                "title": "Command",
-                                "items": {
-                                    "type": "string"
-                                }
-                            },
-                            "ARROW_RIGHT": {
-                                "type": "array",
-                                "title": "Command",
-                                "items": {
-                                    "type": "string"
-                                }
-                            },
-                            "SELECT": {
-                                "type": "array",
-                                "title": "Command",
-                                "items": {
-                                    "type": "string"
-                                }
-                            },
-                            "BACK": {
-                                "type": "array",
-                                "title": "Command",
-                                "items": {
-                                    "type": "string"
-                                }
-                            },
-                            "EXIT": {
-                                "type": "array",
-                                "title": "Command",
-                                "items": {
-                                    "type": "string"
-                                }
-                            },
-                            "PLAY_PAUSE": {
-                                "type": "array",
-                                "title": "Command",
-                                "items": {
-                                    "type": "string"
-                                }
-                            },
-                            "INFORMATION": {
-                                "type": "array",
-                                "title": "Command",
-                                "items": {
-                                    "type": "string"
-                                }
-                            }
-                        }
-                    },
-                    "inputs": {
-                        "title": "Input",
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "name": {
-                                    "title": "Input Name",
-                                    "type": "string",
-                                    "placeholder": "Netflix"
-                                },
-                                "type": {
-                                    "title": "Input Type",
-                                    "type": "string",
-                                    "placeholder": "App",
-                                    "oneOf": [
-                                        {
-                                            "title": "Command",
-                                            "enum": ["command"]
-                                        },
-                                        {
-                                            "title": "App",
-                                            "enum": ["app"]
-                                        }
-                                    ]
-                                },
-                                "value": {
-                                    "title": "Input Value",
-                                    "type": "string",
-                                    "placeholder": "11101200001"
-                                }
-                            },
-                            "required": ["name", "type", "value"]
-                        }
-                    },
-                    "switches": {
-                        "title": "Switch",
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "name": {
-                                    "title": "Switch Name",
-                                    "type": "string",
-                                    "description": "Name of the switch for HomeKit. The device name will be appended."
-                                },
-                                "power": {
-                                    "title": "Power",
-                                    "type": "boolean",
-                                    "description": "Power on TV before running actions."
-                                },
-                                "app": {
-                                    "title": "App ID",
-                                    "type": "string",
-                                    "description": "Open a selected application."
-                                },
-                                "sleep": {
-                                    "title": "Sleep",
-                                    "type": "integer",
-                                    "description": "This will turn off the TV after a specific time. Value is in minutes."
-                                },
-                                "mute": {
-                                    "title": "Mute",
-                                    "type": "boolean",
-                                    "description": "Send the Mute command."
-                                },
-                                "channel": {
-                                    "title": "Channel Number",
-                                    "type": "integer",
-                                    "description": "Switch TV to a channel."
-                                },
-                                "command": {
-                                    "title": "Command",
-                                    "type": "array",
-                                    "items": {
+        "type": "object",
+        "properties": {
+            "name": {"type": "string"},
+            "delay": {"type": "integer"},
+            "keys": {"type": "object"},
+            "inputs": {"type": "array"},
+            "switches": {"type": "array"},
+            "method": {"type": "string"},
+            "refresh": {"type": ["null", "boolean", "integer", "object"]},
+            "timeout": {"type": "integer"},
+
+            "app_list": {
+                "type": "boolean"
+            },
+            "devices": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "wol": {"type": "object"},
+                        "method": {"type": "string"},
+                        "refresh": {"type": ["boolean", "integer", "object"]},
+                        "timeout": {"type": "integer"},
+
+                        "name": {
+                            "type": "string",
+                            "required": true
+                        },
+                        "ip": {
+                            "type": "string",
+                            "format": "ipv4",
+                            "required": true
+                        },
+                        "mac": {
+                            "type": "string",
+                            "required": true,
+                            "pattern": "^([A-Fa-f0-9]{2}:){5}[A-Fa-f0-9]{2}$"
+                        },
+                        "uuid": {
+                            "type": "string"
+                        },
+                        "delay": {
+                            "type": "integer"
+                        },
+                        "inputs": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "type": {
+                                        "type": "string",
+                                        "default": "app",
+                                        "enum": ["app", "command"]
+                                    },
+                                    "name": {
                                         "type": "string"
+                                    },
+                                    "value": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": ["name", "type", "value"]
+                            }
+                        },
+                        "switches": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "required": true
+                                    },
+                                    "power": {
+                                        "type": "boolean"
+                                    },
+                                    "app": {
+                                        "type": "string"
+                                    },
+                                    "sleep": {
+                                        "type": "integer"
+                                    },
+                                    "mute": {
+                                        "type": "boolean"
+                                    },
+                                    "channel": {
+                                        "type": "integer"
+                                    },
+                                    "command": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
                                     }
                                 }
                             }
                         },
-                        "required": ["name"]
-                    },
-                    "delay": {
-                        "title": "Command Delay",
-                        "type": "integer",
-                        "placeholder": "400",
-                        "description": "The delay between commands in miliseconds. Set to 400ms by default."
-                    },
-                    "refresh": {
-                        "title": "Refresh",
-                        "type": "object",
-                        "maxItems": 1,
-                        "description": "Intervals for refreshing accessories in the background in miliseconds.",
-                        "properties": {
-                            "main": {
-                                "type": "integer",
-                                "title": "Main Refresh",
-                                "placeholder": "10000",
-                                "description": "Refresh of the main accessory that toggles the TV on and off. Set to 10 seconds by default.",
-                                "minimum": 500
-                            },
-                            "switch": {
-                                "type": "integer",
-                                "title": "Switch Refresh",
-                                "placeholder": "30000",
-                                "description": "Refresh of the custom switch accessories. Set to 30 seconds by default.",
-                                "minimum": 1000
+                        "keys": {
+                            "type": "object",
+                            "properties": {
+                                "ARROW_UP": {
+                                    "type": "string"
+                                },
+                                "ARROW_DOWN": {
+                                    "type": "string"
+                                },
+                                "ARROW_LEFT": {
+                                    "type": "string"
+                                },
+                                "ARROW_RIGHT": {
+                                    "type": "string"
+                                },
+                                "SELECT": {
+                                    "type": "string"
+                                },
+                                "BACK": {
+                                    "type": "string"
+                                },
+                                "PLAY_PAUSE": {
+                                    "type": "string"
+                                },
+                                "INFORMATION": {
+                                    "type": "string"
+                                }
                             }
                         }
                     }
-                },
-                "required": ["name", "ip", "mac"]
+                }
             }
         }
     },
+
     "layout": [
         {
-            "type": "flex",
-            "items": [
-                {
-                    "key": "name"
-                },
-                {
-                    "key": "app_list"
-                },
-                {
-                    "type": "fieldset",
-                    "title": "Global Key Mapping",
-                    "description": "Changing the default keys for buttons from Remote Control. This key mapping effects all of the configured devices.",
-                    "expandable": true,
-                    "expanded": false,
-                    "displayFlex": true,
-                    "flex-flow": "row wrap",
-                    "items": [
-                        {
-                            "key": "keys.REWIND",
-                            "notitle": true,
-                            "items": {
-                                "type": "string",
-                                "title": "REWIND",
-                                "placeholder": "KEY_REWIND"
-                            }
-                        },
-                        {
-                            "key": "keys.FAST_FORWARD",
-                            "notitle": true,
-                            "items": {
-                                "type": "string",
-                                "title": "FAST_FORWARD",
-                                "placeholder": "KEY_FF"
-                            }
-                        },
-                        {
-                            "key": "keys.NEXT_TRACK",
-                            "notitle": true,
-                            "items": {
-                                "type": "string",
-                                "title": "NEXT_TRACK"
-                            }
-                        },
-                        {
-                            "key": "keys.PREVIOUS_TRACK",
-                            "notitle": true,
-                            "items": {
-                                "type": "string",
-                                "title": "PREVIOUS_TRACK"
-                            }
-                        },
-                        {
-                            "key": "keys.ARROW_UP",
-                            "notitle": true,
-                            "items": {
-                                "type": "string",
-                                "title": "ARROW_UP",
-                                "placeholder": "KEY_UP"
-                            }
-                        },
-                        {
-                            "key": "keys.ARROW_DOWN",
-                            "notitle": true,
-                            "items": {
-                                "type": "string",
-                                "title": "ARROW_DOWN",
-                                "placeholder": "KEY_DOWN"
-                            }
-                        },
-                        {
-                            "key": "keys.ARROW_LEFT",
-                            "notitle": true,
-                            "items": {
-                                "type": "string",
-                                "title": "ARROW_LEFT",
-                                "placeholder": "KEY_LEFT"
-                            }
-                        },
-                        {
-                            "key": "keys.ARROW_RIGHT",
-                            "notitle": true,
-                            "items": {
-                                "type": "string",
-                                "title": "ARROW_RIGHT",
-                                "placeholder": "KEY_RIGHT"
-                            }
-                        },
-                        {
-                            "key": "keys.SELECT",
-                            "notitle": true,
-                            "items": {
-                                "type": "string",
-                                "title": "SELECT",
-                                "placeholder": "KEY_ENTER"
-                            }
-                        },
-                        {
-                            "key": "keys.BACK",
-                            "notitle": true,
-                            "items": {
-                                "type": "string",
-                                "title": "BACK",
-                                "placeholder": "KEY_RETURN"
-                            }
-                        },
-                        {
-                            "key": "keys.EXIT",
-                            "notitle": true,
-                            "items": {
-                                "type": "string",
-                                "title": "EXIT",
-                                "placeholder": "KEY_HOME"
-                            }
-                        },
-                        {
-                            "key": "keys.PLAY_PAUSE",
-                            "notitle": true,
-                            "items": {
-                                "type": "string",
-                                "title": "PLAY_PAUSE",
-                                "placeholder": "KEY_PLAY_BACK"
-                            }
-                        },
-                        {
-                            "key": "keys.INFORMATION",
-                            "notitle": true,
-                            "items": {
-                                "type": "string",
-                                "title": "INFORMATION",
-                                "placeholder": "KEY_INFO"
-                            }
-                        }
-                    ]
-                }
-            ]
+            "key": "app_list",
+            "title": "List Applications List",
+            "description": "Shows installed applications when you start Homebridge instance if TV supports it (Model year < 2020)."
         },
         {
             "type": "fieldset",
             "title": "Devices",
             "items": [
                 {
+                    "title": "Device",
                     "key": "devices",
                     "type": "array",
                     "notitle": true,
                     "items": [
                         {
-                            "type": "flex",
-                            "flex-flow": "row wrap",
+                            "type": "div",
                             "items": [
                                 {
-                                    "key": "devices[].name"
+                                    "key": "devices[].name",
+                                    "title": "Device Name",
+                                    "default": "Bedroom TV"
+                                },
+                                {
+                                  "type": "help",
+                                  "helpvalue": "<p class='help-block'>Make sure that your device have a static IP address. You can set it from your router admin interface!</p>"
                                 },
                                 {
                                     "type": "flex",
@@ -511,171 +171,73 @@
                                     "items": [
                                         {
                                             "key": "devices[].ip",
-                                            "flex-basis": "200px"
+                                            "title": "IP Address",
+                                            "placeholder": "10.20.30.40"
                                         },
                                         {
                                             "key": "devices[].mac",
-                                            "flex-basis": "200px"
+                                            "title": "MAC Address",
+                                            "placeholder": "A0:B1:C2:D3:E4:F5"
                                         }
                                     ]
                                 },
                                 {
                                     "type": "fieldset",
-                                    "title": "Configuration Options",
-                                    "description": "Optional configuration fields.",
+                                    "title": "Advanced Configuration",
                                     "expandable": true,
                                     "expanded": false,
                                     "items": [
                                         {
-                                            "type": "fieldset",
-                                            "title": "Key Mapping",
-                                            "description": "Changing the default keys for buttons from Remote Control.",
-                                            "expandable": true,
-                                            "expanded": false,
-                                            "displayFlex": true,
-                                            "flex-flow": "row wrap",
-                                            "items": [
-                                                {
-                                                    "key": "devices[].keys.REWIND",
-                                                    "notitle": true,
-                                                    "items": {
-                                                        "type": "string",
-                                                        "title": "REWIND",
-                                                        "placeholder": "KEY_REWIND"
-                                                    }
-                                                },
-                                                {
-                                                    "key": "devices[].keys.FAST_FORWARD",
-                                                    "notitle": true,
-                                                    "items": {
-                                                        "type": "string",
-                                                        "title": "FAST_FORWARD",
-                                                        "placeholder": "KEY_FF"
-                                                    }
-                                                },
-                                                {
-                                                    "key": "devices[].keys.NEXT_TRACK",
-                                                    "notitle": true,
-                                                    "items": {
-                                                        "type": "string",
-                                                        "title": "NEXT_TRACK"
-                                                    }
-                                                },
-                                                {
-                                                    "key": "devices[].keys.PREVIOUS_TRACK",
-                                                    "notitle": true,
-                                                    "items": {
-                                                        "type": "string",
-                                                        "title": "PREVIOUS_TRACK"
-                                                    }
-                                                },
-                                                {
-                                                    "key": "devices[].keys.ARROW_UP",
-                                                    "notitle": true,
-                                                    "items": {
-                                                        "type": "string",
-                                                        "title": "ARROW_UP",
-                                                        "placeholder": "KEY_UP"
-                                                    }
-                                                },
-                                                {
-                                                    "key": "devices[].keys.ARROW_DOWN",
-                                                    "notitle": true,
-                                                    "items": {
-                                                        "type": "string",
-                                                        "title": "ARROW_DOWN",
-                                                        "placeholder": "KEY_DOWN"
-                                                    }
-                                                },
-                                                {
-                                                    "key": "devices[].keys.ARROW_LEFT",
-                                                    "notitle": true,
-                                                    "items": {
-                                                        "type": "string",
-                                                        "title": "ARROW_LEFT",
-                                                        "placeholder": "KEY_LEFT"
-                                                    }
-                                                },
-                                                {
-                                                    "key": "devices[].keys.ARROW_RIGHT",
-                                                    "notitle": true,
-                                                    "items": {
-                                                        "type": "string",
-                                                        "title": "ARROW_RIGHT",
-                                                        "placeholder": "KEY_RIGHT"
-                                                    }
-                                                },
-                                                {
-                                                    "key": "devices[].keys.SELECT",
-                                                    "notitle": true,
-                                                    "items": {
-                                                        "type": "string",
-                                                        "title": "SELECT",
-                                                        "placeholder": "KEY_ENTER"
-                                                    }
-                                                },
-                                                {
-                                                    "key": "devices[].keys.BACK",
-                                                    "notitle": true,
-                                                    "items": {
-                                                        "type": "string",
-                                                        "title": "BACK",
-                                                        "placeholder": "KEY_RETURN"
-                                                    }
-                                                },
-                                                {
-                                                    "key": "devices[].keys.EXIT",
-                                                    "notitle": true,
-                                                    "items": {
-                                                        "type": "string",
-                                                        "title": "EXIT",
-                                                        "placeholder": "KEY_HOME"
-                                                    }
-                                                },
-                                                {
-                                                    "key": "devices[].keys.PLAY_PAUSE",
-                                                    "notitle": true,
-                                                    "items": {
-                                                        "type": "string",
-                                                        "title": "PLAY_PAUSE",
-                                                        "placeholder": "KEY_PLAY_BACK"
-                                                    }
-                                                },
-                                                {
-                                                    "key": "devices[].keys.INFORMATION",
-                                                    "notitle": true,
-                                                    "items": {
-                                                        "type": "string",
-                                                        "title": "INFORMATION",
-                                                        "placeholder": "KEY_INFO"
-                                                    }
-                                                }
-                                            ]
+                                            "type": "help",
+                                            "helpvalue": "<p class='help-block'>Here you can add advanced options like <b>Inputs</b> and <b>Switches</b>. Make sure you read our <a href='https://github.com/tavicu/homebridge-samsung-tizen/wiki/Configuration' target='_blank'>Wiki Configuration page</a> where we explain in details every section.</p>"
                                         },
                                         {
-                                            "type": "fieldset",
+                                            "key": "devices[].uuid",
+                                            "title": "UUID",
+                                            "placeholder": "A1",
+                                            "description": "If you have problems adding the TV to Home app, set this field to a unique value. You can find more informations regarding this in the Wiki."
+                                        },
+                                        {
+                                            "key": "devices[].delay",
+                                            "title": "Command Delay Interval",
+                                            "placeholder": "400",
+                                            "description": "This is the delay between each command when you send multiple commands. By lowering the value you risk the commands not being executed. Value is in <b>miliseconds</b>."
+                                        },
+                                        {
+                                            "type": "section",
                                             "title": "Inputs",
-                                            "description": "Custom inputs.",
                                             "expandable": true,
                                             "expanded": false,
                                             "items": [
+                                                {
+                                                    "type": "help",
+                                                    "helpvalue": "<p class='help-block'>By default no inputs are set. Use this section to set your own inputs. You can find more informations on our <a href='https://github.com/tavicu/homebridge-samsung-tizen/wiki/Inputs' target='_blank'>Wiki Inputs page</a>.</p>",
+                                                    "flex": "1 1 100%"
+                                                },
                                                 {
                                                     "type": "array",
                                                     "notitle": true,
                                                     "items": [
                                                         {
-                                                            "type": "flex",
+                                                            "title": "Input",
+                                                            "type": "div",
+                                                            "notitle": true,
+                                                            "display": "flex",
+                                                            "flex-direction": "row",
                                                             "items": [
                                                                 {
-                                                                    "type": "flex",
-                                                                    "flex-flow": "row wrap",
-                                                                    "items": [
-                                                                        "devices[].inputs[].name",
-                                                                        "devices[].inputs[].type"
-                                                                    ]
+                                                                    "key": "devices[].inputs[].type",
+                                                                    "title": "Type"
                                                                 },
                                                                 {
-                                                                    "key": "devices[].inputs[].value"
+                                                                    "key": "devices[].inputs[].name",
+                                                                    "title": "Input Name",
+                                                                    "placeholder": "Netflix"
+                                                                },
+                                                                {
+                                                                    "key": "devices[].inputs[].value",
+                                                                    "title": "Input Value",
+                                                                    "placeholder": "11101200001"
                                                                 }
                                                             ]
                                                         }
@@ -684,38 +246,54 @@
                                             ]
                                         },
                                         {
-                                            "type": "fieldset",
+                                            "type": "section",
                                             "title": "Switches",
-                                            "description": "Switches allows you to create custom accessories with actions that can't be done with the main accessory.",
                                             "expandable": true,
                                             "expanded": false,
                                             "items": [
+                                                {
+                                                    "type": "help",
+                                                    "helpvalue": "<p class='help-block'>This section give you the option to create custom switches (separated accessories) that make specific actions. You can find more informations on our <a href='https://github.com/tavicu/homebridge-samsung-tizen/wiki/Switches' target='_blank'>Wiki Switches page</a>.</p>",
+                                                    "flex": "1 1 100%"
+                                                },
                                                 {
                                                     "type": "array",
                                                     "notitle": true,
                                                     "items": [
                                                         {
-                                                            "type": "flex",
+                                                            "title": "Switch",
+                                                            "type": "div",
+                                                            "notitle": true,
                                                             "items": [
                                                                 {
-                                                                    "key": "devices[].switches[].name"
+                                                                    "key": "devices[].switches[].name",
+                                                                    "title": "Switch Name",
+                                                                    "description": "Name for the switch. The device name will be appended."
                                                                 },
                                                                 {
-                                                                    "type": "flex",
-                                                                    "flex-flow": "row wrap",
-                                                                    "items": [
-                                                                        "devices[].switches[].power",
-                                                                        "devices[].switches[].mute"
-                                                                    ]
+                                                                    "key": "devices[].switches[].power",
+                                                                    "title": "Power On",
+                                                                    "description": "Power on the TV before running any action."
                                                                 },
                                                                 {
-                                                                    "key": "devices[].switches[].app"
+                                                                    "key": "devices[].switches[].app",
+                                                                    "title": "Application ID",
+                                                                    "description": "Set this if you want to open an application."
                                                                 },
                                                                 {
-                                                                    "key": "devices[].switches[].sleep"
+                                                                    "key": "devices[].switches[].sleep",
+                                                                    "title": "Sleep timer",
+                                                                    "description": "This option will turn off the TV after the set time has elapsed. Value is in <b>minutes</b>."
                                                                 },
                                                                 {
-                                                                    "key": "devices[].switches[].channel"
+                                                                    "key": "devices[].switches[].mute",
+                                                                    "title": "Mute",
+                                                                    "description": "This will send the mute command to TV."
+                                                                },
+                                                                {
+                                                                    "key": "devices[].switches[].channel",
+                                                                    "title": "Channel Number",
+                                                                    "description": "Switch the TV to a channel number. This will not work if you are not on Live TV wehn you trigger the switch!"
                                                                 },
                                                                 {
                                                                     "key": "devices[].switches[].command",
@@ -735,22 +313,66 @@
                                             ]
                                         },
                                         {
-                                            "type": "fieldset",
-                                            "title": "Delay",
-                                            "description": "When you have a list of commands they have a delay between them. Lowering this value may result in not sending some of the commands.",
+                                            "type": "section",
+                                            "title": "Key Mapping",
                                             "expandable": true,
                                             "expanded": false,
-                                            "items": ["devices[].delay"]
-                                        },
-                                        {
-                                            "type": "fieldset",
-                                            "title": "Refresh",
-                                            "description": "It isn't recommend lowering the values if you don't use HomeKit automations based on TV status. Setting the refresh value to false is not supported in the interface, you will have to edit the config file manually.",
-                                            "expandable": true,
-                                            "expanded": false,
+                                            "display": "flex",
+                                            "flex-flow": "row wrap",
                                             "items": [
-                                                "devices[].refresh.main",
-                                                "devices[].refresh.switch"
+                                                {
+                                                    "type": "help",
+                                                    "helpvalue": "<p class='help-block'>You don't have to edit this section unless you want to change the default commands for <b>Remote Control</b> buttons. You can find more informations on our <a href='https://github.com/tavicu/homebridge-samsung-tizen/wiki/Keys' target='_blank'>Wiki Keys page</a>.</p>",
+                                                    "flex": "1 1 100%"
+                                                },
+                                                {
+                                                    "key": "devices[].keys.ARROW_UP",
+                                                    "title": "ARROW_UP",
+                                                    "placeholder": "KEY_UP",
+                                                    "flex": "1 1 25%"
+                                                },
+                                                {
+                                                    "key": "devices[].keys.ARROW_DOWN",
+                                                    "title": "ARROW_DOWN",
+                                                    "placeholder": "KEY_DOWN",
+                                                    "flex": "1 1 25%"
+                                                },
+                                                {
+                                                    "key": "devices[].keys.ARROW_LEFT",
+                                                    "title": "ARROW_LEFT",
+                                                    "placeholder": "KEY_LEFT",
+                                                    "flex": "1 1 25%"
+                                                },
+                                                {
+                                                    "key": "devices[].keys.ARROW_RIGHT",
+                                                    "title": "ARROW_RIGHT",
+                                                    "placeholder": "KEY_RIGHT",
+                                                    "flex": "1 1 25%"
+                                                },
+                                                {
+                                                    "key": "devices[].keys.SELECT",
+                                                    "title": "SELECT",
+                                                    "placeholder": "KEY_ENTER",
+                                                    "flex": "1 1 25%"
+                                                },
+                                                {
+                                                    "key": "devices[].keys.BACK",
+                                                    "title": "BACK",
+                                                    "placeholder": "KEY_RETURN",
+                                                    "flex": "1 1 25%"
+                                                },
+                                                {
+                                                    "key": "devices[].keys.PLAY_PAUSE",
+                                                    "title": "PLAY_PAUSE",
+                                                    "placeholder": "KEY_PLAY_BACK",
+                                                    "flex": "1 1 25%"
+                                                },
+                                                {
+                                                    "key": "devices[].keys.INFORMATION",
+                                                    "title": "INFORMATION",
+                                                    "placeholder": "KEY_INFO",
+                                                    "flex": "1 1 25%"
+                                                }
                                             ]
                                         }
                                     ]
