@@ -1,5 +1,17 @@
 # Change Log
 
+## 4.4.0
+
+* Cleanup unused Keys from config
+* Accept multiple commands as string separated by comma
+* Update config schema for Config Ui X settings interface
+* If TV responds to ping, check the PowerState value if TV supports it
+* Implement a caching method for requests so we don't stress the TVs
+* Added error message when failing to fetch installed applications
+* Stylized the response for installed applications output
+* Reinitialize remote after TV informations where fetched
+* Remove sleeping mode when turning off the device if TV supports PowerState
+
 ## 4.3.7
 
 * Use POST method to open applications
