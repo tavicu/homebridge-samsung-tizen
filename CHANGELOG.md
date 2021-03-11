@@ -1,5 +1,9 @@
 # Change Log
 
+## 4.4.1
+
+* Fix bug that destroy storage because of multiple savings in the same time
+
 ## 4.4.0
 
 * Cleanup unused Keys from config

@@ -1,7 +1,7 @@
 {
   "name": "homebridge-samsung-tizen",
-  "version": "4.4.0",
-  "description": "Samsung TV plugin for Homebridge",
+  "version": "4.4.1",
+  "description": "Homebridge plugin for Samsung TV's with Tizen OS",
   "main": "index.js",
   "directories": {
     "lib": "lib"
