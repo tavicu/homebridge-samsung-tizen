@@ -52,8 +52,7 @@ class SamsungPlatform {
                     if (accessory.type == 'television') {
                         externalAccessory = accessory.platformAccessory;
                     }
-
-                    if (accessory.type == 'switch' && externalAccessory) {
+                    else if (externalAccessory) {
                         externalAccessory.addService(accessory.services.main.service);
                     }
                 }
@@ -71,8 +70,6 @@ class SamsungPlatform {
     }
 
     configureAccessory(accessory) {
-        if (this.cachedAccessories) {
-            this.cachedAccessories.push(accessory);
-        }
+        this.cachedAccessories.push(accessory);
     }
 }
