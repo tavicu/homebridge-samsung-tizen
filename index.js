@@ -53,7 +53,7 @@ class SamsungPlatform {
                         externalAccessory = accessory.platformAccessory;
                     }
                     else if (externalAccessory) {
-                        externalAccessory.addService(accessory.services.main.service);
+                        (accessory.services.main.services || [accessory.services.main.service]).forEach(service => externalAccessory.addService(service));
                     }
                 }
 
