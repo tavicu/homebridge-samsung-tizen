@@ -42,22 +42,9 @@ class SamsungPlatform {
 
         for (let device of this.config.devices) {
             try {
-                let externalAccessory = null;
-
                 device = new Device(device, this, Homebridge);
 
-                for (let index in device.accessories) {
-                    let accessory = device.accessories[index];
-
-                    if (accessory.type == 'television') {
-                        externalAccessory = accessory.platformAccessory;
-                    }
-                    else if (externalAccessory) {
-                        (accessory.services.main.services || [accessory.services.main.service]).forEach(service => externalAccessory.addService(service));
-                    }
-                }
-
-                this.api.publishExternalAccessories(PLUGIN_NAME, [externalAccessory]);
+                this.api.publishExternalAccessories(PLUGIN_NAME, [device.accessories[0].platformAccessory]);
             } catch(error) {
                 this.log.error(error.message);
                 this.log.debug(error.stack);
