@@ -271,7 +271,7 @@
                                             "key": "devices[].options",
                                             "title": "Options",
                                             "titleMap": {
-                                                "Frame.ModeOn.Enable": "Display Mode On (for Frame TVs)",
+                                                "Frame.ModeOn.Enable": "Enable Mode On (for Frame TVs)",
                                                 "Frame.ArtSwitch.Disable": "Disable Art Switch (for Frame TVs)",
                                                 "Frame.PowerSwitch.Disable": "Disable Power Switch (for Frame TVs)"
                                             }
