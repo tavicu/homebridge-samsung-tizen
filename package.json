@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "deepmerge": "^4.2.2",
+    "delay": "^5.0.0",
     "fs-extra": "^9.0.1",
     "is-port-reachable": "^3.0.0",
     "node-fetch": "^2.6.1",
