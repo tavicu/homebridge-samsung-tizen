@@ -1,5 +1,14 @@
 # Change Log
 
+## 5.0.0
+
+* Add support for Frame TVs
+* Add Power switch for Frame TVs
+* Add Art Mode switch for Frame TVs
+* Use events for initialise elements and status changes
+* Refresh all accessories when state of TV changes
+
+
 ## 4.4.1
 
 * Fix bug that destroy storage because of multiple savings in the same time
