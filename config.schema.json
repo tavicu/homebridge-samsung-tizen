@@ -104,7 +104,7 @@
                             "type": "array",
                             "items": {
                                 "type": "string",
-                                "enum": ["Frame.ModeOn.Enable", "Frame.ArtSwitch.Disable", "Frame.PowerSwitch.Disable"]
+                                "enum": ["Frame.RealPowerMode", "Frame.ArtSwitch.Disable", "Frame.PowerSwitch.Disable"]
                             }
                         },
                         "refresh": {
@@ -272,7 +272,7 @@
                                             "key": "devices[].options",
                                             "title": "Options",
                                             "titleMap": {
-                                                "Frame.ModeOn.Enable": "Enable Mode On (for Frame TVs)",
+                                                "Frame.RealPowerMode": "Display and control Real Power with Main Acccessory (for Frame TVs)",
                                                 "Frame.ArtSwitch.Disable": "Disable Art Switch (for Frame TVs)",
                                                 "Frame.PowerSwitch.Disable": "Disable Power Switch (for Frame TVs)"
                                             }
@@ -354,8 +354,11 @@
                                                                 },
                                                                 {
                                                                     "key": "devices[].switches[].power",
-                                                                    "title": "Power On",
-                                                                    "description": "Power on the TV before running any action."
+                                                                    "title": "Power on the TV before running any action"
+                                                                },
+                                                                {
+                                                                    "key": "devices[].switches[].mute",
+                                                                    "title": "Send mute command to TV"
                                                                 },
                                                                 {
                                                                     "key": "devices[].switches[].app",
@@ -366,11 +369,6 @@
                                                                     "key": "devices[].switches[].sleep",
                                                                     "title": "Sleep timer",
                                                                     "description": "This option will turn off the TV after the set time has elapsed. Value is in <b>minutes</b>."
-                                                                },
-                                                                {
-                                                                    "key": "devices[].switches[].mute",
-                                                                    "title": "Mute",
-                                                                    "description": "This will send the mute command to TV."
                                                                 },
                                                                 {
                                                                     "key": "devices[].switches[].channel",
