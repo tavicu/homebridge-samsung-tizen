@@ -104,7 +104,7 @@
                             "type": "array",
                             "items": {
                                 "type": "string",
-                                "enum": ["DefaultInput.Disable", "Frame.ModeOn.Enable", "Frame.ArtSwitch.Disable", "Frame.PowerSwitch.Disable"]
+                                "enum": ["Frame.ModeOn.Enable", "Frame.ArtSwitch.Disable", "Frame.PowerSwitch.Disable"]
                             }
                         },
                         "refresh": {
@@ -121,7 +121,8 @@
                                 "properties": {
                                     "type": {
                                         "type": "string",
-                                        "enum": ["app", "command"]
+                                        "default": "app",
+                                        "enum": ["app", "command", "art"]
                                     },
                                     "name": {
                                         "type": "string"
@@ -271,7 +272,6 @@
                                             "key": "devices[].options",
                                             "title": "Options",
                                             "titleMap": {
-                                                "InputDefault.Disable": "Disable Default Input Option",
                                                 "Frame.ModeOn.Enable": "Enable Mode On (for Frame TVs)",
                                                 "Frame.ArtSwitch.Disable": "Disable Art Switch (for Frame TVs)",
                                                 "Frame.PowerSwitch.Disable": "Disable Power Switch (for Frame TVs)"
@@ -301,7 +301,12 @@
                                                             "items": [
                                                                 {
                                                                     "key": "devices[].inputs[].type",
-                                                                    "title": "Type"
+                                                                    "title": "Type",
+                                                                    "titleMap": {
+                                                                        "app": "Application",
+                                                                        "command": "Command",
+                                                                        "art": "Art Mode"
+                                                                    }
                                                                 },
                                                                 {
                                                                     "key": "devices[].inputs[].name",
@@ -311,7 +316,10 @@
                                                                 {
                                                                     "key": "devices[].inputs[].value",
                                                                     "title": "Input Value",
-                                                                    "placeholder": "11101200001"
+                                                                    "placeholder": "11101200001",
+                                                                    "condition": {
+                                                                        "functionBody": "return model.devices[arrayIndices[0]].inputs[arrayIndices[1]].type !== 'art';"
+                                                                    }
                                                                 }
                                                             ]
                                                         }
