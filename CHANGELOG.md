@@ -8,6 +8,8 @@
 * Use events for initialise elements and status changes
 * Refresh all accessories when state of TV changes
 
+For more informations regarding Frame Support please follow this link: https://git.io/JOII1
+
 
 ## 4.4.1
 
