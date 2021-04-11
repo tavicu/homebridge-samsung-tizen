@@ -42,7 +42,7 @@ class SamsungPlatform {
 
         for (let device of this.config.devices) {
             try {
-                let externalAccessory = null;
+                let mainAccessory = null;
 
                 device = new Device(device, this, Homebridge);
 
@@ -50,15 +50,14 @@ class SamsungPlatform {
                     let accessory = device.accessories[index];
 
                     if (accessory.type == 'television') {
-                        externalAccessory = accessory.platformAccessory;
+                        mainAccessory = accessory;
                     }
-
-                    if (accessory.type == 'switch' && externalAccessory) {
-                        externalAccessory.addService(accessory.services.main.service);
+                    else if (mainAccessory) {
+                        mainAccessory.addAccessory(accessory);
                     }
                 }
 
-                this.api.publishExternalAccessories(PLUGIN_NAME, [externalAccessory]);
+                this.api.publishExternalAccessories(PLUGIN_NAME, [mainAccessory.platformAccessory]);
             } catch(error) {
                 this.log.error(error.message);
                 this.log.debug(error.stack);
@@ -71,8 +70,6 @@ class SamsungPlatform {
     }
 
     configureAccessory(accessory) {
-        if (this.cachedAccessories) {
-            this.cachedAccessories.push(accessory);
-        }
+        this.cachedAccessories.push(accessory);
     }
 }

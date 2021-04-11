@@ -1,6 +1,6 @@
 {
   "name": "homebridge-samsung-tizen",
-  "version": "4.4.1",
+  "version": "5.0.0-beta.5",
   "description": "Homebridge plugin for Samsung TV's with Tizen OS",
   "main": "index.js",
   "directories": {
@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "deepmerge": "^4.2.2",
+    "delay": "^5.0.0",
     "fs-extra": "^9.0.1",
     "is-port-reachable": "^3.0.0",
     "node-fetch": "^2.6.1",

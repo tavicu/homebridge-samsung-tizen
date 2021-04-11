@@ -100,6 +100,13 @@
                         "delay": {
                             "type": "integer"
                         },
+                        "options": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "enum": ["Frame.RealPowerMode", "Frame.ArtSwitch.Disable", "Frame.PowerSwitch.Disable"]
+                            }
+                        },
                         "refresh": {
                             "type": "object",
                             "properties": {
@@ -114,7 +121,8 @@
                                 "properties": {
                                     "type": {
                                         "type": "string",
-                                        "enum": ["app", "command"]
+                                        "default": "app",
+                                        "enum": ["app", "command", "art"]
                                     },
                                     "name": {
                                         "type": "string"
@@ -261,6 +269,15 @@
                                             "description": "This is the delay between each command when you send multiple commands. By lowering the value you risk the commands not being executed. Value is in <b>miliseconds</b>."
                                         },
                                         {
+                                            "key": "devices[].options",
+                                            "title": "Options",
+                                            "titleMap": {
+                                                "Frame.RealPowerMode": "Display and control Real Power with Main Acccessory (for Frame TVs)",
+                                                "Frame.ArtSwitch.Disable": "Disable Art Switch (for Frame TVs)",
+                                                "Frame.PowerSwitch.Disable": "Disable Power Switch (for Frame TVs)"
+                                            }
+                                        },
+                                        {
                                             "type": "section",
                                             "title": "Inputs",
                                             "expandable": true,
@@ -284,7 +301,12 @@
                                                             "items": [
                                                                 {
                                                                     "key": "devices[].inputs[].type",
-                                                                    "title": "Type"
+                                                                    "title": "Type",
+                                                                    "titleMap": {
+                                                                        "app": "Application",
+                                                                        "command": "Command",
+                                                                        "art": "Art Mode"
+                                                                    }
                                                                 },
                                                                 {
                                                                     "key": "devices[].inputs[].name",
@@ -294,7 +316,10 @@
                                                                 {
                                                                     "key": "devices[].inputs[].value",
                                                                     "title": "Input Value",
-                                                                    "placeholder": "11101200001"
+                                                                    "placeholder": "11101200001",
+                                                                    "condition": {
+                                                                        "functionBody": "return model.devices[arrayIndices[0]].inputs[arrayIndices[1]].type !== 'art';"
+                                                                    }
                                                                 }
                                                             ]
                                                         }
@@ -329,8 +354,11 @@
                                                                 },
                                                                 {
                                                                     "key": "devices[].switches[].power",
-                                                                    "title": "Power On",
-                                                                    "description": "Power on the TV before running any action."
+                                                                    "title": "Power on the TV before running any action"
+                                                                },
+                                                                {
+                                                                    "key": "devices[].switches[].mute",
+                                                                    "title": "Send mute command to TV"
                                                                 },
                                                                 {
                                                                     "key": "devices[].switches[].app",
@@ -341,11 +369,6 @@
                                                                     "key": "devices[].switches[].sleep",
                                                                     "title": "Sleep timer",
                                                                     "description": "This option will turn off the TV after the set time has elapsed. Value is in <b>minutes</b>."
-                                                                },
-                                                                {
-                                                                    "key": "devices[].switches[].mute",
-                                                                    "title": "Mute",
-                                                                    "description": "This will send the mute command to TV."
                                                                 },
                                                                 {
                                                                     "key": "devices[].switches[].channel",
