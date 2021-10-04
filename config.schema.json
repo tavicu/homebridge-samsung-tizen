@@ -77,7 +77,6 @@
                     "type": "object",
                     "properties": {
                         "wol": {"type": "object"},
-                        "method": {"type": "string"},
                         "timeout": {"type": "integer"},
 
                         "name": {
@@ -99,6 +98,10 @@
                         },
                         "delay": {
                             "type": "integer"
+                        },
+                        "method": {
+                            "type": "string",
+                            "enum": ["wss", "frame", "ws"]
                         },
                         "options": {
                             "type": "array",
@@ -255,6 +258,16 @@
                                         {
                                             "type": "help",
                                             "helpvalue": "<p class='help-block'>Here you can add advanced options like <b>Inputs</b> and <b>Switches</b>. Make sure you read our <a href='https://github.com/tavicu/homebridge-samsung-tizen/wiki/Configuration' target='_blank'>Wiki Configuration page</a> where we explain in details every section.</p>"
+                                        },
+                                        {
+                                            "key": "devices[].method",
+                                            "title": "Type",
+                                            "titleMap": {
+                                                "ws": "Legacy",
+                                                "wss": "Default",
+                                                "frame": "Frame"
+                                            },
+                                            "description": "The plugin detects the type of TV <b>automaticaly</b>. Leave this option set to <b>None</b> unless you are having problems and the plugin don't detect your TV type correctly."
                                         },
                                         {
                                             "key": "devices[].uuid",
