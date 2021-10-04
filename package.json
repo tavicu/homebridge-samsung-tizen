@@ -35,7 +35,7 @@
     "is-port-reachable": "^4.0.0",
     "node-fetch": "^3.0.0",
     "wakeonlan": "^0.1.0",
-    "ws": "^8.2.3"
+    "ws": "^7.0.0"
   },
   "funding": {
     "type": "paypal",
