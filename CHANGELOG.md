@@ -1,5 +1,14 @@
 # Change Log
 
+## 5.1.0
+
+* Update and improve http requests
+* Improve listeners that update accessories
+* Improve storage of settings that are fetched automatically
+* Fix a bug that prevented the plugin to fetch the settings
+* Add option in Config UI interface to select Type of TV
+* Respond to power on/off actions in a maximum time of 1.5 seconds
+
 ## 5.0.0
 
 * Add support for Frame TVs

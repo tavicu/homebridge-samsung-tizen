@@ -3,7 +3,6 @@
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green?logo=paypal&style=flat-square)](https://www.paypal.com/donate?hosted_button_id=5QLCDRNH77Z9L)
 [![verified-by-homebridge](https://img.shields.io/badge/homebridge-verified-blueviolet?style=flat-square)](https://github.com/homebridge/homebridge/wiki/Verified-Plugins)
 [![npm version](https://img.shields.io/npm/v/homebridge-samsung-tizen?style=flat-square)](https://www.npmjs.com/package/homebridge-samsung-tizen)
-[![Dependencies Status](https://img.shields.io/david/tavicu/homebridge-samsung-tizen?style=flat-square)](https://david-dm.org/tavicu/homebridge-samsung-tizen)
 [![Issues Status](https://img.shields.io/github/issues/tavicu/homebridge-samsung-tizen?style=flat-square)](https://github.com/tavicu/homebridge-samsung-tizen/issues)
 
 
