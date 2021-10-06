@@ -11,6 +11,7 @@
             "delay": {"type": "integer"},
             "method": {"type": "string"},
             "timeout": {"type": "integer"},
+            "api_key": {"type": "string"},
 
             "app_list": {
                 "type": "boolean"
@@ -44,6 +45,7 @@
                         "name": {"type": "string"},
                         "power": {"type": "boolean"},
                         "app": {"type": "string"},
+                        "input": {"type": "string"},
                         "sleep": {"type": "integer"},
                         "mute": {"type": "boolean"},
                         "channel": {"type": "integer"},
@@ -78,6 +80,8 @@
                     "properties": {
                         "wol": {"type": "object"},
                         "timeout": {"type": "integer"},
+                        "api_key": {"type": "string"},
+                        "device_id": {"type": "string"},
 
                         "name": {
                             "type": "string",
@@ -124,8 +128,7 @@
                                 "properties": {
                                     "type": {
                                         "type": "string",
-                                        "default": "app",
-                                        "enum": ["app", "command", "art"]
+                                        "enum": ["app", "input", "command", "art"]
                                     },
                                     "name": {
                                         "type": "string"
@@ -134,7 +137,7 @@
                                         "type": "string"
                                     }
                                 },
-                                "required": ["name", "type", "value"]
+                                "required": ["name", "type", "value", "input"]
                             }
                         },
                         "switches": {
@@ -151,6 +154,10 @@
                                     },
                                     "app": {
                                         "type": "string"
+                                    },
+                                    "input": {
+                                        "type": "string",
+                                        "enum": ["digitalTv", "USB", "HDMI1", "HDMI2", "HDMI3", "HDMI4", "HDMI5", "HDMI6"]
                                     },
                                     "sleep": {
                                         "type": "integer"
@@ -251,6 +258,176 @@
                                 },
                                 {
                                     "type": "fieldset",
+                                    "title": "Inputs",
+                                    "expandable": true,
+                                    "expanded": false,
+                                    "items": [
+                                        {
+                                            "type": "help",
+                                            "helpvalue": "<p class='help-block'>By default no inputs are set. Use this section to set your own inputs. You can find more informations on our <a href='https://github.com/tavicu/homebridge-samsung-tizen/wiki/Inputs' target='_blank'>Wiki Inputs page</a>.</p>"
+                                        },
+                                        {
+                                            "type": "array",
+                                            "notitle": true,
+                                            "items": [
+                                                {
+                                                    "title": "Input",
+                                                    "type": "div",
+                                                    "notitle": true,
+                                                    "display": "flex",
+                                                    "flex-direction": "row",
+                                                    "items": [
+                                                        {
+                                                            "key": "devices[].inputs[].type",
+                                                            "title": "Type",
+                                                            "titleMap": {
+                                                                "app": "Application",
+                                                                "input": "Input",
+                                                                "command": "Command",
+                                                                "art": "Art Mode"
+                                                            }
+                                                        },
+                                                        {
+                                                            "key": "devices[].inputs[].name",
+                                                            "title": "Input Name",
+                                                            "placeholder": "Netflix"
+                                                        },
+                                                        {
+                                                            "key": "devices[].inputs[].value",
+                                                            "title": "Input Value",
+                                                            "placeholder": "11101200001",
+                                                            "condition": {
+                                                                "functionBody": "return !['art', 'input'].includes(model.devices[arrayIndices[0]].inputs[arrayIndices[1]].type);"
+                                                            }
+                                                        },
+                                                        {
+                                                            "key": "devices[].inputs[].value",
+                                                            "title": "Input Source",
+                                                            "condition": {
+                                                                "functionBody": "return model.devices[arrayIndices[0]].inputs[arrayIndices[1]].type == 'input';"
+                                                            },
+                                                            "enum": ["digitalTv", "USB", "HDMI1", "HDMI2", "HDMI3", "HDMI4", "HDMI5", "HDMI6"],
+                                                            "titleMap": {
+                                                                "digitalTv": "Live TV",
+                                                                "USB": "USB",
+                                                                "HDMI1": "HDMI 1",
+                                                                "HDMI2": "HDMI 2",
+                                                                "HDMI3": "HDMI 3",
+                                                                "HDMI4": "HDMI 4",
+                                                                "HDMI5": "HDMI 5",
+                                                                "HDMI6": "HDMI 6"
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "type": "fieldset",
+                                    "title": "Switches",
+                                    "expandable": true,
+                                    "expanded": false,
+                                    "items": [
+                                        {
+                                            "type": "help",
+                                            "helpvalue": "<p class='help-block'>This section give you the option to create custom switches (separated accessories) that make specific actions. You can find more informations on our <a href='https://github.com/tavicu/homebridge-samsung-tizen/wiki/Switches' target='_blank'>Wiki Switches page</a>.</p>"
+                                        },
+                                        {
+                                            "type": "array",
+                                            "notitle": true,
+                                            "items": [
+                                                {
+                                                    "title": "Switch",
+                                                    "type": "div",
+                                                    "notitle": true,
+                                                    "items": [
+                                                        {
+                                                            "key": "devices[].switches[].name",
+                                                            "title": "Switch Name",
+                                                            "description": "Name for the switch. The device name will be appended."
+                                                        },
+                                                        {
+                                                            "key": "devices[].switches[].power",
+                                                            "title": "Power on the TV before running any action"
+                                                        },
+                                                        {
+                                                            "key": "devices[].switches[].mute",
+                                                            "title": "Send mute command to TV"
+                                                        },
+                                                        {
+                                                            "key": "devices[].switches[].app",
+                                                            "title": "Application ID",
+                                                            "description": "Set this if you want to open an application."
+                                                        },
+                                                        {
+                                                            "key": "devices[].switches[].input",
+                                                            "title": "Input Source",
+                                                            "description": "Set this if you want to change TV source. <strong>For this you will have to set SmartThings settings</strong>.",
+                                                            "titleMap": {
+                                                                "digitalTv": "Live TV",
+                                                                "USB": "USB",
+                                                                "HDMI1": "HDMI 1",
+                                                                "HDMI2": "HDMI 2",
+                                                                "HDMI3": "HDMI 3",
+                                                                "HDMI4": "HDMI 4",
+                                                                "HDMI5": "HDMI 5",
+                                                                "HDMI6": "HDMI 6"
+                                                            }
+                                                        },
+                                                        {
+                                                            "key": "devices[].switches[].sleep",
+                                                            "title": "Sleep timer",
+                                                            "description": "This option will turn off the TV after the set time has elapsed. Value is in <b>minutes</b>."
+                                                        },
+                                                        {
+                                                            "key": "devices[].switches[].channel",
+                                                            "title": "Channel Number",
+                                                            "description": "Switch the TV to a channel number. This will not work if you are not on Live TV wehn you trigger the switch!"
+                                                        },
+                                                        {
+                                                            "key": "devices[].switches[].command",
+                                                            "notitle": true,
+                                                            "items": [
+                                                                {
+                                                                    "type": "string",
+                                                                    "title": "Command",
+                                                                    "description": "Send commands to TV. Multiple commands can be added together."
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+
+                                {
+                                    "type": "fieldset",
+                                    "title": "SmartThings",
+                                    "expandable": true,
+                                    "expanded": false,
+                                    "items": [
+                                        {
+                                            "type": "flex",
+                                            "flex-flow": "row wrap",
+                                            "items": [
+                                                {
+                                                    "key": "devices[].api_key",
+                                                    "title": "API Key"
+                                                },
+                                                {
+                                                    "key": "devices[].device_id",
+                                                    "title": "Device ID"
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "type": "fieldset",
                                     "title": "Advanced Configuration",
                                     "expandable": true,
                                     "expanded": false,
@@ -289,121 +466,6 @@
                                                 "Frame.ArtSwitch.Disable": "Disable Art Switch (for Frame TVs)",
                                                 "Frame.PowerSwitch.Disable": "Disable Power Switch (for Frame TVs)"
                                             }
-                                        },
-                                        {
-                                            "type": "section",
-                                            "title": "Inputs",
-                                            "expandable": true,
-                                            "expanded": false,
-                                            "items": [
-                                                {
-                                                    "type": "help",
-                                                    "helpvalue": "<p class='help-block'>By default no inputs are set. Use this section to set your own inputs. You can find more informations on our <a href='https://github.com/tavicu/homebridge-samsung-tizen/wiki/Inputs' target='_blank'>Wiki Inputs page</a>.</p>",
-                                                    "flex": "1 1 100%"
-                                                },
-                                                {
-                                                    "type": "array",
-                                                    "notitle": true,
-                                                    "items": [
-                                                        {
-                                                            "title": "Input",
-                                                            "type": "div",
-                                                            "notitle": true,
-                                                            "display": "flex",
-                                                            "flex-direction": "row",
-                                                            "items": [
-                                                                {
-                                                                    "key": "devices[].inputs[].type",
-                                                                    "title": "Type",
-                                                                    "titleMap": {
-                                                                        "app": "Application",
-                                                                        "command": "Command",
-                                                                        "art": "Art Mode"
-                                                                    }
-                                                                },
-                                                                {
-                                                                    "key": "devices[].inputs[].name",
-                                                                    "title": "Input Name",
-                                                                    "placeholder": "Netflix"
-                                                                },
-                                                                {
-                                                                    "key": "devices[].inputs[].value",
-                                                                    "title": "Input Value",
-                                                                    "placeholder": "11101200001",
-                                                                    "condition": {
-                                                                        "functionBody": "return model.devices[arrayIndices[0]].inputs[arrayIndices[1]].type !== 'art';"
-                                                                    }
-                                                                }
-                                                            ]
-                                                        }
-                                                    ]
-                                                }
-                                            ]
-                                        },
-                                        {
-                                            "type": "section",
-                                            "title": "Switches",
-                                            "expandable": true,
-                                            "expanded": false,
-                                            "items": [
-                                                {
-                                                    "type": "help",
-                                                    "helpvalue": "<p class='help-block'>This section give you the option to create custom switches (separated accessories) that make specific actions. You can find more informations on our <a href='https://github.com/tavicu/homebridge-samsung-tizen/wiki/Switches' target='_blank'>Wiki Switches page</a>.</p>",
-                                                    "flex": "1 1 100%"
-                                                },
-                                                {
-                                                    "type": "array",
-                                                    "notitle": true,
-                                                    "items": [
-                                                        {
-                                                            "title": "Switch",
-                                                            "type": "div",
-                                                            "notitle": true,
-                                                            "items": [
-                                                                {
-                                                                    "key": "devices[].switches[].name",
-                                                                    "title": "Switch Name",
-                                                                    "description": "Name for the switch. The device name will be appended."
-                                                                },
-                                                                {
-                                                                    "key": "devices[].switches[].power",
-                                                                    "title": "Power on the TV before running any action"
-                                                                },
-                                                                {
-                                                                    "key": "devices[].switches[].mute",
-                                                                    "title": "Send mute command to TV"
-                                                                },
-                                                                {
-                                                                    "key": "devices[].switches[].app",
-                                                                    "title": "Application ID",
-                                                                    "description": "Set this if you want to open an application."
-                                                                },
-                                                                {
-                                                                    "key": "devices[].switches[].sleep",
-                                                                    "title": "Sleep timer",
-                                                                    "description": "This option will turn off the TV after the set time has elapsed. Value is in <b>minutes</b>."
-                                                                },
-                                                                {
-                                                                    "key": "devices[].switches[].channel",
-                                                                    "title": "Channel Number",
-                                                                    "description": "Switch the TV to a channel number. This will not work if you are not on Live TV wehn you trigger the switch!"
-                                                                },
-                                                                {
-                                                                    "key": "devices[].switches[].command",
-                                                                    "notitle": true,
-                                                                    "items": [
-                                                                        {
-                                                                            "type": "string",
-                                                                            "title": "Command",
-                                                                            "description": "Send commands to TV. Multiple commands can be added together."
-                                                                        }
-                                                                    ]
-                                                                }
-                                                            ]
-                                                        }
-                                                    ]
-                                                }
-                                            ]
                                         },
                                         {
                                             "type": "section",
