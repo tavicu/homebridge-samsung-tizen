@@ -157,7 +157,7 @@
                                     },
                                     "input": {
                                         "type": "string",
-                                        "enum": ["digitalTv", "USB", "HDMI1", "HDMI2", "HDMI3", "HDMI4", "HDMI5", "HDMI6"]
+                                        "enum": ["digitalTv", "HDMI1", "HDMI2", "HDMI3", "HDMI4", "HDMI5", "HDMI6", "USB", "AM", "FM"]
                                     },
                                     "sleep": {
                                         "type": "integer"
@@ -258,6 +258,24 @@
                                 },
                                 {
                                     "type": "fieldset",
+                                    "title": "SmartThings API",
+                                    "items": [
+                                        {
+                                          "type": "help",
+                                          "helpvalue": "<p class='help-block'>SmartThings API is <strong>optional</strong>. You will need to set these parameters only if you want to use inputs! Please <a href='#' target='_blank'>follow this tutorial</a>.</p>"
+                                        },
+                                        {
+                                            "key": "devices[].api_key",
+                                            "title": "API Key"
+                                        },
+                                        {
+                                            "key": "devices[].device_id",
+                                            "title": "Device ID"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "type": "fieldset",
                                     "title": "Inputs",
                                     "expandable": true,
                                     "expanded": false,
@@ -306,16 +324,18 @@
                                                             "condition": {
                                                                 "functionBody": "return model.devices[arrayIndices[0]].inputs[arrayIndices[1]].type == 'input';"
                                                             },
-                                                            "enum": ["digitalTv", "USB", "HDMI1", "HDMI2", "HDMI3", "HDMI4", "HDMI5", "HDMI6"],
+                                                            "enum": ["digitalTv", "HDMI1", "HDMI2", "HDMI3", "HDMI4", "HDMI5", "HDMI6", "USB", "AM", "FM"],
                                                             "titleMap": {
                                                                 "digitalTv": "Live TV",
-                                                                "USB": "USB",
                                                                 "HDMI1": "HDMI 1",
                                                                 "HDMI2": "HDMI 2",
                                                                 "HDMI3": "HDMI 3",
                                                                 "HDMI4": "HDMI 4",
                                                                 "HDMI5": "HDMI 5",
-                                                                "HDMI6": "HDMI 6"
+                                                                "HDMI6": "HDMI 6",
+                                                                "USB": "USB",
+                                                                "AM": "AM",
+                                                                "FM": "FM"
                                                             }
                                                         }
                                                     ]
