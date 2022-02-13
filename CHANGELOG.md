@@ -8,6 +8,12 @@
 * Bugfix: Fix warning when a custom switch takes longer to execute
 * Improvement: Update dependencies used by the plugin
 
+## 5.1.1
+
+* Fix compatibility with HOOBS
+
+For more informations regarding this problem please follow this link: https://github.com/hoobs-org/HOOBS/issues/1790#issuecomment-1038079128
+
 ## 5.1.0
 
 * Update and improve http requests
