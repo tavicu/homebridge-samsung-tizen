@@ -3,7 +3,8 @@
 ## 5.2.0
 
 * New: Add integration with SmartThings API
-* New: Add option to create inputs that selects a specific source (HDMI1, TV). For this you will have to setup SmartThings API
+* New: Add option to create inputs that selects a specific source (example: HDMI1, Live TV)
+* NEW: Add option to select picture mode
 * Bugfix: Clear sleep timeout if the TV shuts down sooner
 * Bugfix: Fix warning when a custom switch takes longer to execute
 * Improvement: Update dependencies used by the plugin
