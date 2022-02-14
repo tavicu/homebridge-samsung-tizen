@@ -32,7 +32,8 @@
                     "properties": {
                         "type": {"type": "string"},
                         "name": {"type": "string"},
-                        "value": {"type": "string"}
+                        "value": {"type": "string"},
+                        "delay": {"type": "integer"}
                     }
                 }
             },
@@ -49,6 +50,7 @@
                         "sleep": {"type": "integer"},
                         "mute": {"type": "boolean"},
                         "channel": {"type": "integer"},
+                        "picture_mode": {"type": "string"},
                         "command": {
                             "type": "array",
                             "items": {
@@ -128,6 +130,7 @@
                                 "properties": {
                                     "type": {
                                         "type": "string",
+                                        "default": "app",
                                         "enum": ["app", "input", "command", "art"]
                                     },
                                     "name": {
@@ -135,9 +138,12 @@
                                     },
                                     "value": {
                                         "type": "string"
+                                    },
+                                    "delay": {
+                                        "type": "integer"
                                     }
                                 },
-                                "required": ["name", "type", "value", "input"]
+                                "required": ["name", "type", "value"]
                             }
                         },
                         "switches": {
@@ -167,6 +173,9 @@
                                     },
                                     "channel": {
                                         "type": "integer"
+                                    },
+                                    "picture_mode": {
+                                        "type": "string"
                                     },
                                     "command": {
                                         "type": "array",
