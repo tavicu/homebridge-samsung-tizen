@@ -3,11 +3,15 @@
 ## 5.2.0
 
 * New: Add integration with SmartThings API
-* New: Add option to create inputs that selects a specific source (example: HDMI1, Live TV)
-* NEW: Add option to select picture mode
-* Bugfix: Clear sleep timeout if the TV shuts down sooner
-* Bugfix: Fix warning when a custom switch takes longer to execute
-* Improvement: Update dependencies used by the plugin
+* Add option to create inputs that selects a specific source (example: HDMI1, Live TV) (require SmartThings API)
+* Add option to select picture mode (require SmartThings API)
+* Add option to set volume with a switch (require SmartThings API)
+* If SmartThings API is configured use it for changing channels
+* Add delay when running a command right after the TV powered ON
+* Clear sleep timeout if the TV shuts down sooner
+* Fix warning when a custom switch takes longer to execute
+* Update dependencies used by the plugin
+
 
 ## 5.1.1
 
