@@ -3,7 +3,7 @@
 ## 5.2.0
 
 * New: Add integration with SmartThings API
-* Add option to create inputs that selects a specific source (example: HDMI1, Live TV) (require SmartThings API)
+* Add option to create inputs that selects a specific source (require SmartThings API)
 * Add option to select picture mode (require SmartThings API)
 * Add option to set volume with a switch (require SmartThings API)
 * If SmartThings API is configured use it for changing channels
@@ -11,6 +11,7 @@
 * Clear sleep timeout if the TV shuts down sooner
 * Fix warning when a custom switch takes longer to execute
 * Update dependencies used by the plugin
+* Remove feature to list installed applications (Samsung removed their API)
 
 
 ## 5.1.1
