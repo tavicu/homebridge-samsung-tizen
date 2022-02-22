@@ -14,10 +14,6 @@
             "wait_time": {"type": "integer"},
             "api_key": {"type": "string"},
 
-            "app_list": {
-                "type": "boolean"
-            },
-
             "refresh": {
                 "type": "object",
                 "properties": {
@@ -224,11 +220,6 @@
     },
 
     "layout": [
-        {
-            "key": "app_list",
-            "title": "List Applications List",
-            "description": "Shows installed applications when you start Homebridge instance if TV supports it (Model year < 2020)."
-        },
         {
             "type": "fieldset",
             "title": "Devices",
