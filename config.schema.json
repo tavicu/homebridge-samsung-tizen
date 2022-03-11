@@ -173,7 +173,8 @@
                                         "type": "integer"
                                     },
                                     "picture_mode": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "enum": ["Standard", "Dynamic", "Natural", "Movie"]
                                     },
                                     "command": {
                                         "type": "array",
@@ -264,7 +265,7 @@
                                     "items": [
                                         {
                                           "type": "help",
-                                          "helpvalue": "<p class='help-block'>SmartThings API is <strong>optional</strong>. You will need to set these parameters only if you want to use inputs! Please <a href='#' target='_blank'>follow this tutorial</a>.</p>"
+                                          "helpvalue": "<p class='help-block'>SmartThings API is <strong>optional</strong>. You will need to set these parameters only if you want to use inputs! Please <a href='https://github.com/tavicu/homebridge-samsung-tizen/wiki/SmartThings-Setup' target='_blank'>follow this tutorial</a>.</p>"
                                         },
                                         {
                                             "key": "devices[].api_key",
@@ -397,6 +398,16 @@
                                                                 "HDMI5": "HDMI 5",
                                                                 "HDMI6": "HDMI 6"
                                                             }
+                                                        },
+                                                        {
+                                                            "key": "devices[].switches[].volume",
+                                                            "title": "Audio volume",
+                                                            "description": "Change audio volume"
+                                                        },
+                                                        {
+                                                            "key": "devices[].switches[].picture_mode",
+                                                            "title": "Picture mode",
+                                                            "description": "Change picture mode"
                                                         },
                                                         {
                                                             "key": "devices[].switches[].sleep",
