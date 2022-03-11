@@ -29,7 +29,7 @@ class SamsungPlatform {
             method   : config.method,
             refresh  : config.refresh,
             timeout  : config.timeout,
-            app_list : config.app_list || false,
+            api_key  : config.api_key || null
         };
 
         if (this.api) {
