@@ -13,6 +13,8 @@
 * Update dependencies used by the plugin
 * Remove feature to list installed applications (Samsung removed their API)
 
+Read here on how to setup SmartThings API: https://github.com/tavicu/homebridge-samsung-tizen/wiki/SmartThings-Setup
+
 
 ## 5.1.1
 
