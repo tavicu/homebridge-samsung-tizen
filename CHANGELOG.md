@@ -1,5 +1,13 @@
 # Change Log
 
+## 5.2.3
+
+ATTENTION! This is just a bump in version so the message can reach more users.
+Samsung pushed a new update for Frame TVs (late 2021 and 2022 from what we know)
+and it decided to remove the API for Art Mode.
+Right now we are still looking for a solution.
+Until then, don't update your Frames and make sure you disable Auto Update.
+
 ## 5.2.0
 
 * New: Add integration with SmartThings API
