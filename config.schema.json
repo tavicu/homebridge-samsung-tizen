@@ -417,7 +417,7 @@
                                                         {
                                                             "key": "devices[].switches[].channel",
                                                             "title": "Channel Number",
-                                                            "description": "Switch the TV to a channel number. This will not work if you are not on Live TV wehn you trigger the switch!"
+                                                            "description": "Switch the TV to a channel number. This will not work if you are not on Live TV when you trigger the switch!"
                                                         },
                                                         {
                                                             "key": "devices[].switches[].command",
