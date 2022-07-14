@@ -1,5 +1,9 @@
 # Change Log
 
+## 5.2.4
+
+Bug fixing and improvements.
+
 ## 5.2.3
 
 ATTENTION! This is just a bump in version so the message can reach more users.
