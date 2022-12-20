@@ -150,12 +150,10 @@ Unfortunately Samsung decided to remove the API that we used in the past to get 
 
 3. In Tizen Studio Device Manager, right click on the entry with your TV and select `Installed Web App List` from the dropdown.
 If you can't see `Installed Web App List` in the dropdown, make sure you installed the TV Extenstion from the first step!
-
-<img :src="$withBase('/images/extra.app-JKEhQ.png')" alt="">
+![Device Manager](~@images/extra.app-device-manager.png)
 
 4. A list with all installed applications should appear
-
-<img :src="$withBase('/images/extra.app-54Ejn.png')" alt="">
+![App List](~@images/extra.app-list.png)
 
 5. As ID use the value from `App ID - WAS`
 

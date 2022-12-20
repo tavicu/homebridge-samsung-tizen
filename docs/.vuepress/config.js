@@ -1,3 +1,5 @@
+const path = require('path');
+
 module.exports = {
     title: 'Homebridge Samsung Tizen',
     description: '',
@@ -9,6 +11,14 @@ module.exports = {
         ['meta', { name: 'apple-mobile-web-app-capable', content: 'yes' }],
         ['meta', { name: 'apple-mobile-web-app-status-bar-style', content: 'black' }]
     ],
+
+    configureWebpack: {
+        resolve: {
+            alias: {
+                '@images': path.resolve(__dirname, 'images')
+            }
+        }
+    },
 
     themeConfig: {
         repo: 'tavicu/homebridge-samsung-tizen',
