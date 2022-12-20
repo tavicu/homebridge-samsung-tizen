@@ -8,4 +8,5 @@ ehthumbs.db
 Thumbs.db
 Icon
 
-/node_modules
+node_modules
+dist

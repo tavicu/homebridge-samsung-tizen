@@ -30,15 +30,21 @@
   },
   "dependencies": {
     "deepmerge": "^4.2.2",
-    "fs-extra": "^10.0.0",
-    "is-port-reachable": "^3.0.0",
+    "fs-extra": "^10.1.0",
+    "is-port-reachable": "^3.1.0",
     "node-fetch": "^2.6.7",
     "timeout-signal": "^1.1.0",
     "wakeonlan": "^0.1.0",
-    "ws": "^8.2.3"
+    "ws": "^8.11.0"
   },
-  "funding": {
-    "type": "paypal",
-    "url": "https://www.paypal.com/donate?hosted_button_id=5QLCDRNH77Z9L"
-  }
+  "funding": [
+    {
+      "type": "paypal",
+      "url": "https://www.paypal.com/donate?hosted_button_id=5QLCDRNH77Z9L"
+    },
+    {
+      "type": "buymeacoffee",
+      "url": "https://www.buymeacoffee.com/tavicu"
+    }
+  ]
 }
