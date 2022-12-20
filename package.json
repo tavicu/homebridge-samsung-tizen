@@ -33,7 +33,7 @@
     "fs-extra": "^10.1.0",
     "is-port-reachable": "^3.1.0",
     "node-fetch": "^2.6.7",
-    "timeout-signal": "^1.1.0",
+    "timeout-signal": "^2.0.0",
     "wakeonlan": "^0.1.0",
     "ws": "^8.11.0"
   },
