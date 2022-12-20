@@ -1,0 +1,1 @@
+# Pairing the device

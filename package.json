@@ -1,0 +1,20 @@
+{
+  "name": "homebridge-samsung-tizen",
+  "version": "1.0.0",
+  "description": "Documentation for homebridge-samsung-tizen plugin",
+  "scripts": {
+    "docs:dev": "vuepress dev docs",
+    "docs:build": "vuepress build docs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tavicu/homebridge-samsung-tizen.git"
+  },
+  "author": "Octavian Ruda",
+  "homepage": "https://tavicu.github.io/homebridge-samsung-tizen",
+  "devDependencies": {
+    "vuepress": "^1.9.7",
+    "vuepress-plugin-medium-zoom": "^1.1.9",
+    "vuepress-plugin-smooth-scroll": "^0.0.10"
+  }
+}
