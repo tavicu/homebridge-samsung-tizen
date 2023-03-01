@@ -58,7 +58,8 @@ module.exports = {
                 collapsable: false,
                 children: [
                     '/configuration/',
-                    '/configuration/options',
+                    '/configuration/device-settings',
+                    '/configuration/frame-tvs',
                     '/configuration/smartthings-api',
                 ]
             },

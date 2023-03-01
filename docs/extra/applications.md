@@ -28,10 +28,12 @@ Most of the IDs changed starting with year 2020. If you know your TV model is fr
 | NOW TV                   | `3201603008746` / `3201603008746`                   |
 | NOW PlayTV               | `3202011022131`                                     |
 | VOYO.RO                  | `111299000769`                                      |
+| SkyShowtime              | `3202208028071`                                     |
 | Pluto TV                 | `3201808016802` / `3201808016802`                   |
 | Discovery+               | `3201803015944`                                     |
 | IPTV Smarters            | `3201812017585`                                     |
 | IPTV Smarters Pro        | `3202009021808`                                     |
+| SmartOne IPTV            | `3202102022877`                                     |
 | Apple TV                 | `3201807016597`                                     |
 | Apple Music              | `3201908019041`                                     |
 | Amazon Music             | `3201710014874`                                     |
