@@ -92,7 +92,7 @@ Unfortunately updating the inputs as soon as you toggle the Art Mode Switch was 
 I will look into it and add it soon. But until then, it will only update the inputs when Home App request it (usually when you open the home app).
 
 Example of how to add the new input:
-```
+``` json
 {
     "name": "Frame TV",
     "ip": "192.168.10.230",
@@ -101,7 +101,7 @@ Example of how to add the new input:
         "Frame.RealPowerMode"
     ],
     "inputs": [
-        {"type": "art", "name": "Art Mode"}
+        {"name": "Art Mode", "type": "art"}
     ]
 }
 ```

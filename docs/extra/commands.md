@@ -1,5 +1,30 @@
 # Commands
 
+Commands represents buttons from phisical remotes and Samsung API allows us to send these commands to the TV.
+
+Example of sending a command
+```
+{"name": "Vol Up", "command": "KEY_VOLUP"}
+```
+
+Example of sending multiple commands
+```
+{"name": "Multiple commands", "command": "KEY_LEFT,KEY_RIGHT,KEY_UP"}
+```
+
+Example of sending a command multiple times. This will send the command `KEY_VOLUP` **5 times**
+```
+{"name": "Vol Up", "command": "KEY_VOLUP*5"}
+```
+
+Example of holding a key for 5 seconds. The time is in seconds, to hold for 2 minutes you need to use `120s`
+```
+{"name": "Vol Up", "command": "KEY_VOLUP*5s"}
+```
+
+
+## List of commands
+
 Here you can find a list of commands that can be sent to TV. These commands are buttons that are found on phisical remote.
 
 ::: tip
