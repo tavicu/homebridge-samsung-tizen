@@ -47,6 +47,7 @@ module.exports = {
                 children: [
                     '/installation/',
                     '/installation/plugin-installation',
+                    '/installation/setting-the-device',
                     '/installation/pairing-the-device',
                     '/installation/adding-to-home-app',
                 ]
