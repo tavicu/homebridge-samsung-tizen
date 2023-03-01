@@ -4,6 +4,7 @@ module.exports = {
     title: 'Homebridge Samsung Tizen',
     description: '',
 
+    port: 8181,
     base: '/homebridge-samsung-tizen/',
 
     head: [
