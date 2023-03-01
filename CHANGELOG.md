@@ -1,5 +1,9 @@
 # Change Log
 
+## 5.2.5
+
+Fix custom switches label.
+
 ## 5.2.4
 
 Bug fixing and improvements.
