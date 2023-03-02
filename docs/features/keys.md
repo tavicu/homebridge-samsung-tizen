@@ -10,6 +10,8 @@ To access Apple TV Remote open the Control Center by swiping down from the upper
 
 If you don't have the icon on the Control Center it can be activated by going into `Settings` -> `Control Center`.
 
+From here you can also change the speaker volume of TV by pressing the phisical volume buttons on your phone / tablet.
+
 ![Features Keys](~@images/features.keys.jpg)
 
 ## Default mapping

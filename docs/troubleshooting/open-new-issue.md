@@ -4,7 +4,7 @@ sidebarDepth: 0
 
 # How to open new issue
 
-Before opening a new issue make sure you checked the documentation for a solution to your problem.
+Before opening a new issue make sure you checked the documentation for a solution to your problem and also check the [Common issues page](/troubleshooting/common-issues.md).
 
 It is recommended to also search the [closed issues](https://github.com/tavicu/homebridge-samsung-tizen/issues?q=is%3Aissue+), maybe someone already had your problem and he found a solution.
 
