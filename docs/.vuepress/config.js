@@ -88,11 +88,6 @@ module.exports = {
                     '/extra/commands',
                     '/extra/install-beta',
                 ]
-            },
-            {
-                title: 'Config',
-                path: '/config/',
-                collapsable: false
             }
         ]
     },
