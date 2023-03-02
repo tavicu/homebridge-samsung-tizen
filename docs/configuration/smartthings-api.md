@@ -6,6 +6,10 @@ SmartThings have a weird functionality and if you don't use the SmartThings appl
 In my opinion, these are anti-competitive methods to force you to use their application.
 :::
 
+::: warning
+Features using SmartThings API are not local and it will require the server to have access to internet. Requests are sent to SmartThings API, not the TV itself.
+:::
+
 We are starting to implement new features from SmartThings API and migrate some functionalities to their API instead of using hacks.
 
 What can be done throught SmartThings API:

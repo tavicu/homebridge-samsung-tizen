@@ -14,7 +14,7 @@ If you don't have the icon on the Control Center it can be activated by going in
 
 ## Default mapping
 
-By default the buttons are already programmed to default commands like in the table below. 
+By default the buttons are already programmed to default commands like in the table below and you don't need to add them to config file unless you want to change something.
 
 You can find a list with known commands on the [Commands page](/extra/commands.md).
 
