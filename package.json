@@ -1,5 +1,6 @@
 {
   "name": "homebridge-samsung-tizen",
+  "displayName": "Homebridge Samsung Tizen",
   "version": "5.2.5",
   "description": "Homebridge plugin for Samsung TV's with Tizen OS",
   "main": "index.js",
@@ -20,7 +21,7 @@
   ],
   "author": "Octavian Ruda",
   "license": "MIT",
-  "homepage": "https://github.com/tavicu/homebridge-samsung-tizen#readme",
+  "homepage": "https://tavicu.github.io/homebridge-samsung-tizen/",
   "bugs": {
     "url": "https://github.com/tavicu/homebridge-samsung-tizen/issues"
   },
