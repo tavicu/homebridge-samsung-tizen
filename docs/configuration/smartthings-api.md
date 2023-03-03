@@ -35,7 +35,7 @@ Please make sure to never post the `api_key` and `device_id` public on the inter
 
 ## Setting up the app
 
-First step is to install the SmartThings application on your phone. 
+First step is to install the SmartThings application on your phone.
 
 If you need help you can follow the steps from [Samsung support page](https://www.samsung.com/uk/support/apps-services/how-to-install-and-use-the-smartthings-app-on-my-iphone/)
 
@@ -53,7 +53,7 @@ Click on `Generate new token` button:
 
 On `Token Name` insert a name for your token so you will be able to identify it. For example `Homebridge Samsung-Tizen`.
 
-On `Authorized Scopes` you can select all checkboxes. I suggest selecting everything from the list because I don't know what features will be included in a future version or what SmartThings API want to access when you use one of the current feature. 
+On `Authorized Scopes` you can select all checkboxes. I suggest selecting everything from the list because I don't know what features will be included in a future version or what SmartThings API want to access when you use one of the current feature.
 
 _If you don't want to select everything from the `Authorized Scopes` the minimum you need is all from `Devices`, `Installed Applications`, `Applications`, `Channels`, `Custom Capabilites` and `Device Profiles`. But again, depending on the features you may get `Unauthorized response` from SmartThings API_.
 
@@ -83,7 +83,7 @@ If you are using Config UI X you can do this from the settings of the plugin.
 
 If you like to be the master of your config and edit it then here are some examples:
 
-```
+``` json
 {
     "platform": "SamsungTizen",
     "devices": [
@@ -100,7 +100,7 @@ If you like to be the master of your config and edit it then here are some examp
 
 If you have multiple devices you can set the `api_key` as general and it will apply to all devices like this:
 
-```
+``` json
 {
     "platform": "SamsungTizen",
     "api_key": "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXX",

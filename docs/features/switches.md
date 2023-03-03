@@ -5,6 +5,7 @@ Switches allows you to create custom accessories with actions that can't be done
 A custom switch can execute multiple or even all actions.
 
 This for example will: Set a sleep time for 60 minutes, mute the TV, change the aspect ratio to 16:9 and switch the TV to channel 13.
+
 ``` json
 {"name": "Multiple", "sleep": 60, "mute": true, "command": "KEY_16_9", "channel": 13}
 ```
@@ -25,11 +26,11 @@ This for example will: Set a sleep time for 60 minutes, mute the TV, change the 
 | [command](#command)           | Send command(s) to TV                           |
 
 ### name
+
 **(Required)** The name of the switch to be used in Home app. The main device name will be appended to the switch name.
 
 - Type: `string`
 - Example: `My Switch`
-
 
 ## Actions
 
@@ -106,7 +107,7 @@ This option allow you to open an installed application. You can find a list with
 In order to use this type of action you must have [SmartThings API](/configuration/smartthings-api.md) configured.
 :::
 
-Select a specific input source. 
+Select a specific input source.
 
 - Type: `string`
 - Example `HDMI1`
@@ -151,21 +152,25 @@ Send commands to TV. You can find a list with known commands on the [Commands pa
 - Example `KEY_VOLUP`
 
 Example of sending a command
-```
+
+``` json
 {"name": "Vol Up", "command": "KEY_VOLUP"}
 ```
 
 Example of sending multiple commands
-```
+
+``` json
 {"name": "Multiple commands", "command": "KEY_LEFT,KEY_RIGHT,KEY_UP"}
 ```
 
 Example of sending a command multiple times. This will send the command `KEY_VOLUP` **5 times**
-```
+
+``` json
 {"name": "Vol Up", "command": "KEY_VOLUP*5"}
 ```
 
 Example of holding a key for 5 seconds
-```
+
+``` json
 {"name": "Vol Up", "command": "KEY_VOLUP*5s"}
 ```

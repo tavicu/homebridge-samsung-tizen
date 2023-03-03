@@ -1,6 +1,6 @@
 # Setting the device
 
-Once you install the plugin you will need to add your devices. 
+Once you install the plugin you will need to add your devices.
 
 After each change to the configuration you will need to restart your Homebridge server to apply the changes.
 

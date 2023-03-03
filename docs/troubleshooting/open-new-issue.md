@@ -16,7 +16,7 @@ If you problem is related to configuration or that something it's not working pl
 If you have a technical problem and something it's not working as it should you are required to start the plugin in debug mode and provide logs from the console related to the plugin and the problem. If you don't provide this information the issue will be closed without response.
 :::
 
-To identify what logs are helpful you must look for logs that include the name of the TV you set in config file or for the plugin name (for example `Bedroom TV` or `homebridge-samsung-tizen`). 
+To identify what logs are helpful you must look for logs that include the name of the TV you set in config file or for the plugin name (for example `Bedroom TV` or `homebridge-samsung-tizen`).
 
 ![Troubleshooting console one](~@images/trouble.console-one.png)
 
@@ -30,7 +30,7 @@ Once you are sure you want to open a new issue you can access the [Issues page](
 
 If you are using Homebridge UI you can do this from the settings.
 
-Press the three dots from the upper-right corner then select `Homebridge Settings`. 
+Press the three dots from the upper-right corner then select `Homebridge Settings`.
 
 Then on the `Startup Options` make sure to enable the radio button for `Homebridge Debug Mode -D`.
 

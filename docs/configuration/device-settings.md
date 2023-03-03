@@ -18,7 +18,6 @@ sidebarDepth: 0
 | [delay](#delay)         | -        | The delay between commands in miliseconds                 |
 | [refresh](#refresh)     | -        | Intervals for refreshing accessories in the background    |
 
-
 ## name
 
 **(Required)** The name of the device. It will appear in Home app and also will be used in the name of the custom switches.
@@ -47,7 +46,7 @@ sidebarDepth: 0
 
 ## mac
 
-**(Required)** The MAC address of the device. This is required to power on the TV. 
+**(Required)** The MAC address of the device. This is required to power on the TV.
 
 You need to use `:` as a separator.
 
@@ -62,7 +61,7 @@ You need to use `:` as a separator.
 
 ## uuid
 
-Each device have a unique id that is used by Home app for pairing. By default UUID is created from the MAC address since this is unique for each TV. 
+Each device have a unique id that is used by Home app for pairing. By default UUID is created from the MAC address since this is unique for each TV.
 
 But there are times when the TV was unpaired from Home app but not from the Homebridge server. This will result in not being able to add the accessory again in Home app.
 
@@ -163,7 +162,7 @@ The delay between commands in miliseconds.
 
 ## refresh
 
-Intervals for refreshing accessories in the background. 
+Intervals for refreshing accessories in the background.
 
 By default the main accessory will be refreshed every **5 seconds** and the custom switches will refresh every **30 seconds**. I don't recomment changing the values to something lower because it will flood the TV with requests.
 
@@ -175,7 +174,7 @@ The minimum value is `500` *(0.5 seconds)* for main accessory and `1000` *(1 sec
 ``` json
 {
     "refresh": {
-        main: 5000, 
+        main: 5000,
         switch: 30000
     }
 }

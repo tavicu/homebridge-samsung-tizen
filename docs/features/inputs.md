@@ -6,19 +6,21 @@ Sometimes when you add inputs it takes some time for HomeKit to link them to TV.
 
 Since iOS 12 Apple allows us to add inputs for TVs.
 
-There are multiple types of inputs. With the basic configuration you can open [applications](#application-type) or send [commands](#command-type) to TV. 
+There are multiple types of inputs. With the basic configuration you can open [applications](#application-type) or send [commands](#command-type) to TV.
 
 If you also have [SmartThing API](/configuration/smartthings-api.md) configured you can select specific inputs like `HDMI1`.
 
 ## Settings
 
 ### name
+
 **(Required)** The name of the input to be used in Home app.
 
 - Type: `string`
 - Example: `Netflix`
 
 ### type
+
 **(Required)** The type of the input.
 
 - Type: `string`
@@ -26,11 +28,11 @@ If you also have [SmartThing API](/configuration/smartthings-api.md) configured 
 - Options: [`app`](#application-type) / [`command`](#command-type) / [`input`](#input-type) / [`art`](#art-type)
 
 ### value
+
 **(Required)** The value of the input. Depending on what type the input is it can be an application id or a command.
 
 - Type: `string`
 - Example: `11101200001`
-
 
 ## Examples
 

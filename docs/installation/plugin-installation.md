@@ -1,7 +1,7 @@
 # Plugin installation
 
 ::: warning HOOBS Users
-This plugin was designed for **Homebridge** server. 
+This plugin was designed for **Homebridge** server.
 At the moment the plugin works with HOOBS too but unfortunately we cannot offer any support for it and we cannot guarantee how it will works in the future since we are not following HOOBS releases and changes.
 :::
 
