@@ -10,6 +10,7 @@ sidebarDepth: 0
 | [ip](#ip)               | **Yes**  | IP address of the device                                  |
 | [mac](#mac)             | **Yes**  | MAC address of the device                                 |
 | [uuid](#uuid)           | -        | Option to change UUID                                     |
+| [options](#options)     | -        | Options that allows you to change the default behavior    |
 | [api_key](#api_key)     | -        | Api key for SmartThings                                   |
 | [device_id](#device_id) | -        | Device ID for SmartThings                                 |
 | [inputs](#inputs)       | -        | Custom inputs                                             |
@@ -74,6 +75,37 @@ That's why we added this key where you can set a string and the new UUID will be
 ``` json
 {
     "uuid": "a1"
+}
+```
+
+## options
+
+With this list you can select some options that change the default behavior of the plugin for a device.
+
+- Type: `list`
+- Default: `[]`
+
+Possible options:
+
+- `Switch.DeviceName.Disable` - By default all custom switches have the main device prepended to the name. With this option you can disable this and create the switch only with the name you select in config file for the switch.
+
+- `Frame.ArtSwitch.Disable` - Remove the default Art Mode Switch that is created by default for Frame TVs
+
+- `Frame.PowerSwitch.Disable` - Remove the default Power Switch that is created by default for Frame TVs
+
+- `Frame.RealPowerMode` - Change the main accessory behaivor for Frame TVs and control the real power of TV
+
+``` json
+{
+    "name": "Frame TV",
+    "ip": "10.20.30.40",
+    "mac": "A0:B1:C2:D3:E4:F5",
+    "options": [
+        "Switch.DeviceName.Disable",
+        "Frame.RealPowerMode",
+        "Frame.ArtSwitch.Disable",
+        "Frame.PowerSwitch.Disable"
+    ]
 }
 ```
 

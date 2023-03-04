@@ -74,8 +74,8 @@ Example of config:
 ``` json
 {
     "name": "Frame TV",
-    "ip": "192.168.10.230",
-    "mac": "4C:C9:5E:94:39:BC",
+    "ip": "10.20.30.40",
+    "mac": "A0:B1:C2:D3:E4:F5",
     "options": [
         "Frame.RealPowerMode",
         "Frame.ArtSwitch.Disable",
