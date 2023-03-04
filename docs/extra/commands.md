@@ -3,25 +3,28 @@
 Commands represents buttons from phisical remotes and Samsung API allows us to send these commands to the TV.
 
 Example of sending a command
-```
+
+``` json
 {"name": "Vol Up", "command": "KEY_VOLUP"}
 ```
 
 Example of sending multiple commands
-```
+
+``` json
 {"name": "Multiple commands", "command": "KEY_LEFT,KEY_RIGHT,KEY_UP"}
 ```
 
 Example of sending a command multiple times. This will send the command `KEY_VOLUP` **5 times**
-```
+
+``` json
 {"name": "Vol Up", "command": "KEY_VOLUP*5"}
 ```
 
 Example of holding a key for 5 seconds. The time is in seconds, to hold for 2 minutes you need to use `120s`
-```
+
+``` json
 {"name": "Vol Up", "command": "KEY_VOLUP*5s"}
 ```
-
 
 ## List of commands
 
@@ -33,14 +36,13 @@ This is not an official list from Samsung and some of the keys may not work with
 
 ### Power Key
 
-```
+``` textile
 KEY_POWER
 ```
 
-
 ### Menus
 
-```
+``` textile
 KEY_MENU
 KEY_TOPMENU
 KEY_TOOLS
@@ -54,7 +56,7 @@ KEY_DVR_MENU
 
 ### Direction Keys
 
-```
+``` textile
 KEY_UP
 KEY_DOWN
 KEY_LEFT
@@ -63,10 +65,9 @@ KEY_ENTER
 KEY_RETURN
 ```
 
-
 ### Number Keys
 
-```
+``` textile
 KEY_0
 KEY_1
 KEY_2
@@ -83,7 +84,7 @@ KEY_12
 
 ### Channel Keys
 
-```
+``` textile
 KEY_CHUP
 KEY_CHDOWN
 KEY_PRECH
@@ -95,7 +96,7 @@ KEY_MAGIC_CHANNEL
 
 ### Volume Keys
 
-```
+``` textile
 KEY_VOLUP
 KEY_VOLDOWN
 KEY_MUTE
@@ -103,7 +104,7 @@ KEY_MUTE
 
 ### Input Keys
 
-```
+``` textile
 KEY_SOURCE
 KEY_HDMI
 KEY_COMPONENT1
@@ -124,7 +125,7 @@ KEY_DTV
 
 ### Media Keys
 
-```
+``` textile
 KEY_REWIND
 KEY_STOP
 KEY_PLAY
@@ -139,7 +140,7 @@ KEY_INSTANT_REPLAY
 
 ### Extended Keys
 
-```
+``` textile
 KEY_EXT1
 KEY_EXT2
 KEY_EXT3
@@ -158,7 +159,7 @@ KEY_EXT41
 
 ### Other Keys
 
-```
+``` textile
 KEY_GREEN
 KEY_YELLOW
 KEY_CYAN

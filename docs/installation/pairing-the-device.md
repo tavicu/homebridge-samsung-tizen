@@ -11,4 +11,5 @@ After the Homebridge server starts you should see a popup on your TV asking to g
 ![Setting device saving configuration](~@images/install.pairing-device.jpg)
 
 ### Clicked Deny by mistake
+
 In case you click **Deny** by mistake the TV will remember and it will reject all future connections. What you need to do is go to `Settings` -> `General` -> `External Device Manager` -> `Device Connection Manager` -> `Device List` and change the permission to Allow or just remove the entry and restart the Homebridge server to initiate the pairing procedure.

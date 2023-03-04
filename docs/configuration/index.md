@@ -105,7 +105,7 @@ In the folowing example `api_key`, `delay`, `refresh`, `inputs`, `switches` and 
         ],
         "keys": {
             "SELECT": "KEY_ENTER"
-        },     
+        },
         "devices": [
             {
                 "name": "Bedroom TV",
