@@ -1,5 +1,10 @@
 # Change Log
 
+## 5.2.6
+
+* By default all custom switches have the main accessory name prepended. We have added the option to disable this. Read [the documentation](https://tavicu.github.io/homebridge-samsung-tizen/configuration/device-settings.html#options) to see how to do it. 
+* Updated the plugin to reflect our [new documentation](https://tavicu.github.io/homebridge-samsung-tizen/).
+
 ## 5.2.5
 
 Fix custom switches label.
