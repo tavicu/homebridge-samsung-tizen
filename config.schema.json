@@ -2,7 +2,7 @@
     "pluginAlias": "SamsungTizen",
     "pluginType": "platform",
     "singular": true,
-    "headerDisplay": "Please [read the Wiki](https://github.com/tavicu/homebridge-samsung-tizen/wiki/) of the plugin for more informations and instructions on how to configure it.",
+    "headerDisplay": "Please [read the documentation](https://tavicu.github.io/homebridge-samsung-tizen/) of the plugin for more informations and step by step instructions on how to configure it.",
 
     "schema": {
         "type": "object",
@@ -111,7 +111,7 @@
                             "type": "array",
                             "items": {
                                 "type": "string",
-                                "enum": ["Frame.RealPowerMode", "Frame.ArtSwitch.Disable", "Frame.PowerSwitch.Disable"]
+                                "enum": ["Switch.DeviceName.Disable", "Frame.RealPowerMode", "Frame.ArtSwitch.Disable", "Frame.PowerSwitch.Disable"]
                             }
                         },
                         "refresh": {
@@ -265,7 +265,7 @@
                                     "items": [
                                         {
                                           "type": "help",
-                                          "helpvalue": "<p class='help-block'>SmartThings API is <strong>optional</strong>. You will need to set these parameters only if you want to use inputs! Please <a href='https://github.com/tavicu/homebridge-samsung-tizen/wiki/SmartThings-Setup' target='_blank'>follow this tutorial</a>.</p>"
+                                          "helpvalue": "<p class='help-block'>SmartThings API is <strong>optional</strong>. You will need to set these parameters only if you want to use inputs! Please <a href='https://tavicu.github.io/homebridge-samsung-tizen/configuration/smartthings-api.html' target='_blank'>follow this tutorial</a>.</p>"
                                         },
                                         {
                                             "key": "devices[].api_key",
@@ -285,7 +285,7 @@
                                     "items": [
                                         {
                                             "type": "help",
-                                            "helpvalue": "<p class='help-block'>By default no inputs are set. Use this section to set your own inputs. You can find more informations on our <a href='https://github.com/tavicu/homebridge-samsung-tizen/wiki/Inputs' target='_blank'>Wiki Inputs page</a>.</p>"
+                                            "helpvalue": "<p class='help-block'>By default no inputs are set. Use this section to set your own inputs. You can find more informations on our <a href='https://tavicu.github.io/homebridge-samsung-tizen/features/inputs.html' target='_blank'>documentation</a>.</p>"
                                         },
                                         {
                                             "type": "array",
@@ -355,7 +355,7 @@
                                     "items": [
                                         {
                                             "type": "help",
-                                            "helpvalue": "<p class='help-block'>This section give you the option to create custom switches (separated accessories) that make specific actions. You can find more informations on our <a href='https://github.com/tavicu/homebridge-samsung-tizen/wiki/Switches' target='_blank'>Wiki Switches page</a>.</p>"
+                                            "helpvalue": "<p class='help-block'>This section give you the option to create custom switches (separated accessories) that make specific actions. You can find more informations on our <a href='https://tavicu.github.io/homebridge-samsung-tizen/features/switches.html' target='_blank'>documentation</a>.</p>"
                                         },
                                         {
                                             "type": "array",
@@ -467,7 +467,7 @@
                                     "items": [
                                         {
                                             "type": "help",
-                                            "helpvalue": "<p class='help-block'>Here you can add advanced options like <b>Inputs</b> and <b>Switches</b>. Make sure you read our <a href='https://github.com/tavicu/homebridge-samsung-tizen/wiki/Configuration' target='_blank'>Wiki Configuration page</a> where we explain in details every section.</p>"
+                                            "helpvalue": "<p class='help-block'>Here you can add advanced options like <b>Inputs</b> and <b>Switches</b>. Make sure you read our <a href='https://tavicu.github.io/homebridge-samsung-tizen/configuration/' target='_blank'>documentation</a> where we explain in details every section.</p>"
                                         },
                                         {
                                             "key": "devices[].method",
@@ -483,7 +483,7 @@
                                             "key": "devices[].uuid",
                                             "title": "UUID",
                                             "placeholder": "A1",
-                                            "description": "If you have problems adding the TV to Home app, set this field to a unique value. You can find more informations regarding this in the Wiki."
+                                            "description": "If you have problems adding the TV to Home app, set this field to a unique value. You can find more informations regarding this in the documentation."
                                         },
                                         {
                                             "key": "devices[].delay",
@@ -495,6 +495,7 @@
                                             "key": "devices[].options",
                                             "title": "Options",
                                             "titleMap": {
+                                                "Switch.DeviceName.Disable": "Disable prepending device name on custom switches",
                                                 "Frame.RealPowerMode": "Display and control Real Power with Main Acccessory (for Frame TVs)",
                                                 "Frame.ArtSwitch.Disable": "Disable Art Switch (for Frame TVs)",
                                                 "Frame.PowerSwitch.Disable": "Disable Power Switch (for Frame TVs)"
@@ -510,7 +511,7 @@
                                             "items": [
                                                 {
                                                     "type": "help",
-                                                    "helpvalue": "<p class='help-block'>You don't have to edit this section unless you want to change the default commands for <b>Remote Control</b> buttons. You can find more informations on our <a href='https://github.com/tavicu/homebridge-samsung-tizen/wiki/Keys' target='_blank'>Wiki Keys page</a>.</p>",
+                                                    "helpvalue": "<p class='help-block'>You don't have to edit this section unless you want to change the default commands for <b>Remote Control</b> buttons. You can find more informations on our <a href='https://tavicu.github.io/homebridge-samsung-tizen/features/keys.html' target='_blank'>documentation</a>.</p>",
                                                     "flex": "1 1 100%"
                                                 },
                                                 {
