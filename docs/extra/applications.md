@@ -20,6 +20,7 @@ Most of the IDs changed starting with year 2020. If you know your TV model is fr
 | HBO GO                   | `3201706012478`                                     |
 | HBO GO Asia              | `3202004020575`                                     |
 | HBO Max                  | `3201601007230`                                     |
+| Max                      | `3202301029760`                                     |
 | Hulu                     | `3201601007625`                                     |
 | Plex                     | `3201512006963` / `3201512006963`                   |
 | Prime Video              | `3201512006785` / `3201910019365`                   |
