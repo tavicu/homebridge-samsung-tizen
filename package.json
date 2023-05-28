@@ -13,7 +13,7 @@
   "author": "Octavian Ruda",
   "homepage": "https://tavicu.github.io/homebridge-samsung-tizen",
   "devDependencies": {
-    "vuepress": "^1.9.7",
+    "vuepress": "^1.9.9",
     "vuepress-plugin-medium-zoom": "^1.1.9",
     "vuepress-plugin-smooth-scroll": "^0.0.10"
   }
