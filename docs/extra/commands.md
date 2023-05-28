@@ -121,6 +121,7 @@ KEY_DVR
 KEY_TV
 KEY_ANTENA
 KEY_DTV
+KEY_AMBIENT
 ```
 
 ### Media Keys
