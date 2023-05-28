@@ -6,7 +6,6 @@ Over the years we managed to gather a list of IDs for most used applications.
 
 Because the IDs change with each release we cannot guarantee that IDs from this list will work on your TV! If you can't find an application in the list or if the ID doesn't work you can follow the steps from the [next section](#get-installed-applications) and get a list with installed applications from your TV.
 
-
 ::: tip Multiple IDs for one application
 Some applications have multiple IDs  because they may differ depending on what year your TV was released and what version of Tizen is using.
 Most of the IDs changed starting with year 2020. If you know your TV model is from 2020 or newer then start and try the IDs from the right. If your TV is older than 2020 then try the IDs from the left.
