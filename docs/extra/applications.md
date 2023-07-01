@@ -151,9 +151,6 @@ Most of the IDs changed starting with year 2020. If you know your TV model is fr
 | MagentaTV                | `3201907018746`                                     |
 | Joyn                     | `3201502001386`                                     |
 
-
-
-
 ## Get installed applications
 
 ::: warning Samsung makes our life harder ...
