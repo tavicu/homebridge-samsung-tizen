@@ -144,6 +144,12 @@ Most of the IDs changed starting with year 2020. If you know your TV model is fr
 | DStv                     | `3201804016109`                                     |
 | Showmax                  | `3201903018045`                                     |
 | Bloomberg                | `3201412000690`                                     |
+| ARD Mediathek            | `3201412000679`                                     |
+| ZDF Mediathek            | `3201412000679`                                     |
+| HD+                      | `3201810017070`                                     |
+| RTL+                     | `3201908018988`                                     |
+| MagentaTV                | `3201907018746`                                     |
+| Joyn                     | `3201502001386`                                     |
 
 ## Get installed applications
 
