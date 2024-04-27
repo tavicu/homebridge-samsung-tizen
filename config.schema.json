@@ -82,7 +82,7 @@
                         "wait_time": {"type": "integer"},
                         "api_key": {"type": "string"},
                         "device_id": {"type": "string"},
-
+                        "use_smartthings_power": {"type": "boolean"},
                         "name": {
                             "type": "string",
                             "required": true
@@ -240,8 +240,8 @@
                                     "default": "Bedroom TV"
                                 },
                                 {
-                                  "type": "help",
-                                  "helpvalue": "<p class='help-block'>Make sure that your device have a static IP address. You can set it from your router admin interface!</p>"
+                                    "type": "help",
+                                    "helpvalue": "<p class='help-block'>Make sure that your device has a static IP address. You can set it from your router admin interface!</p>"
                                 },
                                 {
                                     "type": "flex",
@@ -264,8 +264,8 @@
                                     "title": "SmartThings API",
                                     "items": [
                                         {
-                                          "type": "help",
-                                          "helpvalue": "<p class='help-block'>SmartThings API is <strong>optional</strong>. You will need to set these parameters only if you want to use inputs! Please <a href='https://tavicu.github.io/homebridge-samsung-tizen/configuration/smartthings-api.html' target='_blank'>follow this tutorial</a>.</p>"
+                                            "type": "help",
+                                            "helpvalue": "<p class='help-block'>SmartThings API is <strong>optional</strong> but highly recommended for more reliable power state (see <i>\"Use SmartThings for Power State\"</i>) detection and input management. If provided, it will be used for enhanced functionality such as fetching the power state more effectively and managing inputs. Please <a href='https://tavicu.github.io/homebridge-samsung-tizen/configuration/smartthings-api.html' target='_blank'>follow this tutorial</a> to set it up.</p>"
                                         },
                                         {
                                             "key": "devices[].api_key",
@@ -274,7 +274,14 @@
                                         {
                                             "key": "devices[].device_id",
                                             "title": "Device ID"
-                                        }
+                                        },
+                                        {
+                                            "key": "devices[].use_smartthings_power",
+                                            "type": "boolean",
+                                            "default": false,
+                                            "title": "Use SmartThings for Power State",
+                                            "description": "Enable to use the SmartThings API to check the power state of the TV. This could provide more accurate power readings. Ensure you have provided a valid API Key and Device ID."
+                                        }                                        
                                     ]
                                 },
                                 {
@@ -285,7 +292,7 @@
                                     "items": [
                                         {
                                             "type": "help",
-                                            "helpvalue": "<p class='help-block'>By default no inputs are set. Use this section to set your own inputs. You can find more informations on our <a href='https://tavicu.github.io/homebridge-samsung-tizen/features/inputs.html' target='_blank'>documentation</a>.</p>"
+                                            "helpvalue": "<p class='help-block'>By default, no inputs are set. Use this section to configure your own inputs. For more information, please refer to our <a href='https://tavicu.github.io/homebridge-samsung-tizen/features/inputs.html' target='_blank'>documentation</a>.</p>"
                                         },
                                         {
                                             "type": "array",
@@ -355,7 +362,7 @@
                                     "items": [
                                         {
                                             "type": "help",
-                                            "helpvalue": "<p class='help-block'>This section give you the option to create custom switches (separated accessories) that make specific actions. You can find more informations on our <a href='https://tavicu.github.io/homebridge-samsung-tizen/features/switches.html' target='_blank'>documentation</a>.</p>"
+                                            "helpvalue": "<p class='help-block'>This section allows you to create custom switches (separate accessories) that perform specific actions. For more information, please visit our <a href='https://tavicu.github.io/homebridge-samsung-tizen/features/switches.html' target='_blank'>documentation</a>.</p>"
                                         },
                                         {
                                             "type": "array",
@@ -477,7 +484,7 @@
                                                 "wss": "Default",
                                                 "frame": "Frame"
                                             },
-                                            "description": "The plugin detects the type of TV <b>automaticaly</b>. Leave this option set to <b>None</b> unless you are having problems and the plugin don't detect your TV type correctly."
+                                            "description": "The plugin detects the type of TV <b>automatically</b>. Leave this option set to <b>None</b> unless you are having problems and the plugin don't detect your TV type correctly."
                                         },
                                         {
                                             "key": "devices[].uuid",
@@ -489,14 +496,14 @@
                                             "key": "devices[].delay",
                                             "title": "Command Delay Interval",
                                             "placeholder": "400",
-                                            "description": "This is the delay between each command when you send multiple commands. By lowering the value you risk the commands not being executed. Value is in <b>miliseconds</b>."
+                                            "description": "This is the delay between each command when you send multiple commands. By lowering the value you risk the commands not being executed. Value is in <b>milliseconds</b>."
                                         },
                                         {
                                             "key": "devices[].options",
                                             "title": "Options",
                                             "titleMap": {
-                                                "Switch.DeviceName.Disable": "Disable prepending device name on custom switches",
-                                                "Frame.RealPowerMode": "Display and control Real Power with Main Acccessory (for Frame TVs)",
+                                                "Switch.DeviceName.Disable": "Disable prepending the device name on custom switches",
+                                                "Frame.RealPowerMode": "Display and control Real Power with Main Accessory (for Frame TVs)",
                                                 "Frame.ArtSwitch.Disable": "Disable Art Switch (for Frame TVs)",
                                                 "Frame.PowerSwitch.Disable": "Disable Power Switch (for Frame TVs)"
                                             }
@@ -511,7 +518,7 @@
                                             "items": [
                                                 {
                                                     "type": "help",
-                                                    "helpvalue": "<p class='help-block'>You don't have to edit this section unless you want to change the default commands for <b>Remote Control</b> buttons. You can find more informations on our <a href='https://tavicu.github.io/homebridge-samsung-tizen/features/keys.html' target='_blank'>documentation</a>.</p>",
+                                                    "helpvalue": "<p class='help-block'>You do not need to edit this section unless you want to change the default commands for <b>Remote Control</b> buttons. For more information, please refer to our <a href='https://tavicu.github.io/homebridge-samsung-tizen/features/keys.html' target='_blank'>documentation</a>.</p>",
                                                     "flex": "1 1 100%"
                                                 },
                                                 {
