@@ -82,7 +82,7 @@
                         "wait_time": {"type": "integer"},
                         "api_key": {"type": "string"},
                         "device_id": {"type": "string"},
-                        "use_smartthings_for_power_state": {"type": "boolean"},
+                        "use_smartthings_power": {"type": "boolean"},
                         "name": {
                             "type": "string",
                             "required": true
@@ -276,11 +276,11 @@
                                             "title": "Device ID"
                                         },
                                         {
-                                            "key": "devices[].use_smartthings_for_power_state",
+                                            "key": "devices[].use_smartthings_power",
                                             "type": "boolean",
                                             "default": false,
                                             "title": "Use SmartThings for Power State",
-                                            "description": "Enable to use the SmartThings API to check the power state of the TV. This can provide more accurate results. Ensure you have provided a valid API Key and Device ID."
+                                            "description": "Enable to use the SmartThings API to check the power state of the TV. This could provide more accurate power readings. Ensure you have provided a valid API Key and Device ID."
                                         }                                        
                                     ]
                                 },
