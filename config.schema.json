@@ -158,7 +158,7 @@
                                     },
                                     "input": {
                                         "type": "string",
-                                        "enum": ["digitalTv", "HDMI1", "HDMI2", "HDMI3", "HDMI4", "HDMI5", "HDMI6", "Display Port", "USB", "USB-C", "AM", "FM"]
+                                        "enum": ["digitalTv", "HDMI1", "HDMI2", "HDMI3", "HDMI4", "HDMI5", "HDMI6", "USB", "AM", "FM"]
                                     },
                                     "sleep": {
                                         "type": "integer"
@@ -254,7 +254,7 @@
                                         },
                                         {
                                             "key": "devices[].mac",
-                                            "title": "Network MAC Address",
+                                            "title": "MAC Address",
                                             "placeholder": "A0:B1:C2:D3:E4:F5"
                                         }
                                     ]
@@ -334,7 +334,7 @@
                                                             "condition": {
                                                                 "functionBody": "return model.devices[arrayIndices[0]].inputs[arrayIndices[1]].type == 'input';"
                                                             },
-                                                            "enum": ["digitalTv", "HDMI1", "HDMI2", "HDMI3", "HDMI4", "HDMI5", "HDMI6", "Display Port", "USB", "USB-C", "AM", "FM"],
+                                                            "enum": ["digitalTv", "HDMI1", "HDMI2", "HDMI3", "HDMI4", "HDMI5", "HDMI6", "USB", "AM", "FM"],
                                                             "titleMap": {
                                                                 "digitalTv": "Live TV",
                                                                 "HDMI1": "HDMI 1",
@@ -343,9 +343,7 @@
                                                                 "HDMI4": "HDMI 4",
                                                                 "HDMI5": "HDMI 5",
                                                                 "HDMI6": "HDMI 6",
-                                                                "Display Port": "Display Port",	
                                                                 "USB": "USB",
-                                                                "USB-C": "USB-C",
                                                                 "AM": "AM",
                                                                 "FM": "FM"
                                                             }
@@ -400,8 +398,6 @@
                                                             "titleMap": {
                                                                 "digitalTv": "Live TV",
                                                                 "USB": "USB",
-                                                                "USB-C": "USB-C",
-                                                                "Display Port": "Display Port",	
                                                                 "HDMI1": "HDMI 1",
                                                                 "HDMI2": "HDMI 2",
                                                                 "HDMI3": "HDMI 3",
