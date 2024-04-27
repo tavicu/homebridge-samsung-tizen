@@ -484,7 +484,7 @@
                                                 "wss": "Default",
                                                 "frame": "Frame"
                                             },
-                                            "description": "The plugin detects the type of TV <b>automaticaly</b>. Leave this option set to <b>None</b> unless you are having problems and the plugin don't detect your TV type correctly."
+                                            "description": "The plugin detects the type of TV <b>automatically</b>. Leave this option set to <b>None</b> unless you are having problems and the plugin don't detect your TV type correctly."
                                         },
                                         {
                                             "key": "devices[].uuid",
@@ -496,7 +496,7 @@
                                             "key": "devices[].delay",
                                             "title": "Command Delay Interval",
                                             "placeholder": "400",
-                                            "description": "This is the delay between each command when you send multiple commands. By lowering the value you risk the commands not being executed. Value is in <b>miliseconds</b>."
+                                            "description": "This is the delay between each command when you send multiple commands. By lowering the value you risk the commands not being executed. Value is in <b>milliseconds</b>."
                                         },
                                         {
                                             "key": "devices[].options",
