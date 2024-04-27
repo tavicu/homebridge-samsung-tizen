@@ -507,7 +507,7 @@
                                             "title": "Options",
                                             "titleMap": {
                                                 "Switch.DeviceName.Disable": "Disable prepending the device name on custom switches",
-                                                "Frame.RealPowerMode": "Display and control Real Power with Main Acccessory (for Frame TVs)",
+                                                "Frame.RealPowerMode": "Display and control Real Power with Main Accessory (for Frame TVs)",
                                                 "Frame.ArtSwitch.Disable": "Disable Art Switch (for Frame TVs)",
                                                 "Frame.PowerSwitch.Disable": "Disable Power Switch (for Frame TVs)"
                                             }
