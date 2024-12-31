@@ -1,8 +1,17 @@
 # Change Log
 
+## 5.3.0
+
+* Update plugin to be compatible with Homebridge 2.0
+* Update dependencies used by the plugin
+
+Apologies for the delay in updating the plugin to ensure compatibility with Homebridge 2.0.
+
+For more information about the future plans for the plugin, please visit: [https://github.com/tavicu/homebridge-samsung-tizen/issues/696](https://github.com/tavicu/homebridge-samsung-tizen/issues/696).
+
 ## 5.2.6
 
-* By default all custom switches have the main accessory name prepended. We have added the option to disable this. Read [the documentation](https://tavicu.github.io/homebridge-samsung-tizen/configuration/device-settings.html#options) to see how to do it. 
+* By default all custom switches have the main accessory name prepended. We have added the option to disable this. Read [the documentation](https://tavicu.github.io/homebridge-samsung-tizen/configuration/device-settings.html#options) to see how to do it.
 * Updated the plugin to reflect our [new documentation](https://tavicu.github.io/homebridge-samsung-tizen/).
 
 ## 5.2.5
