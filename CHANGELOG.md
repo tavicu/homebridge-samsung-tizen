@@ -2,8 +2,8 @@
 
 ## 5.3.0
 
-* Update plugin to be compatible with Homebridge 2.0
-* Update dependencies used by the plugin
+* Ensure compatibility of the plugin with Homebridge 2.0.
+* Update the plugin's dependencies.
 
 Apologies for the delay in updating the plugin to ensure compatibility with Homebridge 2.0.
 
