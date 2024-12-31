@@ -26,8 +26,8 @@
     "url": "https://github.com/tavicu/homebridge-samsung-tizen/issues"
   },
   "engines": {
-    "node": ">=12.13.0",
-    "homebridge": ">=1.3.0"
+    "homebridge": "^1.6.0 || ^2.0.0-beta.0",
+    "node": "^18.20.4 || ^20.15.1"
   },
   "dependencies": {
     "deepmerge": "^4.2.2",
