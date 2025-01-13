@@ -1,5 +1,9 @@
 # Change Log
 
+## 5.3.3
+
+* Add SmartThings inputs (USB-C and DisplayPort) for Samsung Monitors
+
 ## 5.3.0
 
 * Ensure compatibility of the plugin with Homebridge 2.0.
