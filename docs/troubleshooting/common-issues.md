@@ -10,12 +10,12 @@ Here are listed the most common issues that users had using the plugin.
 
 Turning ON the TV is working because is using a general protocol (Wake on LAN) which is compatible with most of the devices. The rest of the commands are sent through Samsung API and if your TV is not compatible they will not work!
 
-If your TV is [compatible](installation/index.md#check-compatibility) make sure you didn't click `Deny` when the popup to pair appeared.
+If your TV is [compatible](/installation/index.md#check-compatibility) make sure you didn't click `Deny` when the popup to pair appeared.
 On TV go to `Settings` - `General` - `External Device Manager` - `Device Connection Manager` - `Device List` and make sure you didn't select `Deny`.
 
 ## The pairing popup it's not shown on the TV
 
-This may happend because your TV is not [compatible](installation/index.md#check-compatibility) with the plugin or because you previously clicked `Deny` when the popup to ask for permission appeared. Please look [here](installation/pairing-the-device.md#clicked-deny-by-mistake) to see how you can check if you denied access and if you still didn't solve the problem [open a new issue](/troubleshooting/open-new-issue.md) and provide debug logs from the console.
+This may happend because your TV is not [compatible](/installation/index.md#check-compatibility) with the plugin or because you previously clicked `Deny` when the popup to ask for permission appeared. Please look [here](/installation/pairing-the-device.md#clicked-deny-by-mistake) to see how you can check if you denied access and if you still didn't solve the problem [open a new issue](/troubleshooting/open-new-issue.md) and provide debug logs from the console.
 
 ## TV is always asking for permissions
 
