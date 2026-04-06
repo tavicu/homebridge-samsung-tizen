@@ -26,14 +26,13 @@
     "url": "https://github.com/tavicu/homebridge-samsung-tizen/issues"
   },
   "engines": {
+    "node": "^20.7.0 || ^22 || ^24",
     "homebridge": "^1.6.0 || ^2.0.0-beta.0"
   },
   "dependencies": {
     "deepmerge": "^4.2.2",
     "fs-extra": "^10.1.0",
     "is-port-reachable": "^3.1.0",
-    "node-fetch": "^2.6.7",
-    "timeout-signal": "^1.1.0",
     "wakeonlan": "^0.1.0",
     "ws": "^8.11.0"
   },

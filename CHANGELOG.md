@@ -1,5 +1,12 @@
 # Change Log
 
+## 5.3.5
+
+* Ensure runtime compatibility with Node.js 22.22.0 and newer.
+* Replace `node-fetch` and `timeout-signal` with native `fetch` and `AbortSignal.timeout()`.
+* Remove deprecated `new Buffer.from(...)` usage.
+* Remove obsolete HTTP dependencies to reduce transitive packages.
+
 ## 5.3.3
 
 * Add SmartThings inputs (USB-C and DisplayPort) for Samsung Monitors
