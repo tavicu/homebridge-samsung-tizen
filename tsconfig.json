@@ -1,0 +1,25 @@
+{
+    "tsc-alias": {
+        "resolveFullPaths": true,
+        "verbose": false
+    },
+    "compilerOptions": {
+        "target": "ES2022",
+        "module": "ES2022",
+        "moduleResolution": "node",
+        "lib": ["es2015", "es2016", "es2017", "es2018", "es2019", "es2020", "es2021", "es2022"],
+        "declaration": true,
+        "declarationMap": true,
+        "esModuleInterop": true,
+        "preserveConstEnums": true,
+        "useUnknownInCatchVariables": false,
+        "resolveJsonModule": true,
+        "noImplicitAny": false,
+        "sourceMap": true,
+        "strict": true,
+        "outDir": "./dist",
+        "rootDir": "./src"
+    },
+    "include": ["src/"],
+    "exclude": ["node_modules", "**/*.spec.ts"]
+}

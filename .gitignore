@@ -1,4 +1,23 @@
-# General
+# Ignore compiled code
+dist
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+
+# Dependency directories
+node_modules/
+
+# Optional npm cache directory
+.npm
+
+# OS
 .DS_Store
 .DS_Store?
 ._*
@@ -7,6 +26,3 @@
 ehthumbs.db
 Thumbs.db
 Icon
-
-node_modules
-dist

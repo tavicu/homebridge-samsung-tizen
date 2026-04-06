@@ -1,0 +1,10 @@
+{
+    "watch": ["src"],
+    "ext": "ts",
+    "ignore": [],
+    "exec": "tsc && tsc-alias && homebridge -I -D",
+    "signal": "SIGTERM",
+    "env": {
+        "NODE_OPTIONS": "--trace-warnings"
+    }
+}
