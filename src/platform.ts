@@ -13,7 +13,11 @@ export class SamsungPlatform implements IndependentPlatformPlugin {
     public storage: Storage;
     public devices: Array<Device> = [];
 
-    constructor(public log: Logging, public config: PlatformConfig, public api: API) {
+    constructor(
+        public log: Logging,
+        public config: PlatformConfig,
+        public api: API,
+    ) {
         this.ssdp = new SSDP(this);
         this.storage = new Storage(api);
 

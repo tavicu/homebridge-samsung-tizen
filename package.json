@@ -50,19 +50,12 @@
         "typescript": "^5.4.5"
     },
     "dependencies": {
-        "deepmerge-ts": "^5.1.0",
+        "deepmerge-ts": "^7.1.5",
         "fs-extra": "^11.1.0",
         "is-port-reachable": "^4.0.0",
-        "node-fetch": "^3.3.2",
-        "node-upnp": "^1.2.0",
-        "peer-ssdp": "^0.0.5",
-        "timeout-signal": "^2.0.0"
+        "peer-ssdp": "^0.0.5"
     },
-    "overrides": {
-        "node-upnp": {
-            "got": "^11.8.6"
-        }
-    },
+    "overrides": {},
     "funding": [
         {
             "type": "paypal",
