@@ -38,16 +38,16 @@
         "prepublishOnly": "npm run lint && npm run build"
     },
     "devDependencies": {
-        "@types/node": "^20.12.7",
-        "@typescript-eslint/eslint-plugin": "^7.7.0",
-        "@typescript-eslint/parser": "^7.7.0",
+        "@types/node": "^25.5.0",
+        "@typescript-eslint/eslint-plugin": "^8.58.0",
+        "@typescript-eslint/parser": "^8.58.0",
         "eslint": "^8.57.0",
         "homebridge": "^2.0.0-beta.0",
         "nodemon": "^3.1.0",
-        "rimraf": "^5.0.5",
+        "rimraf": "^6.1.0",
         "ts-node": "^10.9.2",
         "tsc-alias": "^1.8.9",
-        "typescript": "^5.4.5"
+        "typescript": "^6.0.0"
     },
     "dependencies": {
         "deepmerge-ts": "^7.1.5",
