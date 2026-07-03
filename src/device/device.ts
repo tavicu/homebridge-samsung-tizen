@@ -2,9 +2,9 @@ import { Logger } from 'homebridge';
 import { EventEmitter } from 'events';
 import { deepmerge } from 'deepmerge-ts';
 
-import { Cache } from '../cache.js';
+import { Cache } from '../lib/cache.js';
 import { Remote } from './remote.js';
-import { DeviceConfig } from '../types.js';
+import { DeviceConfig } from '../types/types.js';
 import { SamsungPlatform } from '../platform.js';
 import { TelevisionAccessory, SwitchAccessory } from '../accessories/index.js';
 

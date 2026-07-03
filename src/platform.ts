@@ -4,9 +4,9 @@ import { PLUGIN_NAME } from './settings.js';
 
 import { SSDP } from './protocols/index.js';
 import { Device } from './device/index.js';
-import { Storage } from './storage.js';
+import { Storage } from './lib/storage.js';
 
-import { PlatformConfig, DeviceConfig } from './types.js';
+import { PlatformConfig, DeviceConfig } from './types/types.js';
 
 export class SamsungPlatform implements IndependentPlatformPlugin {
   private ssdp: SSDP;

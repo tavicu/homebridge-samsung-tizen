@@ -1,4 +1,4 @@
-import { Device } from './device/index.js';
+import { Device } from '../device/index.js';
 
 export class Cache {
   private keys: object = {};

@@ -1,7 +1,7 @@
 import { HAP, PlatformAccessory } from 'homebridge';
 import { Device } from '../device/index.js';
 import { SamsungPlatform } from '../platform.js';
-import { SwitchConfig } from '../types.js';
+import { SwitchConfig } from '../types/types.js';
 import { SwitchService, InformationService } from '../services/index.js';
 
 export class SwitchAccessory {

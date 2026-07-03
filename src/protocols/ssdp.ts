@@ -1,6 +1,6 @@
 import * as ssdp from 'peer-ssdp';
 
-import { debounce } from '../tools.js';
+import { debounce } from '../lib/tools.js';
 import { SamsungPlatform } from '../platform.js';
 
 type Headers = {

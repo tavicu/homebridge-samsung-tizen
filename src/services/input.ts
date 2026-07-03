@@ -1,7 +1,7 @@
 import { HAP } from 'homebridge';
-import { InputConfig } from '../types.js';
+import { InputConfig } from '../types/types.js';
 
-import { delay } from '../tools.js';
+import { delay } from '../lib/tools.js';
 
 let hap: HAP;
 
