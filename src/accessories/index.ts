@@ -1,2 +1,2 @@
-export * from './switch';
-export * from './television';
+export * from './switch.js';
+export * from './television.js';

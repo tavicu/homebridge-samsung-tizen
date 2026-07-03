@@ -1,2 +1,1 @@
-export * from './ssdp';
-// export * from './upnp';
+export * from './ssdp.js';
