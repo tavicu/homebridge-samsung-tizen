@@ -1,36 +1,84 @@
+import { promises as fs } from 'fs';
 import path from 'path';
-import fs from 'fs-extra';
-
-import { API } from 'homebridge';
+import { API, Logging } from 'homebridge';
+import { DeviceStorage } from '../types/index.js';
 
 export class Storage {
-  private dirPath: string;
   private filePath: string;
-  private accessories: object = {};
+  private accessories: Record<string, any> = {};
+  private saveTimeout: NodeJS.Timeout | null = null;
 
-  constructor(api: API) {
-    this.dirPath = api.user.cachedAccessoryPath();
-    this.filePath = path.join(this.dirPath, 'samsung-tizen.json');
+  // Storage configuration for retries
+  private readonly maxRetries = 3;
+  private readonly retryDelay = 100; // in milliseconds
 
-    fs.ensureDir(this.dirPath);
+  constructor(
+    api: API,
+    private log: Logging,
+  ) {
+    this.filePath = path.join(api.user.cachedAccessoryPath(), 'samsung-tizen.json');
   }
 
-  async initialize() {
-    await fs
-      .readJson(this.filePath)
-      .catch(() => ({}))
-      .then((accessories: object) => (this.accessories = accessories));
+  async initialize(): Promise<void> {
+    try {
+      // Ensure the directory exists (native replacement for ensureDir)
+      await fs.mkdir(path.dirname(this.filePath), { recursive: true });
+
+      const data = await fs.readFile(this.filePath, 'utf-8');
+      this.accessories = JSON.parse(data);
+    } catch {
+      this.accessories = {};
+    }
   }
 
-  get(id: string): object {
+  /**
+   * Returns a proxied storage object for a specific device ID.
+   * Any property mutation will automatically schedule a debounced save operation.
+   */
+  get(id: string): DeviceStorage {
     if (!this.accessories[id]) {
       this.accessories[id] = {};
     }
 
-    return this.accessories[id];
+    return new Proxy(this.accessories[id], {
+      set: (obj, prop, value) => {
+        obj[prop] = value;
+
+        this.save();
+        return true;
+      },
+    });
   }
 
-  save() {
-    return fs.writeJsonSync(this.filePath, this.accessories);
+  /**
+   * Schedules an asynchronous write operation.
+   * Debounces consecutive calls within 50ms to prevent file corruption from multiple devices.
+   */
+  private save(): void {
+    if (this.saveTimeout) {
+      clearTimeout(this.saveTimeout);
+    }
+
+    this.saveTimeout = setTimeout(() => {
+      this.write(this.maxRetries, this.retryDelay);
+    }, 100);
+  }
+
+  /**
+   * Performs the actual file write with a recursive retry mechanism.
+   */
+  private async write(retries: number, delay: number): Promise<void> {
+    try {
+      await fs.writeFile(this.filePath, JSON.stringify(this.accessories, null, 2), 'utf-8');
+    } catch (error) {
+      if (retries > 1) {
+        this.log.warn(`[Storage] Failed to save cache. Retrying in ${delay}ms... (${retries - 1} attempts left)`);
+
+        await new Promise((resolve) => setTimeout(resolve, delay));
+        return this.write(retries - 1, delay * 2); // Double the delay for the next attempt
+      } else {
+        this.log.error('[Storage] Could not save cache file:', error);
+      }
+    }
   }
 }

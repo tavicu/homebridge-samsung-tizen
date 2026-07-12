@@ -1,104 +1,93 @@
-import { HAP } from 'homebridge';
-import { InputConfig } from '../types/types.js';
-
-import { delay } from '../lib/tools.js';
-
-let hap: HAP;
+import { Characteristic } from 'homebridge';
+import { TelevisionAccessory } from '../accessories/television.js';
+import { Device } from '../device/device.js';
+import { race } from '../lib/tools.js';
+import { SamsungPlatform } from '../platform.js';
+import { InputConfig, LinkedService } from '../types/index.js';
 
 export class InputService {
-  public service;
+  public service: LinkedService;
   public stateless: boolean;
+  private device: Device;
+  private platform: SamsungPlatform;
+  private characteristic: typeof Characteristic;
 
   constructor(
     public config: InputConfig,
-    public accessory,
+    private accessory: TelevisionAccessory,
   ) {
-    const { platform } = accessory;
-    hap = platform.api.hap;
+    this.device = this.accessory.device;
+    this.platform = this.accessory.platform;
+    this.characteristic = this.platform.api.hap.Characteristic;
 
-    this.stateless = ['input', 'app', 'art'].indexOf(config.type) === -1;
+    this.stateless = ['command'].includes(config.type);
 
-    this.service = new hap.Service.InputSource(config.name, `input_${config.identifier}`)
-      .setCharacteristic(hap.Characteristic.Identifier, config.identifier)
-      .setCharacteristic(hap.Characteristic.ConfiguredName, config.name)
-      .setCharacteristic(hap.Characteristic.IsConfigured, hap.Characteristic.IsConfigured.CONFIGURED)
-      .setCharacteristic(hap.Characteristic.InputSourceType, this.getSourceType())
-      .setCharacteristic(hap.Characteristic.TargetVisibilityState, hap.Characteristic.TargetVisibilityState.SHOWN)
-      .setCharacteristic(hap.Characteristic.CurrentVisibilityState, hap.Characteristic.CurrentVisibilityState.SHOWN);
+    this.service = new this.platform.api.hap.Service.InputSource(config.name, `input_${config.identifier}`)
+      .setCharacteristic(this.characteristic.Identifier, config.identifier)
+      .setCharacteristic(this.characteristic.ConfiguredName, config.name)
+      .setCharacteristic(this.characteristic.IsConfigured, this.characteristic.IsConfigured.CONFIGURED)
+      .setCharacteristic(this.characteristic.InputSourceType, this.getSourceType())
+      .setCharacteristic(this.characteristic.TargetVisibilityState, this.characteristic.TargetVisibilityState.SHOWN)
+      .setCharacteristic(this.characteristic.CurrentVisibilityState, this.characteristic.CurrentVisibilityState.SHOWN);
 
     this.service.linked = true;
   }
 
-  private getSourceType() {
-    const { value, type } = this.config;
+  private getSourceType(): number {
+    const { type, value } = this.config;
 
     if (typeof value !== 'string') {
-      return hap.Characteristic.InputSourceType.OTHER;
+      return this.characteristic.InputSourceType.OTHER;
     }
 
     if (type === 'app') {
-      return hap.Characteristic.InputSourceType.APPLICATION;
+      return this.characteristic.InputSourceType.APPLICATION;
     }
 
     if (value === 'digitalTv') {
-      return hap.Characteristic.InputSourceType.TUNER;
+      return this.characteristic.InputSourceType.TUNER;
     }
 
     if (value === 'USB') {
-      return hap.Characteristic.InputSourceType.USB;
+      return this.characteristic.InputSourceType.USB;
     }
 
     if (value && value.startsWith('HDMI')) {
-      return hap.Characteristic.InputSourceType.HDMI;
+      return this.characteristic.InputSourceType.HDMI;
     }
 
-    return hap.Characteristic.InputSourceType.OTHER;
+    return this.characteristic.InputSourceType.OTHER;
   }
 
-  // TODO
-  async getInput() {
-    const { type } = this.config;
+  public async getInput(): Promise<boolean> {
+    const { type, value } = this.config;
 
-    if (type === 'art') {
-      await delay(150);
-      // return this.device.remote.getArtMode();
-    } else if (type === 'app') {
-      // let application = await this.device.remote.getApplication(this.config.value);
-      // return application.visible;
-    } else if (type === 'input') {
-      // let input = await this.device.remote.getInputSource();
-      // return input.value == this.config.value;
+    if (type === 'app') {
+      try {
+        const { visible } = await this.device.getApplication(value);
+        return visible as boolean;
+      } catch {}
     }
 
     return false;
   }
 
-  // TODO
-  async setInput() {
-    // await utils.race(this.runInput());
+  public async setInput() {
+    await race(this.runInput());
 
     return this;
   }
 
-  // TODO
-  async runInput() {
-    const { type } = this.config;
+  private async runInput(): Promise<void> {
+    const { value, type } = this.config;
 
     switch (type) {
-      case 'art':
-        // await this.device.remote.setArtMode(true);
-        break;
-
       case 'app':
-        // await this.device.remote.setApplication(this.config.value);
-        break;
-
-      case 'input':
-        // await this.device.remote.setInputSource(this.config.value);
+        await this.device.startApplication(value);
         break;
 
       case 'command':
-        // await this.device.remote.command(this.config.value);
+        await this.device.sendCommand(value);
         break;
     }
   }

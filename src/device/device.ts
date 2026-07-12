@@ -1,25 +1,32 @@
-import { Logger } from 'homebridge';
 import { EventEmitter } from 'events';
 import { deepmerge } from 'deepmerge-ts';
-
+import { Logger } from 'homebridge';
+import { SwitchAccessory, TelevisionAccessory } from '../accessories/index.js';
 import { Cache } from '../lib/cache.js';
-import { Remote } from './remote.js';
-import { DeviceConfig } from '../types/types.js';
+import { parseCommands } from '../lib/parsers.js';
+import { delay } from '../lib/tools.js';
 import { SamsungPlatform } from '../platform.js';
-import { TelevisionAccessory, SwitchAccessory } from '../accessories/index.js';
+import { UPnPDevice } from '../protocols/upnp.js';
+import { WebSocket } from '../protocols/websocket.js';
+import { DeviceConfig, DeviceOptions, DeviceState, DeviceStorage, SwitchConfig } from '../types/index.js';
+import { DeviceController } from './controller.js';
 
 export class Device extends EventEmitter {
   public log: Logger;
   public cache: Cache;
-  public storage: object;
-  public remote: Remote;
+  public storage: DeviceStorage;
+  private upnp: UPnPDevice;
+  private ws: WebSocket;
+  private controller: DeviceController;
 
   public UUID: string;
   public config: DeviceConfig;
   public accessories: Array<TelevisionAccessory | SwitchAccessory>;
 
-  public state = {
-    Power: false,
+  private state: DeviceState = {
+    power: false,
+    mute: false,
+    volume: 10,
   };
 
   constructor(config: DeviceConfig, platform: SamsungPlatform) {
@@ -34,15 +41,25 @@ export class Device extends EventEmitter {
       config,
     );
 
+    this.state = new Proxy(this.state, {
+      set: (target, prop, value) => {
+        if (Reflect.get(target, prop) === value) {
+          return true;
+        } // Do nothing if value is identical
+
+        Reflect.set(target, prop, value);
+        this.emit('state:update', prop, value);
+        return true;
+      },
+    });
+
     // Check if we have device minimum config
     if (!this.config.name) {
       throw new Error('One of your device has no name configured. This device will be skipped.');
     }
-
     if (!this.config.ip) {
       throw new Error(`The IP address is missing from the config for ${this.config.name}. This device will be skipped.`);
     }
-
     if (!this.config.mac) {
       throw new Error(`The MAC address is missing from the config for ${this.config.name}. This device will be skipped.`);
     }
@@ -53,66 +70,48 @@ export class Device extends EventEmitter {
     // Setup logger with device name
     this.log = { ...platform.log, prefix: this.config.name };
 
-    // Homebridge 1.8.0 introduced a `log.success` method that can be used to log success messages
-    // For users that are on a version prior to 1.8.0, we need a 'polyfill' for this method
-    if (!this.log.success) {
-      this.log.success = platform.log.info;
-    }
-
-    // Setup storage for this device
-    this.storage = new Proxy(platform.storage.get(this.UUID), {
-      set: (obj, prop, value) => {
-        if (prop === 'update' && typeof value === 'object') {
-          for (const key in value) {
-            obj[key] = value[key];
-          }
-        } else {
-          obj[prop] = value;
-        }
-
-        platform.storage.save();
-        return true;
-      },
-    });
-
+    // Setup dependencies for this device, order is important
+    this.storage = platform.storage.get(this.UUID);
     this.cache = new Cache(this);
-    this.remote = new Remote(this);
+    this.ws = new WebSocket(this);
+    this.upnp = new UPnPDevice(this, platform);
+    this.controller = new DeviceController(this);
+
     this.accessories = [
       new TelevisionAccessory(this, platform),
       // new FrameAccessory(this, platform),
     ];
 
     // Switches
-    // this.config.switches?.forEach((switchConfig, index) => {
-    //     try {
-    //         this.accessories.push(
-    //             new SwitchAccessory(
-    //                 {
-    //                     ...switchConfig,
-    //                     identifier: index + 1,
-    //                 },
-    //                 this,
-    //                 platform,
-    //             ),
-    //         );
-    //     } catch (error) {
-    //         this.log.error(error.message);
-    //     }
-    // });
-
-    // Homebridge is going down, emit destroy event
-    // ['SIGINT', 'SIGTERM'].forEach((signal) => process.on(signal, () => this.emit('destroy')));
+    this.config.switches?.forEach((switchConfig: SwitchConfig, index: number) => {
+      try {
+        this.accessories.push(
+          new SwitchAccessory(
+            {
+              ...switchConfig,
+              identifier: index + 1,
+            },
+            this,
+            platform,
+          ),
+        );
+      } catch (error) {
+        console.log('error', error);
+        this.log.error(error.message);
+      }
+    });
 
     this.on('ssdp:update', (event) => {
       console.log('ssdp:update', this.config.ip, event);
 
-      if (event === 'ssdp:alive') {
-        this.state.Power = true;
-      } else if (event === 'ssdp:byebye') {
-        this.state.Power = false;
-      }
+      this.state.power = event === 'ssdp:alive';
+    });
 
-      this.emit('state:update');
+    this.on('upnp:update', ({ volume, mute }) => {
+      console.log('upnp:update', this.config.ip, volume, mute);
+
+      this.state.volume = volume ?? this.state.volume;
+      this.state.mute = mute ?? this.state.mute;
     });
 
     this.on('state:update', () => {
@@ -121,11 +120,89 @@ export class Device extends EventEmitter {
 
       console.log('state:update', t, this.config.ip, this.state);
 
-      this.accessories.forEach((element) => element.services.main && element.services.main.updateValue());
+      this.accessories.forEach((accessory) => {
+        Object.values(accessory.services as Record<string, any>).forEach((service) => {
+          service.updateValue?.();
+        });
+      });
+    });
+
+    this.on('paired', ({ token }) => {
+      this.log.debug(`Device paired with success (token: ${token})`);
     });
   }
 
-  hasOption(key: string): boolean {
-    return Boolean(key && this.config.options?.includes(key));
+  public get power(): boolean {
+    return this.state.power;
+  }
+
+  public get mute(): boolean {
+    return this.state.mute;
+  }
+
+  public get volume(): number {
+    return this.state.volume;
+  }
+
+  public get sleep(): boolean {
+    return this.power && this.controller.getSleep();
+  }
+
+  public async setPower(value: boolean): Promise<void> {
+    if (value) {
+      await this.controller.powerOn();
+    } else {
+      this.cache.flush();
+      await this.controller.powerOff();
+    }
+  }
+
+  public setMute(value: boolean): Promise<void> {
+    return this.upnp.setMute(value);
+  }
+
+  public setVolume(value: number): Promise<void> {
+    return this.upnp.setVolume(value);
+  }
+
+  public setSleep(minutes: number, onComplete?: () => Promise<void> | void): Promise<void> {
+    return this.controller.setSleep(minutes, onComplete);
+  }
+
+  public setChannel(channel: number | string): Promise<void> {
+    return this.controller.setChannel(channel);
+  }
+
+  public getApplication(appId: string | number): Promise<any> {
+    return this.controller.getApplication(appId);
+  }
+
+  public startApplication(appId: string | number): Promise<any> {
+    return this.controller.startApplication(appId);
+  }
+
+  public async sendCommand(commands: string | string[]): Promise<void> {
+    const parsed = parseCommands(commands);
+
+    for (const [i, cmd] of parsed.entries()) {
+      if (typeof cmd === 'object') {
+        await this.ws.hold(cmd.key, cmd.time * 1000);
+      } else {
+        await this.ws.click(cmd);
+      }
+
+      if (i < parsed.length - 1) {
+        await delay(400);
+      }
+    }
+  }
+
+  public hasOption(key: DeviceOptions): boolean {
+    return !!(key && this.config.options?.includes(key));
+  }
+
+  public destroy(): void {
+    this.upnp.destroy();
+    this.ws.destroy();
   }
 }

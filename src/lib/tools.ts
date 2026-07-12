@@ -1,20 +1,16 @@
-export const delay = (timeout = 150, { value = undefined } = {}) => {
-  return new Promise((resolve) => {
-    const settle = () => resolve(value);
-
-    setTimeout(settle, timeout);
-  });
+export const delay = <T>(timeout = 150, { value }: { value?: T } = {}): Promise<T | undefined> => {
+  return new Promise((resolve) => setTimeout(() => resolve(value), timeout));
 };
 
-export const race = (promise, timeout = 2500) => {
-  const race = new Promise((resolve) => setTimeout(resolve, timeout));
-
-  return Promise.race([promise, race]);
+export const race = <T>(promise: Promise<T>, timeout = 2500): Promise<T | void> => {
+  const timeoutPromise = new Promise<void>((resolve) => setTimeout(resolve, timeout));
+  return Promise.race([promise, timeoutPromise]);
 };
 
-export const debounce = (callback, timeout = 250) => {
-  let timer;
-  return (...args) => {
+export const debounce = <T extends (...args: any[]) => void>(callback: T, timeout = 250) => {
+  let timer: NodeJS.Timeout;
+
+  return function (this: any, ...args: Parameters<T>) {
     clearTimeout(timer);
 
     timer = setTimeout(() => {

@@ -1,28 +1,21 @@
-import { PlatformIdentifier, PlatformName } from 'homebridge';
+import { PlatformIdentifier, PlatformName, Service } from 'homebridge';
+import { DeviceConfig } from './device.js';
+
+export type LinkedService = Service & {
+  linked?: boolean;
+};
 
 export type PlatformConfig = {
   platform: PlatformName | PlatformIdentifier;
   devices?: Array<DeviceConfig>;
   api_key?: string;
-  inputs?: Array<any>;
-  switches?: Array<any>;
-};
-
-export type DeviceConfig = {
-  name: string;
-  ip: string;
-  mac: string;
-  uuid?: string;
-  api_key?: string;
-  device_id?: string;
-  inputs?: Array<any>;
-  switches?: Array<any>;
-  options?: Array<string>;
+  inputs?: Array<InputConfig>;
+  switches?: Array<SwitchConfig>;
 };
 
 export type InputConfig = {
   name: string;
-  type: string;
+  type: 'app' | 'command';
   value: string;
   identifier: number;
 };
@@ -39,4 +32,11 @@ export type SwitchConfig = {
   channel: number;
   picture_mode?: string;
   command?: string;
+};
+
+export type SwitchOption = {
+  key: string;
+  offable?: boolean;
+  get?: () => Promise<boolean>;
+  set: (switchValue: boolean) => Promise<void>;
 };

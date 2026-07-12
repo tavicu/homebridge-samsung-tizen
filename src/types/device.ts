@@ -1,0 +1,31 @@
+import { InputConfig, SwitchConfig } from './types.js';
+import { WolOptions } from './wol.js';
+
+export type DeviceState = {
+  power: boolean;
+  mute: boolean;
+  volume: number;
+};
+
+export type DeviceStorage = {
+  token?: string;
+  model?: string;
+  firmware?: string;
+  frameSupport?: boolean;
+  tokenSupport?: boolean;
+};
+
+export type DeviceConfig = {
+  name: string;
+  ip: string;
+  mac: string;
+  wol?: WolOptions;
+  uuid?: string;
+  api_key?: string;
+  device_id?: string;
+  inputs?: Array<InputConfig>;
+  switches?: Array<SwitchConfig>;
+  options?: Array<DeviceOptions>;
+};
+
+export type DeviceOptions = 'Switch.DeviceName.Disable';

@@ -1,11 +1,10 @@
 import { Categories, PlatformAccessory } from 'homebridge';
-
 import { Device } from '../device/index.js';
 import { SamsungPlatform } from '../platform.js';
-import { TelevisionService, SpeakerService, InformationService, InputService } from '../services/index.js';
+import { InformationService, InputService, SpeakerService, TelevisionService } from '../services/index.js';
+import { SwitchAccessory } from './index.js';
 
 export class TelevisionAccessory {
-  public type: string = 'television';
   public platformAccessory: PlatformAccessory;
 
   public inputs: any = [];
@@ -15,11 +14,9 @@ export class TelevisionAccessory {
     public device: Device,
     public platform: SamsungPlatform,
   ) {
-    const { api } = platform;
+    this.platformAccessory = new platform.api.platformAccessory(device.config.name, device.UUID, Categories.TELEVISION);
 
-    this.platformAccessory = new api.platformAccessory(device.config.name, device.UUID, Categories.TELEVISION);
-
-    // this.createInputs();
+    this.createInputs();
     this.createServices();
   }
 
@@ -50,9 +47,7 @@ export class TelevisionAccessory {
     this.getServices().forEach((service) => {
       try {
         this.platformAccessory.addService(service);
-      } catch (error) {
-        /* empty */
-      }
+      } catch (error) {}
 
       if (service.linked) {
         this.services.main.addLinkedService(service);
@@ -64,7 +59,7 @@ export class TelevisionAccessory {
     return [...Object.values(this.services).map((type: any) => type.service), ...Object.values(this.inputs).map((type: any) => type.service)].flat();
   }
 
-  addAccessory(accessory) {
+  public addAccessory(accessory: SwitchAccessory) {
     if (!accessory?.services?.main) {
       return;
     }

@@ -1,11 +1,10 @@
-import { HAP, PlatformAccessory } from 'homebridge';
+import { Categories, PlatformAccessory } from 'homebridge';
 import { Device } from '../device/index.js';
 import { SamsungPlatform } from '../platform.js';
-import { SwitchConfig } from '../types/types.js';
-import { SwitchService, InformationService } from '../services/index.js';
+import { InformationService, SwitchService } from '../services/index.js';
+import { SwitchConfig } from '../types/index.js';
 
 export class SwitchAccessory {
-  public type: string = 'switch';
   public UUID: string;
 
   public services: any = {};
@@ -16,16 +15,13 @@ export class SwitchAccessory {
     public device: Device,
     public platform: SamsungPlatform,
   ) {
-    const { api } = platform;
-    const hap: HAP = api.hap;
-
     // Check if we have device info
     if (!config.name) {
       throw new Error(`Switch name is required for ${device.config.name}`);
     }
 
-    this.UUID = hap.uuid.generate(device.UUID + config.identifier + config.name);
-    this.platformAccessory = new api.platformAccessory(`${device.config.name} ${config.name}`, this.UUID);
+    this.UUID = this.platform.api.hap.uuid.generate(device.UUID + config.identifier + config.name);
+    this.platformAccessory = new this.platform.api.platformAccessory(`${device.config.name} ${config.name}`, this.UUID, Categories.SWITCH);
 
     this.createServices();
   }
@@ -39,9 +35,7 @@ export class SwitchAccessory {
     this.getServices().forEach((service) => {
       try {
         this.platformAccessory.addService(service);
-      } catch (error) {
-        /* empty */
-      }
+      } catch (error) {}
     });
   }
 

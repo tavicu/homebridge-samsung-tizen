@@ -1,18 +1,20 @@
-import { HAP } from 'homebridge';
+import { Characteristic } from 'homebridge';
+import { SwitchAccessory, TelevisionAccessory } from '../accessories/index.js';
+import { LinkedService } from '../types/types.js';
 
 export class InformationService {
-  public service;
+  public service: LinkedService;
+  private characteristic: typeof Characteristic;
 
-  constructor(public accessory) {
-    const { device, platform, platformAccessory } = accessory;
-    const hap: HAP = platform.api.hap;
+  constructor(private accessory: TelevisionAccessory | SwitchAccessory) {
+    const { device, platform } = this.accessory;
+    this.characteristic = platform.api.hap.Characteristic;
 
-    this.service = platformAccessory.getService(hap.Service.AccessoryInformation) || new hap.Service.AccessoryInformation();
-
-    this.service
-      .setCharacteristic(hap.Characteristic.Model, 'Tizen OS')
-      .setCharacteristic(hap.Characteristic.Manufacturer, 'Samsung TV')
-      .setCharacteristic(hap.Characteristic.Name, device.config.name)
-      .setCharacteristic(hap.Characteristic.SerialNumber, device.config.ip);
+    this.service = new platform.api.hap.Service.AccessoryInformation(device.config.name)
+      .setCharacteristic(this.characteristic.Model, device.storage.model || 'Tizen OS')
+      .setCharacteristic(this.characteristic.Manufacturer, 'Samsung TV')
+      .setCharacteristic(this.characteristic.Name, device.config.name)
+      .setCharacteristic(this.characteristic.SerialNumber, device.config.ip)
+      .setCharacteristic(this.characteristic.FirmwareRevision, device.storage.firmware || 'Unknown');
   }
 }

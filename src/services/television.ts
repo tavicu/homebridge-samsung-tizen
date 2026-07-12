@@ -1,122 +1,121 @@
-import { HAP, CharacteristicValue } from 'homebridge';
-
-let hap: HAP;
+import { Characteristic, CharacteristicValue } from 'homebridge';
+import { TelevisionAccessory } from '../accessories/television.js';
+import { Device } from '../device/device.js';
+import { delay } from '../lib/tools.js';
+import { SamsungPlatform } from '../platform.js';
+import { LinkedService } from '../types/types.js';
+import { InputService } from './input.js';
 
 export class TelevisionService {
-  public device;
-  public service;
+  public service: LinkedService;
+  private device: Device;
+  private platform: SamsungPlatform;
+  private characteristic: typeof Characteristic;
 
-  constructor(public accessory) {
-    const { device, platform } = accessory;
-    hap = platform.api.hap;
-
-    this.device = device;
+  constructor(private accessory: TelevisionAccessory) {
+    this.device = this.accessory.device;
+    this.platform = this.accessory.platform;
+    this.characteristic = this.platform.api.hap.Characteristic;
 
     // TODO
     // this.remoteKeys = require('../options/remote')(this.device, Hap);
 
-    this.createService();
+    const displayOrder = this.accessory.inputs.map((input: InputService) => input.config.identifier);
+
+    this.service = new this.platform.api.hap.Service.Television(this.device.config.name)
+      .setCharacteristic(this.characteristic.ConfiguredName, this.device.config.name)
+      .setCharacteristic(this.characteristic.DisplayOrder, this.platform.api.hap.encode(1, displayOrder).toString('base64'))
+      .setCharacteristic(this.characteristic.SleepDiscoveryMode, this.characteristic.SleepDiscoveryMode.ALWAYS_DISCOVERABLE);
+
+    this.service.getCharacteristic(this.characteristic.Active).onGet(this.getActive.bind(this)).onSet(this.setActive.bind(this));
+    this.service.getCharacteristic(this.characteristic.ActiveIdentifier).onGet(this.getInput.bind(this)).onSet(this.setInput.bind(this));
   }
 
-  private createService() {
-    const displayOrder = this.accessory.inputs.map((input: any) => input.config.identifier);
-
-    this.service = new hap.Service.Television(this.device.config.name)
-      .setCharacteristic(hap.Characteristic.ConfiguredName, this.device.config.name)
-      .setCharacteristic(hap.Characteristic.DisplayOrder, hap.encode(1, displayOrder).toString('base64'))
-      .setCharacteristic(hap.Characteristic.SleepDiscoveryMode, hap.Characteristic.SleepDiscoveryMode.ALWAYS_DISCOVERABLE);
-
-    this.service.getCharacteristic(hap.Characteristic.Active).onGet(this.getActive.bind(this)).onSet(this.setActive.bind(this));
-
-    // this.service.getCharacteristic(hap.Characteristic.RemoteKey).on(CharacteristicEventTypes.SET, this.setRemote.bind(this));
-
-    // this.service
-    //     .getCharacteristic(hap.Characteristic.ActiveIdentifier)
-    //     .on(CharacteristicEventTypes.GET, this.getInput.bind(this))
-    //     .on(CharacteristicEventTypes.SET, this.setInput.bind(this));
-  }
-
-  addLinkedService(newLinkedService) {
+  public addLinkedService(newLinkedService: LinkedService) {
     return this.service.addLinkedService(newLinkedService);
   }
 
-  public async updateValue() {
+  public async updateValue(): Promise<void> {
     const value = await this.getActive();
 
-    this.service.getCharacteristic(hap.Characteristic.Active).updateValue(value);
+    this.service.updateCharacteristic(this.characteristic.Active, value);
   }
 
-  // TODO
   private async getActive(): Promise<CharacteristicValue> {
-    // this.device.remote.getMain().then((status) => {
-    //     callback(null, status);
-    // });
-
-    return this.device.state.Power;
+    return this.device.power ? this.characteristic.Active.ACTIVE : this.characteristic.Active.INACTIVE;
   }
 
-  // TODO
   private async setActive(value: CharacteristicValue) {
-    this.device.state.Power = value as boolean;
-
-    // utils
-    //     .race(this.device.remote.setMain(value))
-    //     .then(() => {
-    //         callback();
-    //     })
-    //     .catch((error) => {
-    //         this.device.log.error(error.message);
-    //         this.device.log.debug(error.stack);
-    //         callback(error);
-    //     });
+    await this.device.setPower(value as boolean);
   }
 
-  // TODO
-  // private setRemote(value: CharacteristicValue, callback: CharacteristicGetCallback) {
-  //     // utils.race(this.device.remote.command(this.remoteKeys[value])).then(() => {
-  //     //     callback();
-  //     // })
-  //     // .catch(error => {
-  //     //     this.device.log.error(error.message);
-  //     //     this.device.log.debug(error.stack);
-  //     //     callback(error);
-  //     // });
-  // }
+  private async getInput(): Promise<CharacteristicValue> {
+    const currentIdentifier = (this.service.getCharacteristic(this.characteristic.ActiveIdentifier).value as number) || 0;
 
-  // private getInput(callback: CharacteristicGetCallback) {
-  //     callback(null, 0);
-  //     // callback(null, this.service.getCharacteristic(Hap.Characteristic.ActiveIdentifier).value || 0);
-  //     // this.device.remote.getMain().then(async (status) => {
-  //     //     if (!status) { return; }
-  //     //     for (let input of this.accessory.inputs) {
-  //     //         let value = await input.getInput();
-  //     //         if (value) {
-  //     //             return input;
-  //     //         }
-  //     //     }
-  //     // })
-  //     // .then(input => {
-  //     //     this.updateValue(input ? input.config.identifier : 0, Hap.Characteristic.ActiveIdentifier);
-  //     // })
-  //     // .catch(error => {
-  //     //     this.device.log.debug(error.stack);
-  //     // });
-  // }
+    this.runAsyncInputUpdate().catch();
 
-  // private setInput(value: CharacteristicValue, callback: CharacteristicGetCallback) {
-  //     // new Promise(resolve => resolve(this.accessory.inputs.find(input => input.config.identifier == value)))
-  //     // .then(input => input.setInput())
-  //     // .then(input => {
-  //     //     if (input.stateless) {
-  //     //         setTimeout(() => this.updateValue(0, Hap.Characteristic.ActiveIdentifier), 150);
-  //     //     }
-  //     //     callback();
-  //     // })
-  //     // .catch(error => {
-  //     //     this.device.log.error(error.message);
-  //     //     this.device.log.debug(error.stack || error.details);
-  //     //     setTimeout(() => this.updateValue(0, Hap.Characteristic.ActiveIdentifier), 150);
-  //     //     callback();
-  //     // });
-  // }
+    return currentIdentifier;
+  }
+
+  private async setInput(value: CharacteristicValue) {
+    const targetIdentifier = value as number;
+
+    // Find the configured input instance
+    const targetInput = this.accessory.inputs.find((input: InputService) => input.config.identifier === targetIdentifier);
+
+    if (!targetInput) {
+      this.device.log.warn(`Input with identifier ${targetIdentifier} not found.`);
+      return;
+    }
+
+    try {
+      await targetInput.setInput();
+
+      if (targetInput.stateless) {
+        setTimeout(() => this.service.updateCharacteristic(this.characteristic.ActiveIdentifier, 0), 150);
+      }
+    } catch (error: any) {
+      this.device.log.error(`Failed to set input to ${targetInput.config.name}: ${error.message}`);
+
+      throw new this.platform.api.hap.HapStatusError(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
+    }
+  }
+
+  private async runAsyncInputUpdate(): Promise<void> {
+    if (!this.device.power) {
+      return;
+    }
+
+    // Find the identifier that is currently marked as active in the HomeKit cache
+    const currentIdentifier = (this.service.getCharacteristic(this.characteristic.ActiveIdentifier).value as number) || 0;
+
+    // Create a sorted list: if the input has the current identifier, put it at the beginning
+    const prioritizedInputs = [...this.accessory.inputs].sort((a, b) => {
+      if (a.config.identifier === currentIdentifier) {
+        return -1;
+      }
+      if (b.config.identifier === currentIdentifier) {
+        return 1;
+      }
+      return 0;
+    });
+
+    // Interrogate the inputs in the new prioritized order
+    for (const input of prioritizedInputs) {
+      const isActive = await input.getInput();
+
+      if (isActive) {
+        if (currentIdentifier !== input.config.identifier) {
+          this.service.updateCharacteristic(this.characteristic.ActiveIdentifier, input.config.identifier);
+        }
+
+        return;
+      }
+
+      await delay(100);
+    }
+
+    // If no input is detected as active, leave it at 0
+    this.service.updateCharacteristic(this.characteristic.ActiveIdentifier, 0);
+  }
 }
