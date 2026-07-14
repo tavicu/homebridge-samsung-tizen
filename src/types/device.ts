@@ -26,6 +26,7 @@ export type DeviceConfig = {
   inputs?: Array<InputConfig>;
   switches?: Array<SwitchConfig>;
   options?: Array<DeviceOptions>;
+  keys?: Record<string, string>;
 };
 
 export type DeviceOptions = 'Switch.DeviceName.Disable';

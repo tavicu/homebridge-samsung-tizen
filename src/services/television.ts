@@ -1,7 +1,8 @@
 import { Characteristic, CharacteristicValue } from 'homebridge';
 import { TelevisionAccessory } from '../accessories/television.js';
 import { Device } from '../device/device.js';
-import { delay } from '../lib/tools.js';
+import { getRemoteKeysMap } from '../lib/remote.js';
+import { delay, race } from '../lib/tools.js';
 import { SamsungPlatform } from '../platform.js';
 import { LinkedService } from '../types/types.js';
 import { InputService } from './input.js';
@@ -10,6 +11,7 @@ export class TelevisionService {
   public service: LinkedService;
   private device: Device;
   private platform: SamsungPlatform;
+  private remoteKeys: Record<number, string>;
   private characteristic: typeof Characteristic;
 
   constructor(private accessory: TelevisionAccessory) {
@@ -17,8 +19,7 @@ export class TelevisionService {
     this.platform = this.accessory.platform;
     this.characteristic = this.platform.api.hap.Characteristic;
 
-    // TODO
-    // this.remoteKeys = require('../options/remote')(this.device, Hap);
+    this.remoteKeys = getRemoteKeysMap(this.device, this.characteristic);
 
     const displayOrder = this.accessory.inputs.map((input: InputService) => input.config.identifier);
 
@@ -29,6 +30,7 @@ export class TelevisionService {
 
     this.service.getCharacteristic(this.characteristic.Active).onGet(this.getActive.bind(this)).onSet(this.setActive.bind(this));
     this.service.getCharacteristic(this.characteristic.ActiveIdentifier).onGet(this.getInput.bind(this)).onSet(this.setInput.bind(this));
+    this.service.getCharacteristic(this.characteristic.RemoteKey).onSet(this.setRemoteKey.bind(this));
   }
 
   public addLinkedService(newLinkedService: LinkedService) {
@@ -46,7 +48,15 @@ export class TelevisionService {
   }
 
   private async setActive(value: CharacteristicValue) {
-    await this.device.setPower(value as boolean);
+    await race(this.device.setPower(value as boolean));
+  }
+
+  private async setRemoteKey(value: CharacteristicValue) {
+    const tvCommand = this.remoteKeys[value as number];
+
+    if (tvCommand) {
+      await race(this.device.sendCommand(tvCommand));
+    }
   }
 
   private async getInput(): Promise<CharacteristicValue> {
@@ -69,7 +79,7 @@ export class TelevisionService {
     }
 
     try {
-      await targetInput.setInput();
+      await race(targetInput.setInput());
 
       if (targetInput.stateless) {
         setTimeout(() => this.service.updateCharacteristic(this.characteristic.ActiveIdentifier, 0), 150);

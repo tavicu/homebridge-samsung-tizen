@@ -1,7 +1,9 @@
 import WsClient, { RawData } from 'ws';
 import { Device } from '../device/device.js';
 import { delay } from '../lib/tools.js';
-import { HEARTBEAT_TIMEOUT } from '../settings.js';
+
+// Heartbeat timeout, 8 seconds (6 ping + 2 for safety)
+const HEARTBEAT_TIMEOUT = 8 * 1000;
 
 export class WebSocket {
   private ws: WsClient | null = null;

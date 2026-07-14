@@ -28,6 +28,7 @@ export class Device extends EventEmitter {
 
     this.config = deepmerge(
       {
+        keys: platform.config.keys,
         inputs: platform.config.inputs,
         switches: platform.config.switches,
       },

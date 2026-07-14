@@ -10,6 +10,7 @@ export type PlatformConfig = {
   devices?: Array<DeviceConfig>;
   inputs?: Array<InputConfig>;
   switches?: Array<SwitchConfig>;
+  keys?: Record<string, string>;
   clientId?: string;
   clientSecret?: string;
 };
