@@ -2,7 +2,7 @@ import { API, APIEvent, IndependentPlatformPlugin, Logging } from 'homebridge';
 import { SwitchAccessory, TelevisionAccessory } from './accessories/index.js';
 import { Device } from './device/index.js';
 import { Storage } from './lib/storage.js';
-import { SSDP } from './protocols/index.js';
+import { SmartThingsManager, SSDP } from './protocols/index.js';
 import { UPnPManager } from './protocols/upnp.js';
 import { PLUGIN_NAME } from './settings.js';
 import { DeviceConfig, PlatformConfig } from './types/index.js';
@@ -10,6 +10,8 @@ import { DeviceConfig, PlatformConfig } from './types/index.js';
 export class SamsungPlatform implements IndependentPlatformPlugin {
   private ssdp: SSDP;
   private upnp: UPnPManager;
+  private smartthings: SmartThingsManager;
+
   public storage: Storage;
   public devices: Array<Device> = [];
 
@@ -18,9 +20,11 @@ export class SamsungPlatform implements IndependentPlatformPlugin {
     public config: PlatformConfig,
     public api: API,
   ) {
+    this.storage = new Storage(api, log);
+
     this.ssdp = new SSDP(this);
     this.upnp = new UPnPManager(this);
-    this.storage = new Storage(api, log);
+    this.smartthings = new SmartThingsManager(this);
 
     this.api.on(APIEvent.DID_FINISH_LAUNCHING, () => this.initialize());
     this.api.on(APIEvent.SHUTDOWN, () => this.shutdown());
@@ -28,6 +32,10 @@ export class SamsungPlatform implements IndependentPlatformPlugin {
 
   public get upnpManager(): UPnPManager {
     return this.upnp;
+  }
+
+  public get smartthingsManager(): SmartThingsManager {
+    return this.smartthings;
   }
 
   private async initialize(): Promise<void> {
@@ -57,6 +65,7 @@ export class SamsungPlatform implements IndependentPlatformPlugin {
 
     this.ssdp.start();
     this.upnp.start();
+    this.smartthings.start();
   }
 
   private shutdown(): void {

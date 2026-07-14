@@ -8,14 +8,15 @@ export type LinkedService = Service & {
 export type PlatformConfig = {
   platform: PlatformName | PlatformIdentifier;
   devices?: Array<DeviceConfig>;
-  api_key?: string;
   inputs?: Array<InputConfig>;
   switches?: Array<SwitchConfig>;
+  clientId?: string;
+  clientSecret?: string;
 };
 
 export type InputConfig = {
   name: string;
-  type: 'app' | 'command';
+  type: 'app' | 'input' | 'command';
   value: string;
   identifier: number;
 };

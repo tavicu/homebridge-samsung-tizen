@@ -1,7 +1,6 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 import { API, Logging } from 'homebridge';
-import { DeviceStorage } from '../types/index.js';
 
 export class Storage {
   private filePath: string;
@@ -35,19 +34,36 @@ export class Storage {
    * Returns a proxied storage object for a specific device ID.
    * Any property mutation will automatically schedule a debounced save operation.
    */
-  get(id: string): DeviceStorage {
+  get<T = any>(id: string): T & { clear(): void } {
     if (!this.accessories[id]) {
       this.accessories[id] = {};
     }
 
     return new Proxy(this.accessories[id], {
-      set: (obj, prop, value) => {
-        obj[prop] = value;
+      get: (obj, prop) => {
+        if (prop === 'clear') {
+          return () => {
+            for (const key of Object.keys(obj)) {
+              delete obj[key];
+            }
 
+            this.save();
+          };
+        }
+
+        return obj[prop];
+      },
+
+      set: (obj, prop, value) => {
+        if (prop === 'clear') {
+          return false;
+        }
+
+        obj[prop] = value;
         this.save();
         return true;
       },
-    });
+    }) as unknown as T & { clear(): void };
   }
 
   /**

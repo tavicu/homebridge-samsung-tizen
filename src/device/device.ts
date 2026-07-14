@@ -3,11 +3,7 @@ import { deepmerge } from 'deepmerge-ts';
 import { Logger } from 'homebridge';
 import { SwitchAccessory, TelevisionAccessory } from '../accessories/index.js';
 import { Cache } from '../lib/cache.js';
-import { parseCommands } from '../lib/parsers.js';
-import { delay } from '../lib/tools.js';
 import { SamsungPlatform } from '../platform.js';
-import { UPnPDevice } from '../protocols/upnp.js';
-import { WebSocket } from '../protocols/websocket.js';
 import { DeviceConfig, DeviceOptions, DeviceState, DeviceStorage, SwitchConfig } from '../types/index.js';
 import { DeviceController } from './controller.js';
 
@@ -15,8 +11,6 @@ export class Device extends EventEmitter {
   public log: Logger;
   public cache: Cache;
   public storage: DeviceStorage;
-  private upnp: UPnPDevice;
-  private ws: WebSocket;
   private controller: DeviceController;
 
   public UUID: string;
@@ -34,7 +28,6 @@ export class Device extends EventEmitter {
 
     this.config = deepmerge(
       {
-        api_key: platform.config.api_key,
         inputs: platform.config.inputs,
         switches: platform.config.switches,
       },
@@ -73,9 +66,7 @@ export class Device extends EventEmitter {
     // Setup dependencies for this device, order is important
     this.storage = platform.storage.get(this.UUID);
     this.cache = new Cache(this);
-    this.ws = new WebSocket(this);
-    this.upnp = new UPnPDevice(this, platform);
-    this.controller = new DeviceController(this);
+    this.controller = new DeviceController(this, platform);
 
     this.accessories = [
       new TelevisionAccessory(this, platform),
@@ -158,11 +149,27 @@ export class Device extends EventEmitter {
   }
 
   public setMute(value: boolean): Promise<void> {
-    return this.upnp.setMute(value);
+    return this.controller.setMute(value);
   }
 
   public setVolume(value: number): Promise<void> {
-    return this.upnp.setVolume(value);
+    return this.controller.setVolume(value);
+  }
+
+  public getInputSource(): Promise<string | null> {
+    return this.controller.getInputSource();
+  }
+
+  public setInputSource(value: string): Promise<void> {
+    return this.controller.setInputSource(value);
+  }
+
+  public getPictureMode(): Promise<string | null> {
+    return this.controller.getPictureMode();
+  }
+
+  public setPictureMode(value: string): Promise<void> {
+    return this.controller.setPictureMode(value);
   }
 
   public setSleep(minutes: number, onComplete?: () => Promise<void> | void): Promise<void> {
@@ -181,20 +188,8 @@ export class Device extends EventEmitter {
     return this.controller.startApplication(appId);
   }
 
-  public async sendCommand(commands: string | string[]): Promise<void> {
-    const parsed = parseCommands(commands);
-
-    for (const [i, cmd] of parsed.entries()) {
-      if (typeof cmd === 'object') {
-        await this.ws.hold(cmd.key, cmd.time * 1000);
-      } else {
-        await this.ws.click(cmd);
-      }
-
-      if (i < parsed.length - 1) {
-        await delay(400);
-      }
-    }
+  public sendCommand(commands: string | string[]): Promise<void> {
+    return this.controller.sendCommand(commands);
   }
 
   public hasOption(key: DeviceOptions): boolean {
@@ -202,7 +197,6 @@ export class Device extends EventEmitter {
   }
 
   public destroy(): void {
-    this.upnp.destroy();
-    this.ws.destroy();
+    this.controller.destroy();
   }
 }

@@ -1,15 +1,31 @@
 import axios from 'axios';
 import isPortReachable from 'is-port-reachable';
 import { TvOfflineError } from '../errors.js';
+import { parseCommands } from '../lib/parsers.js';
+import { delay } from '../lib/tools.js';
 import { wol } from '../lib/wol.js';
-import { COOLDOWN_TIMEOUT } from '../settings.js';
+import { SamsungPlatform } from '../platform.js';
+import { SmartThingsClient, UPnPDevice, WebSocket } from '../protocols/index.js';
 import { Device } from './device.js';
 
-export class DeviceController {
-  private sleepTimeout: NodeJS.Timeout | null = null;
-  private cooldownTimer: NodeJS.Timeout | null = null;
+const POWERING_TIMEOUT = 1000 * 3;
 
-  constructor(private device: Device) {
+export class DeviceController {
+  private ws: WebSocket;
+  private upnp: UPnPDevice;
+  private smartthings: SmartThingsClient;
+
+  private sleepTimeout: NodeJS.Timeout | null = null;
+  private poweringTimeout: NodeJS.Timeout | null = null;
+
+  constructor(
+    private device: Device,
+    platform: SamsungPlatform,
+  ) {
+    this.ws = new WebSocket(this.device);
+    this.upnp = new UPnPDevice(this.device, platform);
+    this.smartthings = new SmartThingsClient(this.device, platform);
+
     // Get device info on startup
     this.getInfo().catch(() => {});
   }
@@ -41,6 +57,34 @@ export class DeviceController {
     }
   }
 
+  public async setMute(value: boolean): Promise<void> {
+    await this.waitPowering();
+    return this.upnp.setMute(value);
+  }
+
+  public async setVolume(value: number): Promise<void> {
+    await this.waitPowering();
+    return this.upnp.setVolume(value);
+  }
+
+  public getInputSource(): Promise<string | null> {
+    return this.smartthings.getInputSource();
+  }
+
+  public async setInputSource(value: string): Promise<void> {
+    await this.waitPowering();
+    return this.smartthings.setInputSource(value);
+  }
+
+  public getPictureMode(): Promise<string | null> {
+    return this.smartthings.getPictureMode();
+  }
+
+  public async setPictureMode(value: string): Promise<void> {
+    await this.waitPowering();
+    return this.smartthings.setPictureMode(value);
+  }
+
   public getSleep() {
     return this.sleepTimeout !== null;
   }
@@ -57,11 +101,16 @@ export class DeviceController {
       throw new TvOfflineError();
     }
 
+    await this.waitPowering();
+
     this.sleepTimeout = setTimeout(
       async () => {
         try {
           this.sleepTimeout = null;
-          await this.powerOff();
+
+          if (this.device.power) {
+            await this.device.setPower(false);
+          }
 
           if (onComplete) {
             Promise.resolve(onComplete()).catch();
@@ -75,16 +124,22 @@ export class DeviceController {
   }
 
   public async setChannel(channel: number | string): Promise<void> {
+    await this.waitPowering();
+
     const channelStr = String(channel);
 
     if (!channel || !/^\d+$/.test(channelStr)) {
       throw new Error(`Invalid channel: ${channel}`);
     }
 
-    const commands = channelStr.split('').map((char) => `KEY_${char}`);
-    commands.push('KEY_ENTER');
+    if (this.smartthings.isAvailable) {
+      await this.smartthings.setTvChannel(channel);
+    } else {
+      const commands = channelStr.split('').map((char) => `KEY_${char}`);
+      commands.push('KEY_ENTER');
 
-    await this.device.sendCommand(commands);
+      await this.device.sendCommand(commands);
+    }
   }
 
   /**
@@ -104,6 +159,8 @@ export class DeviceController {
    * Launch Application
    */
   public async startApplication(appId: string | number): Promise<any> {
+    await this.waitPowering();
+
     try {
       const response = await axios.post(`http://${this.device.config.ip}:8001/api/v2/applications/${appId}`, null, { timeout: 300 });
 
@@ -113,8 +170,26 @@ export class DeviceController {
     }
   }
 
+  public async sendCommand(commands: string | string[]): Promise<void> {
+    await this.waitPowering();
+
+    const parsed = parseCommands(commands);
+
+    for (const [i, cmd] of parsed.entries()) {
+      if (typeof cmd === 'object') {
+        await this.ws.hold(cmd.key, cmd.time * 1000);
+      } else {
+        await this.ws.click(cmd);
+      }
+
+      if (i < parsed.length - 1) {
+        await delay(400);
+      }
+    }
+  }
+
   public async powerOn(): Promise<void> {
-    if (this.cooldownTimer !== null) {
+    if (this.poweringTimeout !== null) {
       throw new Error('TV is currently transitioning states. Please wait.');
     }
 
@@ -132,11 +207,11 @@ export class DeviceController {
       });
     }
 
-    this.cooldownTimer = setTimeout(() => (this.cooldownTimer = null), COOLDOWN_TIMEOUT);
+    this.poweringTimeout = setTimeout(() => (this.poweringTimeout = null), POWERING_TIMEOUT);
   }
 
   public async powerOff(): Promise<void> {
-    if (this.cooldownTimer !== null) {
+    if (this.poweringTimeout !== null) {
       throw new Error('TV is currently transitioning states. Please wait.');
     }
 
@@ -146,6 +221,17 @@ export class DeviceController {
 
     await this.device.sendCommand('KEY_POWER');
 
-    this.cooldownTimer = setTimeout(() => (this.cooldownTimer = null), COOLDOWN_TIMEOUT);
+    this.poweringTimeout = setTimeout(() => (this.poweringTimeout = null), POWERING_TIMEOUT);
+  }
+
+  private async waitPowering(): Promise<void> {
+    while (this.poweringTimeout !== null) {
+      await delay(200);
+    }
+  }
+
+  public destroy(): void {
+    this.ws.destroy();
+    this.upnp.destroy();
   }
 }

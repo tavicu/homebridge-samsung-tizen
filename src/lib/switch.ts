@@ -29,7 +29,7 @@ export function getSwitchOptions(accessory: SwitchAccessory, device: Device, ser
       key: 'sleep',
       offable: true,
       get: async () => {
-        return device.sleep;
+        return !!device.sleep;
       },
       set: async (switchValue: boolean) => {
         await device.setSleep(switchValue ? config.sleep || 0 : 0, () => {
@@ -62,9 +62,23 @@ export function getSwitchOptions(accessory: SwitchAccessory, device: Device, ser
     },
 
     {
+      key: 'input',
+      set: async (_switchValue: boolean) => {
+        await device.setInputSource(config.input as string);
+      },
+    },
+
+    {
       key: 'channel',
       set: async (_switchValue: boolean) => {
         await device.setChannel(config.channel as number | string);
+      },
+    },
+
+    {
+      key: 'picture_mode',
+      set: async (_switchValue: boolean) => {
+        await device.setPictureMode(config.picture_mode as string);
       },
     },
 

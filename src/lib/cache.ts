@@ -4,7 +4,7 @@ export class Cache {
   private keys: object = {};
 
   constructor(device: Device) {
-    device.on('state.change', () => this.flush());
+    device.on('state:update', () => this.flush());
   }
 
   get(key: string, run: any = Promise.resolve.bind(Promise), time = 500) {

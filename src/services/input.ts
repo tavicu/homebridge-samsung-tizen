@@ -20,7 +20,7 @@ export class InputService {
     this.platform = this.accessory.platform;
     this.characteristic = this.platform.api.hap.Characteristic;
 
-    this.stateless = ['command'].includes(config.type);
+    this.stateless = !['input', 'app'].includes(config.type);
 
     this.service = new this.platform.api.hap.Service.InputSource(config.name, `input_${config.identifier}`)
       .setCharacteristic(this.characteristic.Identifier, config.identifier)
@@ -67,6 +67,11 @@ export class InputService {
         const { visible } = await this.device.getApplication(value);
         return visible as boolean;
       } catch {}
+    } else if (type === 'input') {
+      try {
+        const inputSource = await this.device.getInputSource();
+        return inputSource === value;
+      } catch {}
     }
 
     return false;
@@ -84,6 +89,10 @@ export class InputService {
     switch (type) {
       case 'app':
         await this.device.startApplication(value);
+        break;
+
+      case 'input':
+        await this.device.setInputSource(value);
         break;
 
       case 'command':

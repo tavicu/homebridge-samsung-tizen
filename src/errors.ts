@@ -11,3 +11,9 @@ export class TvOfflineError extends BaseError {
     super('TV is offline');
   }
 }
+
+export class SmartThingsNotAvailable extends BaseError {
+  constructor() {
+    super('SmartThings is not available or not configured');
+  }
+}
