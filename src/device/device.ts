@@ -69,10 +69,7 @@ export class Device extends EventEmitter {
     this.cache = new Cache(this);
     this.controller = new DeviceController(this, platform);
 
-    this.accessories = [
-      new TelevisionAccessory(this, platform),
-      // new FrameAccessory(this, platform),
-    ];
+    this.accessories = [new TelevisionAccessory(this, platform)];
 
     // Switches
     this.config.switches?.forEach((switchConfig: SwitchConfig, index: number) => {
@@ -121,6 +118,8 @@ export class Device extends EventEmitter {
 
     this.on('paired', ({ token }) => {
       this.log.debug(`Device paired with success (token: ${token})`);
+
+      // TODO: add refresh interval
     });
   }
 

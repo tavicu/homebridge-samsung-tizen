@@ -5,14 +5,14 @@ import { parseCommands } from '../lib/parsers.js';
 import { delay } from '../lib/tools.js';
 import { wol } from '../lib/wol.js';
 import { SamsungPlatform } from '../platform.js';
-import { SmartThingsClient, UPnPDevice, WebSocket } from '../protocols/index.js';
+import { SmartThingsClient, UPnPClient, WebSocket } from '../protocols/index.js';
 import { Device } from './device.js';
 
 const POWERING_TIMEOUT = 1000 * 3;
 
 export class DeviceController {
   private ws: WebSocket;
-  private upnp: UPnPDevice;
+  private upnp: UPnPClient;
   private smartthings: SmartThingsClient;
 
   private sleepTimeout: NodeJS.Timeout | null = null;
@@ -23,7 +23,7 @@ export class DeviceController {
     platform: SamsungPlatform,
   ) {
     this.ws = new WebSocket(this.device);
-    this.upnp = new UPnPDevice(this.device, platform);
+    this.upnp = new UPnPClient(this.device, platform);
     this.smartthings = new SmartThingsClient(this.device, platform);
 
     // Get device info on startup
@@ -38,7 +38,7 @@ export class DeviceController {
   }
 
   public async getInfo(): Promise<any> {
-    try {
+    const fetchInfo = async () => {
       const { data } = await axios.get(`http://${this.device.config.ip}:8001/api/v2/`, { timeout: 1000 });
 
       // Update device storage
@@ -52,9 +52,9 @@ export class DeviceController {
       }
 
       return data;
-    } catch (error: any) {
-      throw new Error(error.message || error, { cause: error });
-    }
+    };
+
+    return this.device.cache.get('device-info', fetchInfo, 5000);
   }
 
   public async setMute(value: boolean): Promise<void> {
@@ -142,32 +142,22 @@ export class DeviceController {
     }
   }
 
-  /**
-   * Get Application Information
-   */
   public async getApplication(appId: string | number): Promise<any> {
-    try {
+    const fetchApp = async () => {
       const response = await axios.get(`http://${this.device.config.ip}:8001/api/v2/applications/${appId}`, { timeout: 300 });
-
       return response.data;
-    } catch (error: any) {
-      throw new Error(error.message || error, { cause: error });
-    }
+    };
+
+    return this.device.cache.get(`app-${appId}`, fetchApp, 1000);
   }
 
-  /**
-   * Launch Application
-   */
   public async startApplication(appId: string | number): Promise<any> {
     await this.waitPowering();
 
-    try {
-      const response = await axios.post(`http://${this.device.config.ip}:8001/api/v2/applications/${appId}`, null, { timeout: 300 });
+    // TODO: check data.code when invalid app id is provided
 
-      return response.data;
-    } catch (error: any) {
-      throw new Error(error.message || error, { cause: error });
-    }
+    const response = await axios.post(`http://${this.device.config.ip}:8001/api/v2/applications/${appId}`, null, { timeout: 300 });
+    return response.data;
   }
 
   public async sendCommand(commands: string | string[]): Promise<void> {

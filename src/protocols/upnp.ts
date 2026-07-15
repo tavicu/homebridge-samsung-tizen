@@ -111,7 +111,7 @@ export class UPnPManager {
   }
 }
 
-export class UPnPDevice {
+export class UPnPClient {
   private readonly manager: UPnPManager;
   private readonly controlUrl: string;
   private readonly eventUrl: string;

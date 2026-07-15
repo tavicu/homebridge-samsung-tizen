@@ -22,7 +22,12 @@ export class SSDP {
   constructor(private readonly platform: SamsungPlatform) {
     this.peer = ssdp.createPeer();
 
-    this.peer.on('ready', this.search.bind(this));
+    this.peer.on('ready', () => {
+      this.search();
+
+      // Sometimes search is not working, so we need to call it again
+      setTimeout(() => this.search(), 1000 * 5);
+    });
     this.peer.on('notify', this.onNotify.bind(this));
     this.peer.on('found', this.onFound.bind(this));
   }
