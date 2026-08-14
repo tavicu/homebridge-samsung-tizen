@@ -39,7 +39,7 @@ export class DeviceController {
 
   public async getInfo(): Promise<any> {
     const fetchInfo = async () => {
-      const { data } = await axios.get(`http://${this.device.config.ip}:8001/api/v2/`, { timeout: 1000 });
+      const { data } = await axios.get(`http://${this.device.config.ip}:8001/api/v2/`, { timeout: 1500 });
 
       // Update device storage
       if (data?.device) {
@@ -49,12 +49,13 @@ export class DeviceController {
         storage.model = data.device.modelName;
         storage.frameSupport = data.device.FrameTVSupport === 'true';
         storage.tokenSupport = data.device.TokenAuthSupport === 'true';
+        storage.powerStateSupport = data.device.PowerState !== undefined;
       }
 
       return data;
     };
 
-    return this.device.cache.get('device-info', fetchInfo, 5000);
+    return this.device.cache.get('device-info', fetchInfo, 2500);
   }
 
   public async setMute(value: boolean): Promise<void> {

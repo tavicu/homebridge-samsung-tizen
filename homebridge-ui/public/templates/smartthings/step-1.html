@@ -1,0 +1,48 @@
+<form class="card rounded" novalidate>
+  <div class="card-header">Step 1 — Enter API Credentials</div>
+
+  <div class="card-body">
+    <div class="ht-callout callout-info mb-3">
+      <div class="fw-semibold mb-1">How to obtain your SmartThings API credentials</div>
+      Please check <a href="" target="_blank" class="font-semibold">the documentation</a> for step-by-step instructions on how to create a SmartThings
+      developer project and obtain your API credentials required for authorization.
+    </div>
+
+    <div class="mb-3">
+      <label for="client_id" class="form-label">Client ID <strong class="text-danger">*</strong></label>
+      <input
+        type="text"
+        class="form-control"
+        id="client_id"
+        name="client_id"
+        value="{{ config.client_id }}"
+        placeholder="e.g. a1b2c3d4-e5f6-7a8b-9c0d-e1f2a3b4c5d6"
+        pattern="^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+        required
+      />
+      <div class="invalid-feedback">Please enter a valid OAuth Client ID from your developer project</div>
+      <small class="form-text text-muted">The OAuth Client ID from your SmartThings developer project</small>
+    </div>
+
+    <div>
+      <label for="client_secret" class="form-label">Client Secret <strong class="text-danger">*</strong></label>
+      <input
+        type="text"
+        class="form-control"
+        id="client_secret"
+        name="client_secret"
+        value="{{ config.client_secret }}"
+        placeholder="e.g. 3e2517a2-4a9b-4c54-9d01-123456789abc"
+        pattern="^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+        required
+      />
+      <div class="invalid-feedback">Please enter a valid OAuth Client Secret from your developer project</div>
+      <small class="form-text text-muted">The OAuth Client Secret from your SmartThings developer project</small>
+    </div>
+  </div>
+
+  <div class="card-footer text-end">
+    <button type="button" class="btn btn-outline-secondary" data-page="dashboard">Cancel</button>
+    <button type="submit" class="btn btn-primary">Continue to authorization <i class="fas fa-arrow-right"></i></button>
+  </div>
+</form>

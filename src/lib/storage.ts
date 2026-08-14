@@ -1,11 +1,13 @@
 import { promises as fs } from 'fs';
 import path from 'path';
+import { deepmerge } from 'deepmerge-ts';
 import { API, Logging } from 'homebridge';
 
 export class Storage {
   private filePath: string;
   private accessories: Record<string, any> = {};
   private saveTimeout: NodeJS.Timeout | null = null;
+  private lastKnownMtime: number = 0;
 
   // Storage configuration for retries
   private readonly maxRetries = 3;
@@ -22,6 +24,9 @@ export class Storage {
     try {
       // Ensure the directory exists (native replacement for ensureDir)
       await fs.mkdir(path.dirname(this.filePath), { recursive: true });
+
+      const stats = await fs.stat(this.filePath);
+      this.lastKnownMtime = stats.mtimeMs;
 
       const data = await fs.readFile(this.filePath, 'utf-8');
       this.accessories = JSON.parse(data);
@@ -81,11 +86,38 @@ export class Storage {
   }
 
   /**
+   * Checks if the file has been modified by the UI and makes a deep merge if needed.
+   * Any errors (e.g. file not found on first run) are caught silently.
+   */
+  private async syncChanges(): Promise<void> {
+    try {
+      const currentStats = await fs.stat(this.filePath);
+
+      if (currentStats.mtimeMs > this.lastKnownMtime) {
+        const diskData = await fs.readFile(this.filePath, 'utf-8');
+        const parsedData = JSON.parse(diskData);
+
+        this.accessories = deepmerge(parsedData, this.accessories);
+
+        this.lastKnownMtime = currentStats.mtimeMs;
+      }
+    } catch {}
+  }
+
+  /**
    * Performs the actual file write with a recursive retry mechanism.
    */
   private async write(retries: number, delay: number): Promise<void> {
     try {
+      // Check if file has been modified
+      await this.syncChanges();
+
+      // Write file with new details
       await fs.writeFile(this.filePath, JSON.stringify(this.accessories, null, 2), 'utf-8');
+
+      // Update last known modification time
+      const newStats = await fs.stat(this.filePath);
+      this.lastKnownMtime = newStats.mtimeMs;
     } catch (error) {
       if (retries > 1) {
         this.log.warn(`[Storage] Failed to save cache. Retrying in ${delay}ms... (${retries - 1} attempts left)`);

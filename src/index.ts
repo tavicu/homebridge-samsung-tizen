@@ -1,8 +1,7 @@
 import { API } from 'homebridge';
-
-import { PLATFORM_NAME } from './settings.js';
 import { SamsungPlatform } from './platform.js';
+import { PLATFORM_NAME, PLUGIN_NAME } from './settings.js';
 
 export default (api: API): void => {
-  api.registerPlatform(PLATFORM_NAME, SamsungPlatform);
+  api.registerPlatform(PLUGIN_NAME, PLATFORM_NAME, SamsungPlatform);
 };

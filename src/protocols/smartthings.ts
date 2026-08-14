@@ -15,9 +15,11 @@ export class SmartThingsManager {
 
   public isAvailable: boolean = false;
 
+  private refreshPromise: Promise<void> | null = null;
+
   constructor(private platform: SamsungPlatform) {
-    this.clientId = platform.config.clientId;
-    this.clientSecret = platform.config.clientSecret;
+    this.clientId = platform.config.client_id;
+    this.clientSecret = platform.config.client_secret;
   }
 
   public async start(): Promise<void> {
@@ -31,24 +33,45 @@ export class SmartThingsManager {
       return;
     }
 
+    try {
+      await this.ensureValidToken();
+
+      this.platform.log.info('[SmartThings] Successfully initialized and authenticated.');
+    } catch (error: any) {
+      this.platform.log.error(`[SmartThings] Failed initialization check: ${error.message}`);
+      this.platform.log.info('[SmartThings] Please follow the authorization flow again...');
+    }
+  }
+
+  private async ensureValidToken(): Promise<void> {
     const now = Date.now();
 
-    if (this.storage.expiresAt - now < 10 * 60 * 1000) {
-      this.platform.log.debug('[SmartThings] Token is expiring soon. Will try to refresh it...');
+    if (this.storage.expiresAt - now >= 10 * 60 * 1000) {
+      this.isAvailable = true;
+      return;
+    }
 
+    if (this.refreshPromise) {
+      return this.refreshPromise;
+    }
+
+    this.platform.log.debug('[SmartThings] Token is expiring soon or expired. Refreshing token...');
+
+    this.refreshPromise = (async () => {
       try {
         await this.refreshAccessToken();
 
         this.isAvailable = true;
       } catch (error: any) {
-        this.platform.log.error(`[SmartThings] Error refreshing access token: ${error.message}`, error);
-        this.platform.log.info('[SmartThings] Please follow the authorization flow again...');
-
+        this.isAvailable = false;
         this.storage.clear();
+        throw error;
+      } finally {
+        this.refreshPromise = null;
       }
-    } else {
-      this.isAvailable = true;
-    }
+    })();
+
+    return this.refreshPromise;
   }
 
   private async refreshAccessToken(): Promise<void> {
@@ -81,6 +104,8 @@ export class SmartThingsManager {
     if (!this.isAvailable) {
       throw new SmartThingsNotAvailable();
     }
+
+    await this.ensureValidToken();
 
     const { endpoint, commands } = config;
 
@@ -136,7 +161,7 @@ export class SmartThingsClient {
   ) {
     this.manager = platform.smartthingsManager;
 
-    this.deviceId = this.device.config.deviceId;
+    this.deviceId = this.device.config.device_id;
     this.apiBaseUrl = `https://api.smartthings.com/v1/devices/${this.deviceId}`;
     this.apiStatesUrl = `${this.apiBaseUrl}/states`;
     this.apiCommandUrl = `${this.apiBaseUrl}/commands`;

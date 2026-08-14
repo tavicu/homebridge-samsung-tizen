@@ -1,0 +1,111 @@
+.border-dashed {
+  border-style: dashed;
+}
+
+[ht-ui-root] .btn {
+  line-height: 1.25;
+  font-size: 0.75rem;
+  text-transform: none;
+  padding: 0.375rem 0.5rem;
+}
+
+[ht-ui-root] .table {
+  background: #ffffff;
+  border: 1px solid #e7e9eb;
+  border-radius: 0.5rem;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+[ht-ui-root] .table thead {
+  background: #f0f1f3;
+}
+
+[ht-ui-root] .table tbody tr td {
+  box-shadow: none;
+}
+
+[ht-ui-root] .table tbody tr:hover td {
+  background-color: #f8f8f8;
+}
+
+[ht-ui-root] .table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+[ht-ui-root] .card.card-danger {
+  background-color: rgba(var(--bs-danger-rgb), 0.05);
+}
+
+[ht-ui-root] .card.card-success {
+  background-color: rgba(var(--bs-success-rgb), 0.05);
+}
+
+[ht-ui-root] .card .card-icon {
+  font-size: 1.75rem;
+  background: #eee;
+  border-radius: 50%;
+  width: 4rem;
+  height: 4rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+[ht-ui-root] .card .card-icon.success {
+  background: rgba(var(--bs-success-rgb), 0.1);
+  color: rgba(var(--bs-success-rgb), 1);
+}
+
+[ht-ui-root] .card .card-icon.danger {
+  background: rgba(var(--bs-danger-rgb), 0.1);
+  color: rgba(var(--bs-danger-rgb), 1);
+}
+
+.ht-code {
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  border-radius: var(--bs-border-radius);
+  background-color: var(--bs-card-cap-bg);
+  border: 1px solid var(--bs-card-border-color);
+}
+
+.ht-callout {
+  background: var(--bs-light);
+  border: 1px solid #e7e9eb;
+  border-left: 3px solid var(--bs-gray-200);
+  border-radius: 0.375rem;
+  padding: 0.7rem 0.875rem;
+  font-size: 0.8rem;
+  line-height: 1.25rem;
+}
+
+.ht-callout.callout-info {
+  border-left-color: var(--bs-info);
+}
+
+.ht-callout.callout-smartthings {
+  border-left-color: #038df6;
+}
+
+.ht-wizard .card-header {
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.ht-wizard .alert p {
+  max-width: 30rem;
+  margin: 0 auto 1rem;
+}
+
+.ht-wizard .alert-danger {
+  color: #721c24;
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+}
+
+.ht-wizard .alert-success {
+  color: #155724;
+  background-color: #d4edda;
+  border-color: #c3e6cb;
+}

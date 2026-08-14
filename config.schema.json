@@ -1,6 +1,143 @@
 {
-    "pluginAlias": "SamsungTizen",
-    "pluginType": "platform",
-    "singular": true,
-    "headerDisplay": "Please read the [documentation](https://tavicu.github.io/homebridge-samsung-tizen/) of the plugin for more informations and step by step instructions on how to configure it."
+  "pluginAlias": "SamsungTizen",
+  "pluginType": "platform",
+  "singular": true,
+  "customUi": true,
+  "disableChildBridges": true,
+  "schema": {
+    "type": "object",
+    "properties": {
+      "name": { "type": "string" },
+      "client_id": { "type": "string" },
+      "client_secret": { "type": "string" },
+
+      "inputs": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "type": { "type": "string" },
+            "name": { "type": "string" },
+            "value": { "type": "string" }
+          }
+        }
+      },
+
+      "switches": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string" },
+            "power": { "type": "boolean" },
+            "app": { "type": "string" },
+            "input": { "type": "string" },
+            "sleep": { "type": "integer" },
+            "mute": { "type": "boolean" },
+            "volume": { "type": "integer" },
+            "channel": { "type": "integer" },
+            "picture_mode": { "type": "string" },
+            "command": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+
+      "keys": {
+        "type": "object",
+        "properties": {
+          "ARROW_UP": { "type": "string" },
+          "ARROW_DOWN": { "type": "string" },
+          "ARROW_LEFT": { "type": "string" },
+          "ARROW_RIGHT": { "type": "string" },
+          "SELECT": { "type": "string" },
+          "BACK": { "type": "string" },
+          "PLAY_PAUSE": { "type": "string" },
+          "INFORMATION": { "type": "string" }
+        }
+      },
+
+      "devices": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "wol": { "type": "object" },
+            "device_id": { "type": "string" },
+            "name": {
+              "type": "string",
+              "required": true
+            },
+            "ip": {
+              "type": "string",
+              "format": "ipv4",
+              "required": true
+            },
+            "mac": {
+              "type": "string",
+              "required": true,
+              "pattern": "^([A-Fa-f0-9]{2}:){5}[A-Fa-f0-9]{2}$"
+            },
+            "uuid": {
+              "type": "string"
+            },
+            "options": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+
+  "layout": [
+    {
+      "type": "help",
+      "helpvalue": "<div class='alert alert-warning mb-3' role='alert'><h5 class='alert-heading mb-1'><i class='fas fa-exclamation-triangle me-2'></i>Interactive Interface Unavailable</h5><p class='mb-0 small'>This plugin includes a full interactive setup wizard, but it cannot be loaded because you are running an older version of <span class='fw-bold'>Homebridge Config UI X</span>. You are currently viewing the basic configuration editor, which still allows you to manage your devices below. Please update Config UI X to <span class='fw-bold'>v5.27.0</span> or higher to unlock the full custom interface.</p></div>"
+    },
+    {
+      "title": "Devices",
+      "key": "devices",
+      "type": "array",
+      "items": [
+        {
+          "type": "div",
+          "items": [
+            {
+              "key": "devices[].name",
+              "title": "Device Name",
+              "default": "Bedroom TV"
+            },
+            {
+              "type": "help",
+              "helpvalue": "<p class='help-block'>Make sure that your device has a static IP address. You can set it from your router admin interface!</p>"
+            },
+            {
+              "type": "flex",
+              "flex-flow": "row wrap",
+              "items": [
+                {
+                  "key": "devices[].ip",
+                  "title": "IP Address",
+                  "placeholder": "10.20.30.40"
+                },
+                {
+                  "key": "devices[].mac",
+                  "title": "MAC Address",
+                  "placeholder": "A0:B1:C2:D3:E4:F5"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }

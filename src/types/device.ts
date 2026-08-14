@@ -13,6 +13,7 @@ export type DeviceStorage = {
   firmware?: string;
   frameSupport?: boolean;
   tokenSupport?: boolean;
+  powerStateSupport?: boolean;
   clear(): void;
 };
 
@@ -22,7 +23,7 @@ export type DeviceConfig = {
   mac: string;
   wol?: WolOptions;
   uuid?: string;
-  deviceId?: string;
+  device_id?: string;
   inputs?: Array<InputConfig>;
   switches?: Array<SwitchConfig>;
   options?: Array<DeviceOptions>;

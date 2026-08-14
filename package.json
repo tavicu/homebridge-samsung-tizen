@@ -1,7 +1,7 @@
 {
   "name": "homebridge-samsung-tizen",
   "displayName": "Homebridge Samsung Tizen",
-  "version": "5.2.6",
+  "version": "5.3.5",
   "description": "Homebridge plugin for Samsung TV's with Tizen OS",
   "license": "ISC",
   "author": "Octavian Ruda",
@@ -51,12 +51,14 @@
     "homebridge": "^2.1.0",
     "nodemon": "^3.1.14",
     "prettier": "^3.9.4",
+    "prettier-plugin-jinja-template": "^2.2.0",
     "rimraf": "^6.1.3",
     "ts-node": "^10.9.2",
     "typescript": "^6.0.0",
     "typescript-eslint": "^8.59.2"
   },
   "dependencies": {
+    "@homebridge/plugin-ui-utils": "^2.2.5",
     "axios": "^1.18.1",
     "deepmerge-ts": "^7.1.5",
     "fast-xml-parser": "^5.9.3",

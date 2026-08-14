@@ -90,10 +90,20 @@ export class Device extends EventEmitter {
       }
     });
 
-    this.on('ssdp:update', (event) => {
+    this.on('ssdp:update', async (event) => {
       console.log('ssdp:update', this.config.ip, event);
 
-      this.state.power = event === 'ssdp:alive';
+      let power = event === 'ssdp:alive';
+
+      if (power && this.storage.powerStateSupport) {
+        try {
+          const { device = {} } = await this.controller.getInfo();
+          console.log('ssdp:alive:info', device.PowerState);
+          power = device.PowerState === 'on';
+        } catch {}
+      }
+
+      this.state.power = power;
     });
 
     this.on('upnp:update', ({ volume, mute }) => {

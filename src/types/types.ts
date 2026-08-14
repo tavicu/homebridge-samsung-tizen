@@ -11,8 +11,8 @@ export type PlatformConfig = {
   inputs?: Array<InputConfig>;
   switches?: Array<SwitchConfig>;
   keys?: Record<string, string>;
-  clientId?: string;
-  clientSecret?: string;
+  client_id?: string;
+  client_secret?: string;
 };
 
 export type InputConfig = {
