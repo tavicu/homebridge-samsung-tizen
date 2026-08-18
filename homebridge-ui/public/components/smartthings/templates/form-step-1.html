@@ -9,13 +9,13 @@
     </div>
 
     <div class="mb-3">
-      <label for="client_id" class="form-label">Client ID <strong class="text-danger">*</strong></label>
+      <label for="clientId" class="form-label">Client ID <strong class="text-danger">*</strong></label>
       <input
         type="text"
         class="form-control"
-        id="client_id"
-        name="client_id"
-        value="{{ config.client_id }}"
+        id="clientId"
+        name="clientId"
+        value="{{ config.clientId }}"
         placeholder="e.g. a1b2c3d4-e5f6-7a8b-9c0d-e1f2a3b4c5d6"
         pattern="^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
         required
@@ -25,13 +25,13 @@
     </div>
 
     <div>
-      <label for="client_secret" class="form-label">Client Secret <strong class="text-danger">*</strong></label>
+      <label for="clientSecret" class="form-label">Client Secret <strong class="text-danger">*</strong></label>
       <input
         type="text"
         class="form-control"
-        id="client_secret"
-        name="client_secret"
-        value="{{ config.client_secret }}"
+        id="clientSecret"
+        name="clientSecret"
+        value="{{ config.clientSecret }}"
         placeholder="e.g. 3e2517a2-4a9b-4c54-9d01-123456789abc"
         pattern="^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
         required

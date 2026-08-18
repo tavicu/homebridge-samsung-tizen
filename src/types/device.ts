@@ -23,11 +23,16 @@ export type DeviceConfig = {
   mac: string;
   wol?: WolOptions;
   uuid?: string;
-  device_id?: string;
+  deviceId?: string;
   inputs?: Array<InputConfig>;
   switches?: Array<SwitchConfig>;
   options?: Array<DeviceOptions>;
   keys?: Record<string, string>;
+
+  /**
+   * @deprecated Use `deviceId` instead. Kept for backwards compatibility with older versions.
+   */
+  device_id?: string;
 };
 
 export type DeviceOptions = 'Switch.DeviceName.Disable';

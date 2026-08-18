@@ -1,13 +1,5 @@
-<div class="d-flex align-items-center justify-content-between mb-2">
-  <h5 class="fw-semibold mb-0">Devices</h5>
-
-  {% if config.devices %}
-    <button type="button" class="btn btn-primary" data-page="device"><i class="fas fa-plus"></i> Add device</button>
-  {% endif %}
-</div>
-
 {% if config.devices %}
-  <table class="table table-hover mb-4">
+  <table class="table table-hover mb-0">
     <thead>
       <tr>
         <th>Name</th>
@@ -23,7 +15,7 @@
           <td class="text-muted">{{ device.ip }}</td>
           <td class="text-muted">{{ device.mac }}</td>
           <td class="text-end">
-            <button type="button" class="btn btn-primary" data-page="device" data-device-index="{{ loop.index0 }}">Edit</button>
+            <button type="button" class="btn btn-primary" data-page="devices" data-device-index="{{ loop.index0 }}">Edit</button>
           </td>
         </tr>
       {% endfor %}
@@ -35,7 +27,7 @@
       <h6 class="fw-semibold">No devices configured</h6>
       <p class="small">Add your first Samsung TV to get started with Homebridge control</p>
 
-      <button type="button" class="btn btn-primary" data-page="device"><i class="fas fa-plus"></i> Add your first device</button>
+      <button type="button" class="btn btn-primary" data-page="devices"><i class="fas fa-plus"></i> Add your first device</button>
     </div>
   </div>
 {% endif %}

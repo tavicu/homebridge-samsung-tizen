@@ -8,8 +8,8 @@
     "type": "object",
     "properties": {
       "name": { "type": "string" },
-      "client_id": { "type": "string" },
-      "client_secret": { "type": "string" },
+      "clientId": { "type": "string" },
+      "clientSecret": { "type": "string" },
 
       "inputs": {
         "type": "array",
@@ -67,7 +67,7 @@
           "type": "object",
           "properties": {
             "wol": { "type": "object" },
-            "device_id": { "type": "string" },
+            "deviceId": { "type": "string" },
             "name": {
               "type": "string",
               "required": true

@@ -18,8 +18,8 @@ export class SmartThingsManager {
   private refreshPromise: Promise<void> | null = null;
 
   constructor(private platform: SamsungPlatform) {
-    this.clientId = platform.config.client_id;
-    this.clientSecret = platform.config.client_secret;
+    this.clientId = platform.config.clientId;
+    this.clientSecret = platform.config.clientSecret;
   }
 
   public async start(): Promise<void> {
@@ -161,7 +161,7 @@ export class SmartThingsClient {
   ) {
     this.manager = platform.smartthingsManager;
 
-    this.deviceId = this.device.config.device_id;
+    this.deviceId = this.device.config.deviceId || this.device.config.device_id;
     this.apiBaseUrl = `https://api.smartthings.com/v1/devices/${this.deviceId}`;
     this.apiStatesUrl = `${this.apiBaseUrl}/states`;
     this.apiCommandUrl = `${this.apiBaseUrl}/commands`;

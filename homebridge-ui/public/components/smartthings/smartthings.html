@@ -1,7 +1,5 @@
-<div>
-  <h5 class="fw-semibold mb-2">SmartThings Integration</h5>
-
-  <div class="ht-callout callout-smartthings d-flex align-items-start gap-3">
+<div class="ht-wizard">
+  <div class="ht-wizard-header text-center mb-3">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 55.96" width="52">
       <path
         d="M49.74 6.26C46.32 2.99 41.56 1.2 36.35.46c-4.91-.59-8.33-.44-8.33-.44s-3.42-.15-8.33.45C14.48 1.21 9.72 3 6.3 6.27 3.03 9.68 1.25 14.44.5 19.65c-.74 4.91-.44 8.33-.44 8.33s-.3 3.42.45 8.33c.74 5.21 2.53 9.97 5.8 13.39 3.42 3.27 8.18 5.06 13.39 5.8 4.91.59 8.33.45 8.33.45s3.42.15 8.33-.45c5.21-.74 9.97-2.53 13.39-5.8 3.27-3.42 5.06-8.18 5.8-13.39.6-4.91.45-8.33.45-8.33s.15-3.42-.45-8.33c-.74-5.21-2.53-9.97-5.8-13.39Z"
@@ -12,29 +10,9 @@
         style="fill: #fff; fill-rule: evenodd"
       />
     </svg>
-
-    <div>
-      {% if smartthings %}
-        {% if smartthings.expiresAt > now %}
-          <div class="fw-semibold">Connected</div>
-          <p>Your SmartThings account is authorized and active. TV devices are synchronized via the SmartThings API.</p>
-          <button type="button" class="btn btn-primary" data-page="smartthings"><i class="fas fa-pen me-1"></i> Edit Credentials</button>
-        {% else %}
-          <div class="fw-semibold mb-1">Authorization expired</div>
-          <div class="alert alert-warning text-start p-1 px-2 mb-1">
-            Your SmartThings access token expired on <span class="fw-semibold">{{ smartthings.expiresAt | formatDate }}</span>. Re-authorize to
-            restore full functionality.
-          </div>
-          <p>You can re-authorize using your existing credentials or update them if your Client ID or Secret has changed.</p>
-          <button type="button" class="btn btn-danger" data-page="smartthings">
-            <i class="fas fa-arrows-rotate me-1"></i> Re-authorize SmartThings
-          </button>
-        {% endif %}
-      {% else %}
-        <div class="fw-semibold">Not connected</div>
-        <p>Connect your SmartThings account to control your devices directly from this plugin.</p>
-        <button type="button" class="btn btn-success" data-page="smartthings"><i class="fas fa-link me-1"></i> Connect to SmartThings</button>
-      {% endif %}
-    </div>
+    <h6 class="fw-bold mt-2 mb-0">SmartThings Authorization</h6>
+    <small class="text-muted">Connect your Samsung SmartThings account to Homebridge</small>
   </div>
+
+  {% include "components/smartthings/templates/form-step-" ~ currentStep ~ ".html" %}
 </div>

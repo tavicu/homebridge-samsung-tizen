@@ -34,11 +34,11 @@
   ],
   "scripts": {
     "build": "rimraf ./dist && tsc",
+    "watch": "npm run build && npm link && nodemon",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint . --max-warnings=0",
     "lint:fix": "eslint --fix .",
-    "watch": "npm run build && npm link && nodemon",
     "prepublishOnly": "npm run lint && npm run build"
   },
   "devDependencies": {
