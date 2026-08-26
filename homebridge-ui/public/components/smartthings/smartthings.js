@@ -80,7 +80,7 @@ async function goToStep(stepNumber) {
   state.currentStep = stepNumber;
 
   try {
-    container.innerHTML = await render(`components/smartthings/smartthings.html`, state);
+    container.innerHTML = await render(`components/smartthings/smartthings.tmpl`, state);
 
     await initStep(stepNumber);
   } catch (error) {

@@ -188,7 +188,7 @@ function handleInputCommandRemove(event) {
 }
 
 async function initInputAdd() {
-  container.innerHTML = await render('components/inputs/templates/add.html', state);
+  container.innerHTML = await render('components/inputs/templates/tmpl.html', state);
 
   container.querySelector('select[name="type"]')?.addEventListener('change', handleInputTypeChange);
   container.querySelector('[data-command-add]')?.addEventListener('click', handleInputCommandAdd);
@@ -202,7 +202,7 @@ async function initInputEdit() {
   const device = state.config.devices?.[state.deviceIndex];
   state.input = state.device ? device.inputs?.[state.inputIndex] : state.config.inputs?.[state.inputIndex];
 
-  container.innerHTML = await render('components/inputs/templates/edit.html', state);
+  container.innerHTML = await render('components/inputs/templates/tmpl.html', state);
   container.querySelector('select[name="type"]')?.addEventListener('change', handleInputTypeChange);
   container.querySelector('[data-command-add]')?.addEventListener('click', handleInputCommandAdd);
   container.querySelectorAll('[data-command-remove]').forEach((button) => button.addEventListener('click', handleInputCommandRemove));
@@ -215,7 +215,7 @@ async function initInputDelete() {
   const device = state.config.devices?.[state.deviceIndex];
   state.input = state.device ? device.inputs?.[state.inputIndex] : state.config.inputs?.[state.inputIndex];
 
-  container.innerHTML = await render('components/inputs/templates/delete.html', state);
+  container.innerHTML = await render('components/inputs/templates/tmpl.html', state);
   container.querySelector('[data-input-cancel]')?.addEventListener('click', () => initInputEdit());
   container.querySelector('[data-input-confirm]')?.addEventListener('click', () => handleInputDelete());
 }

@@ -9,7 +9,7 @@ export async function renderPage({ root, params }) {
     now: Date.now(),
   };
 
-  root.innerHTML = await render('components/dashboard/dashboard.html', state);
+  root.innerHTML = await render('components/dashboard/dashboard.tmpl', state);
 
   console.log('Rendering dashboard page', root, params, state);
   console.log('--------------------------------');
