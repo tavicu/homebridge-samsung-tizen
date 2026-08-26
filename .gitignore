@@ -1,5 +1,6 @@
 # Ignore compiled code
 dist
+homebridge-ui/public/
 
 # Logs
 logs
@@ -37,4 +38,5 @@ ehthumbs.db
 Thumbs.db
 Icon
 
+# Test config
 /test/hbConfig
