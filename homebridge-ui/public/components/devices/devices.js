@@ -92,7 +92,7 @@ async function handleDeviceDelete() {
 }
 
 async function initDeviceAdd() {
-  container.innerHTML = await render('components/device/templates/add.html', state);
+  container.innerHTML = await render('components/devices/templates/add.html', state);
 
   const form = container.querySelector('form');
   form?.addEventListener('submit', handleDeviceAdd);
@@ -103,7 +103,7 @@ async function initDeviceEdit() {
 
   if (!state.device) return;
 
-  container.innerHTML = await render('components/device/templates/edit.html', state);
+  container.innerHTML = await render('components/devices/templates/edit.html', state);
   container.querySelector('[data-device-delete]')?.addEventListener('click', () => initDeviceDelete());
 
   const form = container.querySelector('form');
@@ -115,7 +115,7 @@ async function initDeviceDelete() {
 
   if (!state.device) return;
 
-  container.innerHTML = await render('components/device/templates/delete.html', state);
+  container.innerHTML = await render('components/devices/templates/delete.html', state);
   container.querySelector('[data-device-cancel]')?.addEventListener('click', () => initDeviceEdit());
   container.querySelector('[data-device-confirm]')?.addEventListener('click', () => handleDeviceDelete());
 }
@@ -127,14 +127,14 @@ export async function renderPage({ root, params }) {
     config: await getConfig(),
     params: params,
     device: null,
-    deviceIndex: Number(params.deviceIndex),
+    deviceIndex: !isNaN(params.deviceIndex) ? Number(params.deviceIndex) : undefined,
   };
 
   container = root;
 
   console.log('Rendering device page', root, params, state);
 
-  if (params.action === 'edit' || params.deviceIndex !== undefined) {
+  if (params.action === 'edit' || state.deviceIndex !== undefined) {
     await initDeviceEdit();
   } else if (params.action === 'delete') {
     await initDeviceDelete();

@@ -5,6 +5,8 @@ const cacheBust = (path) => import(`${path}?v=${Date.now()}`);
 export const ROUTES = {
   dashboard: () => cacheBust('../components/dashboard/dashboard.js'),
   devices: () => cacheBust('../components/devices/devices.js'),
+  inputs: () => cacheBust('../components/inputs/inputs.js'),
+  switch: () => cacheBust('../components/switch/switch.js'),
   smartthings: () => cacheBust('../components/smartthings/smartthings.js'),
 };
 
