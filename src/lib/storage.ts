@@ -2,6 +2,7 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import { deepmerge } from 'deepmerge-ts';
 import { API, Logging } from 'homebridge';
+import { sleep } from './tools.js';
 
 export class Storage {
   private filePath: string;
@@ -122,8 +123,8 @@ export class Storage {
       if (retries > 1) {
         this.log.warn(`[Storage] Failed to save cache. Retrying in ${delay}ms... (${retries - 1} attempts left)`);
 
-        await new Promise((resolve) => setTimeout(resolve, delay));
-        return this.write(retries - 1, delay * 2); // Double the delay for the next attempt
+        await sleep(delay);
+        return this.write(retries - 1, delay * 2);
       } else {
         this.log.error('[Storage] Could not save cache file:', error);
       }

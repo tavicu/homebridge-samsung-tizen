@@ -1,6 +1,6 @@
 import WsClient, { RawData } from 'ws';
 import { Device } from '../device/device.js';
-import { delay } from '../lib/tools.js';
+import { sleep } from '../lib/tools.js';
 
 // Heartbeat timeout, 8 seconds (6 ping + 2 for safety)
 const HEARTBEAT_TIMEOUT = 8 * 1000;
@@ -40,7 +40,7 @@ export class WebSocket {
 
   public async hold(key: string, duration: number) {
     await this.click(key, 'Press');
-    await delay(duration);
+    await sleep(duration);
     await this.click(key, 'Release');
   }
 
@@ -75,7 +75,7 @@ export class WebSocket {
 
     this.connectionPromise = this.connect()
       .then(async () => {
-        await delay(250);
+        await sleep(250);
       })
       .finally(() => {
         this.connectionPromise = null;
@@ -141,7 +141,7 @@ export class WebSocket {
       if (this.pairRetries > 0) {
         this.pairRetries--;
 
-        await delay(3000);
+        await sleep(3000);
         return await this.startPairing();
       } else {
         throw error;
@@ -156,7 +156,7 @@ export class WebSocket {
 
     this.disconnect();
 
-    await delay(1000);
+    await sleep(1000);
     await this.connect();
   }
 

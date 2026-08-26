@@ -2,7 +2,7 @@ import axios from 'axios';
 import isPortReachable from 'is-port-reachable';
 import { TvOfflineError } from '../errors.js';
 import { parseCommands } from '../lib/parsers.js';
-import { delay } from '../lib/tools.js';
+import { sleep } from '../lib/tools.js';
 import { wol } from '../lib/wol.js';
 import { SamsungPlatform } from '../platform.js';
 import { SmartThingsClient, UPnPClient, WebSocket } from '../protocols/index.js';
@@ -174,7 +174,7 @@ export class DeviceController {
       }
 
       if (i < parsed.length - 1) {
-        await delay(400);
+        await sleep(400);
       }
     }
   }
@@ -217,7 +217,7 @@ export class DeviceController {
 
   private async waitPowering(): Promise<void> {
     while (this.poweringTimeout !== null) {
-      await delay(200);
+      await sleep(200);
     }
   }
 

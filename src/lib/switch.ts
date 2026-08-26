@@ -3,7 +3,7 @@ import { Device } from '../device/device.js';
 import { TvOfflineError } from '../errors.js';
 import { SwitchService } from '../services/index.js';
 import { SwitchOption } from '../types/types.js';
-import { delay } from './tools.js';
+import { sleep } from './tools.js';
 
 export function getSwitchOptions(accessory: SwitchAccessory, device: Device, service: SwitchService): SwitchOption[] {
   const { config } = accessory;
@@ -21,7 +21,7 @@ export function getSwitchOptions(accessory: SwitchAccessory, device: Device, ser
         }
 
         await device.setPower(true);
-        await delay(3000);
+        await sleep(3000);
       },
     },
 

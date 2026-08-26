@@ -2,7 +2,7 @@ import { Characteristic, CharacteristicValue } from 'homebridge';
 import { TelevisionAccessory } from '../accessories/television.js';
 import { Device } from '../device/device.js';
 import { getRemoteKeysMap } from '../lib/remote.js';
-import { delay, race } from '../lib/tools.js';
+import { race, sleep } from '../lib/tools.js';
 import { SamsungPlatform } from '../platform.js';
 import { LinkedService } from '../types/types.js';
 import { InputService } from './input.js';
@@ -136,7 +136,7 @@ export class TelevisionService {
         }
       } catch {}
 
-      await delay(100);
+      await sleep(100);
     }
 
     this.service.updateCharacteristic(this.characteristic.ActiveIdentifier, 0);

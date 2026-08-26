@@ -1,4 +1,4 @@
-export const delay = <T>(timeout = 150, { value }: { value?: T } = {}): Promise<T | undefined> => {
+export const sleep = <T>(timeout = 150, { value }: { value?: T } = {}): Promise<T | undefined> => {
   return new Promise((resolve) => setTimeout(() => resolve(value), timeout));
 };
 

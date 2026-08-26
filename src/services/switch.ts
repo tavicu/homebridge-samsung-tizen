@@ -3,7 +3,7 @@ import { SwitchAccessory } from '../accessories/switch.js';
 import { Device } from '../device/device.js';
 import { TvOfflineError } from '../errors.js';
 import { getSwitchOptions } from '../lib/switch.js';
-import { delay, race } from '../lib/tools.js';
+import { race, sleep } from '../lib/tools.js';
 import { SamsungPlatform } from '../platform.js';
 import { LinkedService, SwitchOption } from '../types/index.js';
 
@@ -93,7 +93,7 @@ export class SwitchService {
       await option.set(value);
 
       if (this.options.length > 1 && i < this.options.length - 1) {
-        await delay(value ? 300 : 50);
+        await sleep(value ? 300 : 50);
       }
     }
 
