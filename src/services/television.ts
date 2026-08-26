@@ -39,7 +39,6 @@ export class TelevisionService {
 
   public async updateValue(): Promise<void> {
     const value = await this.getActive();
-
     this.service.updateCharacteristic(this.characteristic.Active, value);
   }
 
@@ -48,14 +47,30 @@ export class TelevisionService {
   }
 
   private async setActive(value: CharacteristicValue) {
-    await race(this.device.setPower(value as boolean));
+    try {
+      await race(this.device.setPower(value as boolean));
+    } catch (error: any) {
+      this.device.log.error(`Failed to set power state to ${value}: ${error.message || error}`);
+      this.device.log.debug(error.stack);
+
+      throw new this.platform.api.hap.HapStatusError(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
+    }
   }
 
   private async setRemoteKey(value: CharacteristicValue) {
     const tvCommand = this.remoteKeys[value as number];
 
-    if (tvCommand) {
+    if (!tvCommand) {
+      return;
+    }
+
+    try {
       await race(this.device.sendCommand(tvCommand));
+    } catch (error: any) {
+      this.device.log.error(`Failed to send remote key ${tvCommand}: ${error.message || error}`);
+      this.device.log.debug(error.stack);
+
+      throw new this.platform.api.hap.HapStatusError(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
     }
   }
 
@@ -70,12 +85,12 @@ export class TelevisionService {
   private async setInput(value: CharacteristicValue) {
     const targetIdentifier = value as number;
 
-    // Find the configured input instance
     const targetInput = this.accessory.inputs.find((input: InputService) => input.config.identifier === targetIdentifier);
 
     if (!targetInput) {
       this.device.log.warn(`Input with identifier ${targetIdentifier} not found.`);
-      return;
+
+      throw new this.platform.api.hap.HapStatusError(this.platform.api.hap.HAPStatus.RESOURCE_DOES_NOT_EXIST);
     }
 
     try {
@@ -85,7 +100,8 @@ export class TelevisionService {
         setTimeout(() => this.service.updateCharacteristic(this.characteristic.ActiveIdentifier, 0), 150);
       }
     } catch (error: any) {
-      this.device.log.error(`Failed to set input to ${targetInput.config.name}: ${error.message}`);
+      this.device.log.error(`Failed to set input to ${targetInput.config.name}: ${error.message || error}`);
+      this.device.log.debug(error.stack);
 
       throw new this.platform.api.hap.HapStatusError(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
     }
@@ -96,10 +112,8 @@ export class TelevisionService {
       return;
     }
 
-    // Find the identifier that is currently marked as active in the HomeKit cache
     const currentIdentifier = (this.service.getCharacteristic(this.characteristic.ActiveIdentifier).value as number) || 0;
 
-    // Create a sorted list: if the input has the current identifier, put it at the beginning
     const prioritizedInputs = [...this.accessory.inputs].sort((a, b) => {
       if (a.config.identifier === currentIdentifier) {
         return -1;
@@ -110,22 +124,21 @@ export class TelevisionService {
       return 0;
     });
 
-    // Interrogate the inputs in the new prioritized order
     for (const input of prioritizedInputs) {
-      const isActive = await input.getInput();
+      try {
+        const isActive = await input.getInput();
 
-      if (isActive) {
-        if (currentIdentifier !== input.config.identifier) {
-          this.service.updateCharacteristic(this.characteristic.ActiveIdentifier, input.config.identifier);
+        if (isActive) {
+          if (currentIdentifier !== input.config.identifier) {
+            this.service.updateCharacteristic(this.characteristic.ActiveIdentifier, input.config.identifier);
+          }
+          return;
         }
-
-        return;
-      }
+      } catch {}
 
       await delay(100);
     }
 
-    // If no input is detected as active, leave it at 0
     this.service.updateCharacteristic(this.characteristic.ActiveIdentifier, 0);
   }
 }

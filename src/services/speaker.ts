@@ -1,6 +1,7 @@
 import { Characteristic, CharacteristicValue } from 'homebridge';
 import { TelevisionAccessory } from '../accessories/television.js';
 import { Device } from '../device/device.js';
+import { race } from '../lib/tools.js';
 import { SamsungPlatform } from '../platform.js';
 import { LinkedService } from '../types/index.js';
 
@@ -32,8 +33,8 @@ export class SpeakerService {
     const mute = await this.getMute();
     const volume = await this.getVolume();
 
-    this.service.getCharacteristic(this.characteristic.Mute).updateValue(mute);
-    this.service.getCharacteristic(this.characteristic.Volume).updateValue(volume);
+    this.service.updateCharacteristic(this.characteristic.Mute, mute);
+    this.service.updateCharacteristic(this.characteristic.Volume, volume);
   }
 
   /**
@@ -48,9 +49,12 @@ export class SpeakerService {
    */
   private async setMute(value: CharacteristicValue): Promise<void> {
     try {
-      await this.device.setMute(value as boolean);
+      await race(this.device.setMute(value as boolean));
     } catch (error: any) {
+      this.device.log.error(`Failed to set mute: ${error.message || error}`);
       this.device.log.debug(error.stack);
+
+      throw new this.platform.api.hap.HapStatusError(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
     }
   }
 
@@ -66,9 +70,12 @@ export class SpeakerService {
    */
   private async setVolume(value: CharacteristicValue): Promise<void> {
     try {
-      await this.device.setVolume(value as number);
+      await race(this.device.setVolume(value as number));
     } catch (error: any) {
+      this.device.log.error(`Failed to set volume to ${value}: ${error.message || error}`);
       this.device.log.debug(error.stack);
+
+      throw new this.platform.api.hap.HapStatusError(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
     }
   }
 
@@ -80,12 +87,15 @@ export class SpeakerService {
       const direction = value as number;
 
       if (direction === this.characteristic.VolumeSelector.INCREMENT) {
-        await this.device.sendCommand('KEY_VOLUP');
+        await race(this.device.sendCommand('KEY_VOLUP'));
       } else if (direction === this.characteristic.VolumeSelector.DECREMENT) {
-        await this.device.sendCommand('KEY_VOLDOWN');
+        await race(this.device.sendCommand('KEY_VOLDOWN'));
       }
     } catch (error: any) {
+      this.device.log.error(`Failed to send volume step: ${error.message || error}`);
       this.device.log.debug(error.stack);
+
+      throw new this.platform.api.hap.HapStatusError(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
     }
   }
 }

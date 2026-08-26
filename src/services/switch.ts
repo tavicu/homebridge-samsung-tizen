@@ -60,7 +60,7 @@ export class SwitchService {
 
       return false;
     } catch (error: any) {
-      this.device.log.debug(`Failed to get switch state: ${error.message}`);
+      this.device.log.debug(`Failed to get switch state: ${error.message || error}`);
 
       return false;
     }
@@ -72,7 +72,7 @@ export class SwitchService {
     try {
       await race(this.runSwitch(switchValue));
     } catch (error: any) {
-      this.device.log.error(error.message);
+      this.device.log.error(`Failed to set switch state: ${error.message || error}`);
       this.device.log.debug(error.stack);
 
       if (error instanceof TvOfflineError) {

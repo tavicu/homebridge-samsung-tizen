@@ -64,8 +64,8 @@ export class InputService {
 
     if (type === 'app') {
       try {
-        const { visible } = await this.device.getApplication(value);
-        return visible as boolean;
+        const application = await this.device.getApplication(value);
+        return (application?.visible as boolean) ?? false;
       } catch {}
     } else if (type === 'input') {
       try {
