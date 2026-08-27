@@ -1,4 +1,5 @@
 import * as ssdp from 'peer-ssdp';
+import { Device } from '../device/index.js';
 import { debounce } from '../lib/tools.js';
 import { SamsungPlatform } from '../platform.js';
 
@@ -13,11 +14,17 @@ type Address = {
   address: string;
 };
 
+type TrackedDevice = {
+  device: Device;
+  emit: (event: string) => void;
+};
+
 export class SSDP {
-  private devices = new Map<string, (event: string) => void>();
+  private devices = new Map<string, TrackedDevice>();
 
   private readonly peer: any;
   private readonly possibleEvents: Array<string> = [ssdp.ALIVE, ssdp.BYEBYE];
+  private searchInterval?: NodeJS.Timeout;
 
   constructor(private readonly platform: SamsungPlatform) {
     this.peer = ssdp.createPeer();
@@ -25,7 +32,6 @@ export class SSDP {
     this.peer.on('ready', () => {
       this.search();
 
-      // Sometimes search is not working, so we need to call it again
       setTimeout(() => this.search(), 1000 * 5);
     });
     this.peer.on('notify', this.onNotify.bind(this));
@@ -34,48 +40,76 @@ export class SSDP {
 
   public start() {
     this.platform.devices.forEach((device) => {
-      const { config } = device;
-
-      this.devices.set(
-        config.ip,
-        debounce((event: string) => {
+      this.devices.set(device.config.ip, {
+        device,
+        emit: debounce((event: string) => {
           if (this.possibleEvents.includes(event)) {
             device.emit(ssdp.UPDATE, event);
           }
         }),
-      );
+      });
+
+      device.on('state:update', (prop: string) => {
+        if (prop === 'power') {
+          this.syncSearchInterval();
+        }
+      });
     });
 
     this.peer.start();
+    this.syncSearchInterval();
   }
 
   public search() {
-    this.peer.search({
-      ST: 'upnp:rootdevice',
-    });
+    try {
+      this.peer.search({
+        ST: 'upnp:rootdevice',
+      });
+    } catch (err) {
+      this.platform.log.debug('[SSDP] Search failed: %s', err);
+    }
+  }
+
+  private syncSearchInterval() {
+    const hasOfflineDevice = [...this.devices.values()].some(({ device }) => !device.power);
+
+    if (hasOfflineDevice && !this.searchInterval) {
+      this.searchInterval = setInterval(() => this.search(), 1000 * 30);
+    }
+
+    if (!hasOfflineDevice) {
+      clearInterval(this.searchInterval);
+      this.searchInterval = undefined;
+    }
   }
 
   private onNotify(headers: Headers, address: Address) {
+    const tracked = this.devices.get(address.address);
+
     // Filter response to devices
-    if (headers.NT !== 'upnp:rootdevice' || !this.devices.has(address.address)) {
+    if (headers.NT !== 'upnp:rootdevice' || !tracked) {
       return;
     }
 
     // Send received event
-    this.devices.get(address.address)?.(headers.NTS);
+    tracked.emit(headers.NTS);
   }
 
   private onFound(headers: Headers, address: Address) {
-    // Filter response to devices
-    if (headers.ST !== 'upnp:rootdevice' || !this.devices.has(address.address)) {
+    const tracked = this.devices.get(address.address);
+
+    // Filter response to devices already known as on
+    if (headers.ST !== 'upnp:rootdevice' || !tracked || tracked.device.power) {
       return;
     }
 
     // Send alive event
-    this.devices.get(address.address)?.(ssdp.ALIVE);
+    tracked.emit(ssdp.ALIVE);
   }
 
   public destroy() {
+    clearInterval(this.searchInterval);
+
     try {
       this.peer?.stopInterfaceDisco();
       this.peer?.close();
