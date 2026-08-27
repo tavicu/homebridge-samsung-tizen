@@ -1,40 +1,24 @@
 import { createApp } from 'vue';
 import App from './App.vue';
+import { useConfig } from './composables/useConfig';
+import { isConfigUiXSupported } from './utils/helpers';
 
-function isVersionLower(current, target) {
-	if (!current) return true;
+async function startApp() {
+  const root = document.querySelector('#app-tizen');
+  if (!root) return;
 
-	const currentParts = current.split('.').map(Number);
-	const targetParts = target.split('.').map(Number);
+  if (!isConfigUiXSupported()) {
+    window.homebridge?.showSchemaForm();
+    return;
+  }
 
-	for (let index = 0; index < 3; index++) {
-		if ((currentParts[index] || 0) < (targetParts[index] || 0)) return true;
-		if ((currentParts[index] || 0) > (targetParts[index] || 0)) return false;
-	}
-
-	return false;
+  try {
+    const { getConfig } = useConfig();
+    await getConfig();
+    createApp(App).mount(root);
+  } catch (err) {
+    root.innerHTML = `<div class="alert alert-danger">There was an error initializing the app: ${err.message}</div>`;
+  }
 }
 
-function isConfigUiXSupported(minVersion = '5.27.0') {
-	const currentVersion = window.homebridge?.serverEnv?.env?.packageVersion;
-	return !isVersionLower(currentVersion, minVersion);
-}
-
-function startApp() {
-	const root = document.querySelector('#app');
-	if (!root) return;
-
-	if (!isConfigUiXSupported()) {
-		root.innerHTML = '';
-		window.homebridge?.showSchemaForm();
-		return;
-	}
-
-	createApp(App).mount(root);
-}
-
-if (document.readyState === 'loading') {
-	document.addEventListener('DOMContentLoaded', startApp, { once: true });
-} else {
-	startApp();
-}
+startApp();

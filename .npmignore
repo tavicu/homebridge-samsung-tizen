@@ -1,5 +1,8 @@
 # Ignore source code
 src
+homebridge-ui/src/
+homebridge-ui/vite.config.js
+homebridge-ui/index.html
 
 # ------------- Defaults ------------- #
 
@@ -134,3 +137,5 @@ web_modules/
 .pnp.*
 
 test/
+
+dist/**/*.map

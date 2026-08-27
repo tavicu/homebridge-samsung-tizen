@@ -30,13 +30,15 @@
   "types": "dist/index.d.ts",
   "files": [
     "dist",
-    "homebridge-ui",
+    "homebridge-ui/public",
+    "homebridge-ui/server.js",
     "config.schema.json"
   ],
   "customUiPath": "./dist/homebridge-ui",
   "scripts": {
     "build": "rimraf dist homebridge-ui/public && tsc && vite build --config homebridge-ui/vite.config.js",
     "watch": "npm run build && npm link && nodemon",
+    "watch:ui": "vite build --config homebridge-ui/vite.config.js --watch",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint . --max-warnings=0",

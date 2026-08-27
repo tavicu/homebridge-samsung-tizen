@@ -1,23 +1,23 @@
 {
-    "compilerOptions": {
-        "target": "ES2022",
-        "lib": ["DOM", "ES2022"],
-        "module": "nodenext",
-        "moduleResolution": "nodenext",
-        "strict": true,
-        "declaration": true,
-        "skipLibCheck": true,
-        "sourceMap": true,
-        "allowSyntheticDefaultImports": true,
-        "esModuleInterop": true,
-        "forceConsistentCasingInFileNames": true,
-        "preserveConstEnums": true,
-        "useUnknownInCatchVariables": false,
-        "resolveJsonModule": true,
-        "noImplicitAny": false,
-        "rootDir": "src",
-        "outDir": "dist"
-    },
-    "include": ["src"],
-    "exclude": ["node_modules", "**/*.spec.ts"]
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["DOM", "ES2022"],
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "strict": true,
+    "declaration": true,
+    "skipLibCheck": true,
+    "sourceMap": false,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "preserveConstEnums": true,
+    "useUnknownInCatchVariables": false,
+    "resolveJsonModule": true,
+    "noImplicitAny": false,
+    "rootDir": "src",
+    "outDir": "dist"
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "**/*.spec.ts"]
 }

@@ -3,9 +3,10 @@ import vue from '@vitejs/plugin-vue';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-  plugins: [vue()],
-  root: import.meta.dirname,
   base: './',
+  root: import.meta.dirname,
+  plugins: [vue()],
+  publicDir: false,
   build: {
     outDir: path.resolve(import.meta.dirname, 'public'),
     emptyOutDir: true,
