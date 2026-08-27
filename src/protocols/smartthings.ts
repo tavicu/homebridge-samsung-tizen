@@ -16,6 +16,7 @@ export class SmartThingsManager {
   public isAvailable: boolean = false;
 
   private refreshPromise: Promise<void> | null = null;
+  private refreshTimer: NodeJS.Timeout | null = null;
 
   constructor(private platform: SamsungPlatform) {
     this.clientId = platform.config.clientId;
@@ -35,6 +36,7 @@ export class SmartThingsManager {
 
     try {
       await this.ensureValidToken();
+      this.scheduleRefresh();
 
       this.platform.log.info('[SmartThings] Successfully initialized and authenticated.');
     } catch (error: any) {
@@ -46,7 +48,8 @@ export class SmartThingsManager {
   private async ensureValidToken(): Promise<void> {
     const now = Date.now();
 
-    if (this.storage.expiresAt - now >= 10 * 60 * 1000) {
+    // Refresh token if it's expiring in the next 30 minutes
+    if (this.storage.expiresAt - now >= 30 * 60 * 1000) {
       this.isAvailable = true;
       return;
     }
@@ -72,6 +75,26 @@ export class SmartThingsManager {
     })();
 
     return this.refreshPromise;
+  }
+
+  private scheduleRefresh(): void {
+    const now = Date.now();
+
+    if (this.refreshTimer) {
+      clearTimeout(this.refreshTimer);
+    }
+
+    // Calculate exact time until the next 15 minutes before token expiration
+    const delay = Math.max(this.storage.expiresAt - now - 15 * 60 * 1000, 0);
+
+    this.refreshTimer = setTimeout(async () => {
+      try {
+        await this.ensureValidToken();
+        this.scheduleRefresh();
+      } catch (error: any) {
+        this.platform.log.error(`[SmartThings] Background refresh token failed: ${error.message}`);
+      }
+    }, delay);
   }
 
   private async refreshAccessToken(): Promise<void> {
