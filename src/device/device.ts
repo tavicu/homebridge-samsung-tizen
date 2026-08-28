@@ -49,13 +49,13 @@ export class Device extends EventEmitter {
 
     // Check if we have device minimum config
     if (!this.config.name) {
-      throw new Error('One of your device has no name configured. This device will be skipped.');
+      throw new Error('One of your device has no name configured, skipping initialization...');
     }
     if (!this.config.ip) {
-      throw new Error(`The IP address is missing from the config for ${this.config.name}. This device will be skipped.`);
+      throw new Error(`The IP address is missing from the config for ${this.config.name}, skipping initialization...`);
     }
     if (!this.config.mac) {
-      throw new Error(`The MAC address is missing from the config for ${this.config.name}. This device will be skipped.`);
+      throw new Error(`The MAC address is missing from the config for ${this.config.name}, skipping initialization...`);
     }
 
     // Create UUID for device
@@ -208,5 +208,9 @@ export class Device extends EventEmitter {
 
   public destroy(): void {
     this.controller.destroy();
+  }
+
+  public static isDisabled(config: DeviceConfig): boolean {
+    return Array.isArray(config?.options) && config.options.includes('Device.Disable');
   }
 }

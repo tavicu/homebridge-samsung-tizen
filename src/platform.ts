@@ -42,6 +42,11 @@ export class SamsungPlatform implements IndependentPlatformPlugin {
     await this.storage.initialize();
 
     this.config.devices?.forEach((deviceConfig: DeviceConfig) => {
+      if (Device.isDisabled(deviceConfig)) {
+        this.log.debug(`Device ${deviceConfig.name} is disabled, skipping initialization...`);
+        return;
+      }
+
       try {
         let mainAccessory: TelevisionAccessory;
         const device = new Device(deviceConfig, this);
