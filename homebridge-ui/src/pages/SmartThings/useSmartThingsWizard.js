@@ -1,9 +1,14 @@
 import { reactive, ref } from 'vue';
 import { useConfig } from '../../composables/useConfig';
+import { useHomebridge } from '../../composables/useHomebridge';
+import { useToast } from '../../composables/useToast';
 
 export function useSmartThingsWizard() {
   const currentStep = ref(1);
   const { config, updateConfig } = useConfig();
+  const { serverRequest, showSpinner, hideSpinner } = useHomebridge();
+  const toast = useToast();
+
   const state = reactive({
     config: null,
     credentials: {
@@ -23,8 +28,7 @@ export function useSmartThingsWizard() {
         clientSecret: config.value?.clientSecret || '',
       };
     } catch (error) {
-      console.error('Error initializing wizard:', error);
-      window.homebridge.toast.error('Failed to initialize wizard');
+      toast.error('Failed to initialize wizard');
     }
   }
 
@@ -36,7 +40,7 @@ export function useSmartThingsWizard() {
       };
 
       const credentials = { clientId: payload.clientId, clientSecret: payload.clientSecret };
-      const authUrl = await window.homebridge.request('/smartthings/auth-url', credentials);
+      const authUrl = await serverRequest('/smartthings/auth-url', credentials);
       state.authUrl = authUrl;
 
       await updateConfig({
@@ -46,13 +50,12 @@ export function useSmartThingsWizard() {
 
       currentStep.value = 2;
     } catch (error) {
-      console.error('Error in step 1:', error);
-      window.homebridge.toast.error('An error occurred while processing your request. Please try again.');
+      toast.error('An error occurred while processing your request. Please try again.');
     }
   }
 
   async function submitStep2(payload) {
-    window.homebridge.showSpinner();
+    showSpinner();
 
     const authorizationCode = payload.authorizationCode.replace(/^["']|["']$/g, '').trim();
 
@@ -63,7 +66,7 @@ export function useSmartThingsWizard() {
         authorizationCode,
       };
 
-      const authToken = await window.homebridge.request('/smartthings/auth-token', requestPayload);
+      const authToken = await serverRequest('/smartthings/auth-token', requestPayload);
 
       console.log('authToken', authToken);
 
@@ -71,15 +74,14 @@ export function useSmartThingsWizard() {
         throw new Error(authToken.error_description || authToken.error);
       }
 
-      await window.homebridge.request('/smartthings/save-token', authToken);
+      await serverRequest('/smartthings/save-token', authToken);
 
       state.status = 'success';
     } catch (error) {
-      console.error('Error in step 2:', error);
       state.status = 'error';
       state.error = error.message;
     } finally {
-      window.homebridge.hideSpinner();
+      hideSpinner();
       currentStep.value = 3;
     }
   }

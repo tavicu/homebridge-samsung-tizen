@@ -1,11 +1,8 @@
 import { computed, reactive, ref, watch } from 'vue';
 import { useConfig } from '../../composables/useConfig';
 import { useRouter } from '../../composables/useRouter';
-
-function parseIndex(value) {
-  const index = Number(value);
-  return value !== undefined && value !== '' && !Number.isNaN(index) ? index : undefined;
-}
+import { useHomebridge } from '../../composables/useHomebridge';
+import { useToast } from '../../composables/useToast';
 
 function toCommands(value) {
   if (Array.isArray(value)) {
@@ -34,9 +31,10 @@ function hasAnyAction(form) {
 }
 
 export function useSwitchPage() {
-  const hb = window.homebridge;
   const { config, updateConfig, cleanConfig } = useConfig();
   const { currentParams, navigateTo } = useRouter();
+  const { disableSaveButton } = useHomebridge();
+  const toast = useToast();
 
   const validated = ref(false);
   const form = reactive({
@@ -52,8 +50,8 @@ export function useSwitchPage() {
     commands: [''],
   });
 
-  const deviceIndex = computed(() => parseIndex(currentParams.value.deviceIndex));
-  const switchIndex = computed(() => parseIndex(currentParams.value.switchIndex));
+  const deviceIndex = computed(() => currentParams.value.deviceIndex);
+  const switchIndex = computed(() => currentParams.value.switchIndex);
 
   const mode = computed(() => {
     if (currentParams.value.action === 'delete') {
@@ -141,7 +139,7 @@ export function useSwitchPage() {
   }
 
   function init() {
-    hb?.disableSaveButton();
+    disableSaveButton();
     validated.value = false;
 
     if (mode.value === 'add') {
@@ -150,7 +148,7 @@ export function useSwitchPage() {
     }
 
     if (!currentSwitch.value) {
-      hb?.toast?.error('Switch not found');
+      toast.error('Switch not found');
       goBack();
       return;
     }
@@ -208,7 +206,7 @@ export function useSwitchPage() {
   async function submit() {
     if (!hasAnyAction(form)) {
       validated.value = true;
-      hb?.toast?.error('Please configure at least one switch action');
+      toast.error('Please configure at least one switch action');
       return;
     }
 
@@ -218,15 +216,15 @@ export function useSwitchPage() {
       if (mode.value === 'edit') {
         const updatedSwitches = getCurrentSwitches().map((item, index) => (index === switchIndex.value ? switchData : item));
         await persistSwitches(updatedSwitches);
-        hb?.toast?.success('Switch updated successfully');
+        toast.success('Switch updated successfully');
       } else {
         await persistSwitches([...getCurrentSwitches(), switchData]);
-        hb?.toast?.success('Switch added successfully');
+        toast.success('Switch added successfully');
       }
 
       goBack();
     } catch {
-      hb?.toast?.error(mode.value === 'edit' ? 'Failed to edit switch' : 'Failed to add switch');
+      toast.error(mode.value === 'edit' ? 'Failed to edit switch' : 'Failed to add switch');
     }
   }
 
@@ -234,10 +232,10 @@ export function useSwitchPage() {
     try {
       const updatedSwitches = getCurrentSwitches().filter((_, index) => index !== switchIndex.value);
       await persistSwitches(updatedSwitches);
-      hb?.toast?.success('Switch deleted successfully');
+      toast.success('Switch deleted successfully');
       goBack();
     } catch {
-      hb?.toast?.error('Failed to delete switch');
+      toast.error('Failed to delete switch');
     }
   }
 

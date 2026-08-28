@@ -4,13 +4,15 @@ import SmartThingsStep1 from './SmartThingsStep1.vue';
 import SmartThingsStep2 from './SmartThingsStep2.vue';
 import SmartThingsStep3 from './SmartThingsStep3.vue';
 import { useRouter } from '../../composables/useRouter';
+import { useHomebridge } from '../../composables/useHomebridge';
 import { useSmartThingsWizard } from './useSmartThingsWizard';
 
 const { currentStep, state, initWizard, submitStep1, submitStep2, goBackStep, retryStep2 } = useSmartThingsWizard();
 const { navigateTo } = useRouter();
+const { disableSaveButton } = useHomebridge();
 
 onMounted(() => {
-  window.homebridge.disableSaveButton();
+  disableSaveButton();
   initWizard();
 });
 

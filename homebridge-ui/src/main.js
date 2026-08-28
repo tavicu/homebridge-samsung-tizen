@@ -1,6 +1,7 @@
 import { createApp } from 'vue';
 import App from './App.vue';
 import { useConfig } from './composables/useConfig';
+import { useHomebridge } from './composables/useHomebridge';
 import { isConfigUiXSupported } from './homebridge';
 import './assets/main.css';
 
@@ -11,7 +12,7 @@ async function startApp() {
   }
 
   if (!isConfigUiXSupported()) {
-    window.homebridge?.showSchemaForm();
+    useHomebridge().showSchemaForm();
     return;
   }
 

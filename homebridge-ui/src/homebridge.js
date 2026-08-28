@@ -1,5 +1,9 @@
+import { useHomebridge } from './composables/useHomebridge';
+
 export function isConfigUiXSupported(minVersion = '5.27.0') {
-  const currentVersion = window.homebridge?.serverEnv?.env?.packageVersion;
+  const { hb } = useHomebridge();
+  const currentVersion = hb?.serverEnv?.env?.packageVersion;
+
   if (!currentVersion) {
     return true;
   }

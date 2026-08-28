@@ -1,9 +1,12 @@
 import { ref } from 'vue';
+import { useHomebridge } from './useHomebridge';
+import { useToast } from './useToast';
 
 const config = ref({ platform: 'SamsungTizen' });
 
 export function useConfig() {
-  const hb = window.homebridge;
+  const { hb } = useHomebridge();
+  const toast = useToast();
 
   function cleanConfig(data) {
     if (data === null || data === undefined) {
@@ -32,20 +35,13 @@ export function useConfig() {
   }
 
   async function getConfig() {
-    if (!hb) {
-      return config.value;
-    }
+    const pluginConfig = await hb.getPluginConfig();
 
-    try {
-      const pluginConfig = await hb.getPluginConfig();
-      if (pluginConfig?.length && pluginConfig[0]) {
-        config.value = {
-          platform: 'SamsungTizen',
-          ...pluginConfig[0],
-        };
-      }
-    } catch (error) {
-      console.error('Error fetching config:', error);
+    if (pluginConfig?.length && pluginConfig[0]) {
+      config.value = {
+        platform: 'SamsungTizen',
+        ...pluginConfig[0],
+      };
     }
 
     return config.value;
@@ -53,10 +49,12 @@ export function useConfig() {
 
   async function updateConfig(partialConfig, save = true) {
     try {
-      const updatedConfig = {
-        ...config.value,
-        ...partialConfig,
-      };
+      const updatedConfig = JSON.parse(
+        JSON.stringify({
+          ...config.value,
+          ...partialConfig,
+        }),
+      );
 
       await hb.updatePluginConfig([updatedConfig]);
 
@@ -67,8 +65,7 @@ export function useConfig() {
       config.value = updatedConfig;
       return updatedConfig;
     } catch (error) {
-      console.error('Error updating config:', error);
-      hb.toast?.error('An error occurred while updating the config.');
+      toast.error('An error occurred while updating the config.');
       throw error;
     }
   }

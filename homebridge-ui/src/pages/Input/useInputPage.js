@@ -1,11 +1,8 @@
 import { computed, reactive, ref, watch } from 'vue';
 import { useConfig } from '../../composables/useConfig';
 import { useRouter } from '../../composables/useRouter';
-
-function parseIndex(value) {
-  const index = Number(value);
-  return value !== undefined && value !== '' && !Number.isNaN(index) ? index : undefined;
-}
+import { useHomebridge } from '../../composables/useHomebridge';
+import { useToast } from '../../composables/useToast';
 
 function toCommands(value) {
   if (Array.isArray(value)) {
@@ -20,9 +17,10 @@ function toCommands(value) {
 }
 
 export function useInputPage() {
-  const hb = window.homebridge;
   const { config, updateConfig, cleanConfig } = useConfig();
   const { currentParams, navigateTo } = useRouter();
+  const { disableSaveButton } = useHomebridge();
+  const toast = useToast();
 
   const validated = ref(false);
   const form = reactive({
@@ -33,8 +31,8 @@ export function useInputPage() {
     commands: [''],
   });
 
-  const deviceIndex = computed(() => parseIndex(currentParams.value.deviceIndex));
-  const inputIndex = computed(() => parseIndex(currentParams.value.inputIndex));
+  const deviceIndex = computed(() => currentParams.value.deviceIndex);
+  const inputIndex = computed(() => currentParams.value.inputIndex);
 
   const mode = computed(() => {
     if (currentParams.value.action === 'delete') return 'delete';
@@ -106,7 +104,7 @@ export function useInputPage() {
   }
 
   function init() {
-    hb?.disableSaveButton();
+    disableSaveButton();
     validated.value = false;
 
     if (mode.value === 'add') {
@@ -115,7 +113,7 @@ export function useInputPage() {
     }
 
     if (!currentInput.value) {
-      hb?.toast?.error('Input not found');
+      toast.error('Input not found');
       goBack();
       return;
     }
@@ -176,15 +174,15 @@ export function useInputPage() {
       if (mode.value === 'edit') {
         const updatedInputs = getCurrentInputs().map((input, index) => (index === inputIndex.value ? inputData : input));
         await persistInputs(updatedInputs);
-        hb?.toast?.success('Input updated successfully');
+        toast.success('Input updated successfully');
       } else {
         await persistInputs([...getCurrentInputs(), inputData]);
-        hb?.toast?.success('Input added successfully');
+        toast.success('Input added successfully');
       }
 
       goBack();
     } catch {
-      hb?.toast?.error(mode.value === 'edit' ? 'Failed to edit input' : 'Failed to add input');
+      toast.error(mode.value === 'edit' ? 'Failed to edit input' : 'Failed to add input');
     }
   }
 
@@ -192,10 +190,10 @@ export function useInputPage() {
     try {
       const updatedInputs = getCurrentInputs().filter((_, index) => index !== inputIndex.value);
       await persistInputs(updatedInputs);
-      hb?.toast?.success('Input deleted successfully');
+      toast.success('Input deleted successfully');
       goBack();
     } catch {
-      hb?.toast?.error('Failed to delete input');
+      toast.error('Failed to delete input');
     }
   }
 

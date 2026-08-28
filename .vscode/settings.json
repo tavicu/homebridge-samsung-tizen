@@ -6,6 +6,6 @@
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true,
   "editor.tabSize": 2,
-  "editor.rulers": [140],
+  "editor.rulers": [180],
   "eslint.enable": true
 }

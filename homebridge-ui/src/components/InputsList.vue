@@ -4,14 +4,19 @@ import Tooltip from '../components/Tooltip.vue';
 import { useConfig } from '../composables/useConfig';
 import { useRouter } from '../composables/useRouter';
 
-const { config } = useConfig();
-const { navigateTo, currentParams } = useRouter();
+const props = defineProps({
+  deviceIndex: {
+    type: Number,
+    default: undefined,
+  },
+});
 
-const deviceIndex = computed(() => currentParams.value?.deviceIndex);
+const { config } = useConfig();
+const { navigateTo } = useRouter();
 
 const inputs = computed(() => {
-  if (deviceIndex.value !== undefined && config.value?.devices?.[deviceIndex.value]) {
-    return config.value.devices[deviceIndex.value].inputs || [];
+  if (props.deviceIndex !== undefined && config.value?.devices?.[props.deviceIndex]) {
+    return config.value.devices[props.deviceIndex].inputs || [];
   }
 
   return config.value?.inputs || [];

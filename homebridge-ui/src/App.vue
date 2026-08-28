@@ -2,11 +2,13 @@
 import { computed } from 'vue';
 import { useRouter } from './composables/useRouter';
 import DashboardView from './views/DashboardView.vue';
+import DeviceView from './views/DeviceView.vue';
 
 const { currentView } = useRouter();
 
 const routes = {
   dashboard: DashboardView,
+  device: DeviceView,
 };
 
 const activeComponent = computed(() => routes[currentView.value]);

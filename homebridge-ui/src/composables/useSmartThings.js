@@ -1,14 +1,17 @@
 import { computed, ref } from 'vue';
+import { useHomebridge } from './useHomebridge';
 
 const smartthings = ref(null);
 const isLoading = ref(false);
 
 export function useSmartThings() {
+  const { serverRequest } = useHomebridge();
+
   async function fetchSmartThings() {
     isLoading.value = true;
 
     try {
-      smartthings.value = await window.homebridge.request('/smartthings/get-token');
+      smartthings.value = await serverRequest('/smartthings/get-token');
     } catch (err) {
       smartthings.value = null;
     } finally {

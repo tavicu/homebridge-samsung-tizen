@@ -1,13 +1,16 @@
 <script setup>
+import { useHomebridge } from '../../composables/useHomebridge';
+
 defineProps({
   status: String,
   error: String,
 });
 
 const emit = defineEmits(['success', 'retry']);
+const { enableSaveButton } = useHomebridge();
 
 function handleSuccess() {
-  window.homebridge.enableSaveButton();
+  enableSaveButton();
   emit('success');
 }
 

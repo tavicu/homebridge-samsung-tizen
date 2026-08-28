@@ -3,14 +3,19 @@ import { computed } from 'vue';
 import { useConfig } from '../composables/useConfig';
 import { useRouter } from '../composables/useRouter';
 
-const { config } = useConfig();
-const { navigateTo, currentParams } = useRouter();
+const props = defineProps({
+  deviceIndex: {
+    type: Number,
+    default: undefined,
+  },
+});
 
-const deviceIndex = computed(() => currentParams.value?.deviceIndex);
+const { config } = useConfig();
+const { navigateTo } = useRouter();
 
 const switches = computed(() => {
-  if (deviceIndex.value !== undefined && config.value?.devices?.[deviceIndex.value]) {
-    return config.value.devices[deviceIndex.value].switches || [];
+  if (props.deviceIndex !== undefined && config.value?.devices?.[props.deviceIndex]) {
+    return config.value.devices[props.deviceIndex].switches || [];
   }
 
   return config.value?.switches || [];
