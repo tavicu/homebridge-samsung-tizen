@@ -2,9 +2,9 @@
   "semi": true,
   "trailingComma": "all",
   "singleQuote": true,
-  "printWidth": 150,
+  "printWidth": 180,
   "tabWidth": 2,
-  "plugins": ["@ianvs/prettier-plugin-sort-imports", "prettier-plugin-jinja-template"],
+  "plugins": ["@ianvs/prettier-plugin-sort-imports"],
   "importOrderParserPlugins": ["typescript"],
   "importOrder": ["<BUILTIN_MODULES>", "<THIRD_PARTY_MODULES>", "^[./]"]
 }

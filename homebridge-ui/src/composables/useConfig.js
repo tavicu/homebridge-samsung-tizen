@@ -32,7 +32,9 @@ export function useConfig() {
   }
 
   async function getConfig() {
-    if (!hb) return config.value;
+    if (!hb) {
+      return config.value;
+    }
 
     try {
       const pluginConfig = await hb.getPluginConfig();

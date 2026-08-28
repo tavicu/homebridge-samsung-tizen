@@ -1,0 +1,9 @@
+.border-dashed {
+  border-style: dashed;
+}
+
+.text-abbr {
+  text-decoration: underline dotted #6c757d;
+  text-underline-offset: 3px;
+  cursor: help;
+}

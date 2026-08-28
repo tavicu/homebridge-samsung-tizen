@@ -1,13 +1,11 @@
 {
   "files.eol": "\n",
-  "files.associations": {
-    "*.tmpl": "html"
-  },
   "editor.codeActionsOnSave": {
     "source.fixAll": "explicit"
   },
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true,
+  "editor.tabSize": 2,
   "editor.rulers": [140],
   "eslint.enable": true
 }

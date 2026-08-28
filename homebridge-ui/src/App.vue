@@ -1,18 +1,23 @@
+<script setup>
+import { computed } from 'vue';
+import { useRouter } from './composables/useRouter';
+import DashboardView from './views/DashboardView.vue';
+
+const { currentView } = useRouter();
+
+const routes = {
+  dashboard: DashboardView,
+};
+
+const activeComponent = computed(() => routes[currentView.value]);
+</script>
+
 <template>
-  <Dashboard v-if="currentPage === 'dashboard'" />
-  <SmartThings v-else-if="currentPage === 'smartthings'" />
-  <Device v-else-if="currentPage === 'device'" />
-  <Input v-else-if="currentPage === 'input'" />
-  <Switch v-else-if="currentPage === 'switch'" />
+  <component :is="activeComponent" />
 </template>
 
-<script setup>
-import { useRouter } from './composables/useRouter';
-import Dashboard from './pages/Dashboard/Dashboard.vue';
-import Device from './pages/Device/Device.vue';
-import Input from './pages/Input/Input.vue';
-import SmartThings from './pages/SmartThings/SmartThings.vue';
-import Switch from './pages/Switch/Switch.vue';
-
-const { currentPage } = useRouter();
-</script>
+<style>
+.border-dashed {
+  border-style: dashed;
+}
+</style>

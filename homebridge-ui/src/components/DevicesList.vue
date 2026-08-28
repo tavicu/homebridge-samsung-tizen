@@ -1,7 +1,12 @@
 <script setup>
-import { useDevices } from './useDevices';
+import { computed } from 'vue';
+import { useConfig } from '../composables/useConfig';
+import { useRouter } from '../composables/useRouter';
 
-const { devices, editDevice } = useDevices();
+const { config } = useConfig();
+const { navigateTo } = useRouter();
+
+const devices = computed(() => config.value?.devices || []);
 </script>
 
 <template>
@@ -12,7 +17,7 @@ const { devices, editDevice } = useDevices();
           <th>Name</th>
           <th>IP Address</th>
           <th>MAC Address</th>
-          <th></th>
+          <th />
         </tr>
       </thead>
       <tbody>
@@ -21,7 +26,7 @@ const { devices, editDevice } = useDevices();
           <td class="text-muted">{{ device.ip }}</td>
           <td class="text-muted">{{ device.mac }}</td>
           <td class="text-end">
-            <button type="button" class="btn btn-primary" @click="editDevice(index)">Edit</button>
+            <button type="button" class="btn btn-primary" @click="navigateTo('device', { action: 'edit', deviceIndex: index })">Edit</button>
           </td>
         </tr>
       </tbody>
@@ -33,9 +38,7 @@ const { devices, editDevice } = useDevices();
       <h6 class="fw-semibold">No devices configured</h6>
       <p class="small">Add your first Samsung TV to get started with Homebridge control</p>
 
-      <button type="button" class="btn btn-primary" @click="editDevice(-1)">
-        <i class="fas fa-plus"></i> Add your first device
-      </button>
+      <button type="button" class="btn btn-primary" @click="navigateTo('device', { action: 'add' })"><i class="fas fa-plus" /> Add your first device</button>
     </div>
   </div>
 </template>
