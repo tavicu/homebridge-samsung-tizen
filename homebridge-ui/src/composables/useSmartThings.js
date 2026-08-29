@@ -7,7 +7,15 @@ const isLoading = ref(false);
 export function useSmartThings() {
   const { serverRequest } = useHomebridge();
 
-  async function fetchSmartThings() {
+  async function getAuthUrl(credentials) {
+    return serverRequest('/smartthings/auth-url', credentials);
+  }
+
+  async function getAuthToken(payload) {
+    return serverRequest('/smartthings/auth-token', payload);
+  }
+
+  async function getToken() {
     isLoading.value = true;
 
     try {
@@ -17,6 +25,10 @@ export function useSmartThings() {
     } finally {
       isLoading.value = false;
     }
+  }
+
+  async function saveToken(token) {
+    return serverRequest('/smartthings/save-token', token);
   }
 
   const isExpired = computed(() => {
@@ -31,6 +43,9 @@ export function useSmartThings() {
     smartthings,
     isLoading,
     isExpired,
-    fetchSmartThings,
+    getAuthUrl,
+    getAuthToken,
+    getToken,
+    saveToken,
   };
 }

@@ -6,10 +6,10 @@ import { useSmartThings } from '../composables/useSmartThings';
 
 const { navigateTo } = useRouter();
 
-const { smartthings, isLoading, isExpired, fetchSmartThings } = useSmartThings();
+const { smartthings, isLoading, isExpired, getToken } = useSmartThings();
 
 onMounted(() => {
-  fetchSmartThings();
+  getToken();
 });
 
 function formatDate(timestamp) {

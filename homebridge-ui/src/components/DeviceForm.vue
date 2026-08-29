@@ -93,7 +93,7 @@ function buildDeviceData(existingDevice = {}) {
   });
 }
 
-async function submit() {
+async function handleSubmit() {
   if (!formEl.value?.checkValidity()) {
     validated.value = true;
     return;
@@ -144,13 +144,13 @@ watch(
     This initial step covers basic setup. Additional features (inputs, custom switches, power options) can be fully customized from the Edit Device menu after adding.
   </div>
 
-  <form ref="formEl" class="card rounded" :class="{ 'was-validated': validated }" novalidate @submit.prevent="submit">
+  <form ref="formEl" class="card rounded" :class="{ 'was-validated': validated }" novalidate @submit.prevent="handleSubmit">
     <div v-if="isEdit" class="card-header">Main Configuration</div>
 
     <div class="card-body">
       <div class="mb-3">
         <label for="name" class="form-label">Device Name <strong class="text-danger">*</strong></label>
-        <input id="name" v-model="form.name" type="text" class="form-control" name="name" placeholder="e.g. Living Room TV" pattern="^[a-zA-Z0-9 ]+$" required />
+        <input id="name" v-model="form.name" type="text" class="form-control" placeholder="e.g. Living Room TV" pattern="^[a-zA-Z0-9 ]+$" required />
         <div class="invalid-feedback">Please enter a valid device name.</div>
       </div>
 
@@ -162,7 +162,6 @@ watch(
             v-model="form.ip"
             type="text"
             class="form-control"
-            name="ipAddress"
             placeholder="e.g. 192.168.1.100"
             pattern="^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
             required
@@ -178,7 +177,6 @@ watch(
             v-model="form.mac"
             type="text"
             class="form-control"
-            name="macAddress"
             placeholder="e.g. AA:BB:CC:DD:EE:FF"
             pattern="([0-9a-fA-F]{2}(:|-)){5}[0-9a-fA-F]{2}"
             required
@@ -197,7 +195,6 @@ watch(
           v-model="form.deviceId"
           type="text"
           class="form-control"
-          name="deviceId"
           placeholder="e.g. d3b4f9a1-22cc-4e1f-b8aa-0011aabbccdd"
           pattern="^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
         />
@@ -207,7 +204,7 @@ watch(
       <template v-if="isEdit">
         <div class="mb-3">
           <label for="uuid" class="form-label">UUID <span class="text-muted">(optional)</span></label>
-          <input id="uuid" v-model="form.uuid" type="text" class="form-control" name="uuid" placeholder="e.g. AX1D" />
+          <input id="uuid" v-model="form.uuid" type="text" class="form-control" placeholder="e.g. AX1D" />
           <small class="form-text text-muted">If you have problems adding the TV to Home app, set this field to a unique value</small>
         </div>
 
