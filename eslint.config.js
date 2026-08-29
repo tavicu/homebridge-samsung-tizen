@@ -55,6 +55,7 @@ export default defineConfig(
       'vue/max-attributes-per-line': 'off',
       'vue/singleline-html-element-content-newline': 'off',
       'vue/html-closing-bracket-newline': 'off',
+      'vue/no-v-html': 'off',
     },
   },
   eslintConfigPrettier,

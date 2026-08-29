@@ -16,10 +16,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <p class="small">
-    Please read the <a href="https://tavicu.github.io/homebridge-samsung-tizen/" target="_blank">documentation</a>
-    of the plugin for more informations and step by step instructions on how to configure it.
-  </p>
+  <p class="small" v-html="$t('dashboard.alert', { url: 'https://tavicu.github.io/homebridge-samsung-tizen/' })" />
 
   <div class="mb-4">
     <h5 class="fw-semibold mb-2">SmartThings Integration</h5>

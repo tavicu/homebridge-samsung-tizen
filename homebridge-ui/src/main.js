@@ -3,6 +3,7 @@ import App from './App.vue';
 import { useConfig } from './composables/useConfig';
 import { useHomebridge } from './composables/useHomebridge';
 import { isConfigUiXSupported } from './homebridge';
+import { setupI18n } from './i18n';
 import './assets/main.css';
 
 async function startApp() {
@@ -17,10 +18,13 @@ async function startApp() {
   }
 
   try {
-    const { getConfig } = useConfig();
-    await getConfig();
+    const app = createApp(App);
 
-    createApp(App).mount(root);
+    const { getConfig } = useConfig();
+
+    await Promise.all([getConfig(), setupI18n(app)]);
+
+    app.mount(root);
   } catch (err) {
     root.innerHTML = `<div class="alert alert-danger">There was an error initializing the app: ${err.message}</div>`;
   }

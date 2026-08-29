@@ -1,0 +1,5 @@
+{
+  "dashboard": {
+    "alert": "Please read the <a href=\"{url}\" target=\"_blank\">documentation</a> of the plugin for more informations and step by step instructions on how to configure it."
+  }
+}
