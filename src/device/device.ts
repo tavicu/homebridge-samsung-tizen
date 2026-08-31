@@ -59,7 +59,7 @@ export class Device extends EventEmitter {
     }
 
     // Create UUID for device
-    this.UUID = platform.api.hap.uuid.generate(this.config.mac + this.config.uuid || '');
+    this.UUID = platform.api.hap.uuid.generate(this.config.mac + (this.config.uuid || ''));
 
     // Setup logger with device name
     this.log = { ...platform.log, prefix: this.config.name };
