@@ -1,6 +1,6 @@
 import WsClient, { RawData } from 'ws';
 import { Device } from '../device/device.js';
-import { sleep } from '../lib/tools.js';
+import { retry, sleep } from '../lib/tools.js';
 
 // Heartbeat timeout, 8 seconds (6 ping + 2 for safety)
 const HEARTBEAT_TIMEOUT = 8 * 1000;
@@ -12,7 +12,6 @@ export class WebSocket {
   private token: string | null = null;
   private heartbeatTimeout?: NodeJS.Timeout;
   private connectionPromise: Promise<void> | null = null;
-  private pairRetries = 3;
 
   constructor(private readonly device: Device) {
     this.name = Buffer.from('Homebridge').toString('base64');
@@ -135,18 +134,7 @@ export class WebSocket {
       return;
     }
 
-    try {
-      await this.pair();
-    } catch (error) {
-      if (this.pairRetries > 0) {
-        this.pairRetries--;
-
-        await sleep(3000);
-        return await this.startPairing();
-      } else {
-        throw error;
-      }
-    }
+    await retry(() => this.pair(), { retries: 3, delay: 3000 });
   }
 
   private async pair() {

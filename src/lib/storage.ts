@@ -2,17 +2,13 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import { deepmerge } from 'deepmerge-ts';
 import { API, Logging } from 'homebridge';
-import { sleep } from './tools.js';
+import { retry } from './tools.js';
 
 export class Storage {
   private filePath: string;
   private accessories: Record<string, any> = {};
   private saveTimeout: NodeJS.Timeout | null = null;
   private lastKnownMtime: number = 0;
-
-  // Storage configuration for retries
-  private readonly maxRetries = 3;
-  private readonly retryDelay = 100; // in milliseconds
 
   constructor(
     api: API,
@@ -82,7 +78,7 @@ export class Storage {
     }
 
     this.saveTimeout = setTimeout(() => {
-      this.write(this.maxRetries, this.retryDelay);
+      this.write();
     }, 100);
   }
 
@@ -108,26 +104,20 @@ export class Storage {
   /**
    * Performs the actual file write with a recursive retry mechanism.
    */
-  private async write(retries: number, delay: number): Promise<void> {
+  private async write(): Promise<void> {
     try {
-      // Check if file has been modified
-      await this.syncChanges();
+      await retry(
+        async () => {
+          await this.syncChanges();
+          await fs.writeFile(this.filePath, JSON.stringify(this.accessories, null, 2), 'utf-8');
 
-      // Write file with new details
-      await fs.writeFile(this.filePath, JSON.stringify(this.accessories, null, 2), 'utf-8');
-
-      // Update last known modification time
-      const newStats = await fs.stat(this.filePath);
-      this.lastKnownMtime = newStats.mtimeMs;
+          const newStats = await fs.stat(this.filePath);
+          this.lastKnownMtime = newStats.mtimeMs;
+        },
+        { retries: 3, delay: 100 },
+      );
     } catch (error) {
-      if (retries > 1) {
-        this.log.warn(`[Storage] Failed to save cache. Retrying in ${delay}ms... (${retries - 1} attempts left)`);
-
-        await sleep(delay);
-        return this.write(retries - 1, delay * 2);
-      } else {
-        this.log.error('[Storage] Could not save cache file:', error);
-      }
+      this.log.error('[Storage] Could not save cache file:', error);
     }
   }
 }

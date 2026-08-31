@@ -2,6 +2,19 @@ export const sleep = <T>(timeout = 150, { value }: { value?: T } = {}): Promise<
   return new Promise((resolve) => setTimeout(() => resolve(value), timeout));
 };
 
+export const retry = async <T>(run: () => Promise<T>, { retries = 3, delay = 1000 } = {}): Promise<T> => {
+  try {
+    return await run();
+  } catch (error) {
+    if (!retries) {
+      throw error;
+    }
+
+    await sleep(delay);
+    return retry(run, { retries: retries - 1, delay });
+  }
+};
+
 export const race = <T>(promise: Promise<T>, timeout = 2500): Promise<T | void> => {
   const timeoutPromise = new Promise<void>((resolve) => setTimeout(resolve, timeout));
   return Promise.race([promise, timeoutPromise]);
