@@ -4,7 +4,7 @@ import { Logger } from 'homebridge';
 import { SwitchAccessory, TelevisionAccessory } from '../accessories/index.js';
 import { Cache } from '../lib/cache.js';
 import { SamsungPlatform } from '../platform.js';
-import { DeviceConfig, DeviceOptions, DeviceState, DeviceStorage, SwitchConfig, TizenApplication } from '../types/index.js';
+import { DeviceConfig, DeviceOptions, DeviceState, DeviceStorage, SsdpEvent, SwitchConfig, TizenApplication } from '../types/index.js';
 import { DeviceController } from './controller.js';
 
 export class Device extends EventEmitter {
@@ -90,10 +90,10 @@ export class Device extends EventEmitter {
       }
     });
 
-    this.on('ssdp:update', async (event) => {
+    this.on('ssdp:update', async (event: SsdpEvent) => {
       console.log('ssdp:update', this.config.ip, event);
 
-      let power = event === 'ssdp:alive';
+      let power = event === SsdpEvent.ALIVE;
 
       if (power && this.storage.powerStateSupport) {
         try {

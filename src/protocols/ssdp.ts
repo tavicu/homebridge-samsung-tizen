@@ -1,7 +1,8 @@
-import * as ssdp from 'peer-ssdp';
+import { createPeer } from 'peer-ssdp';
 import { Device } from '../device/index.js';
 import { debounce } from '../lib/tools.js';
 import { SamsungPlatform } from '../platform.js';
+import { SsdpEvent } from '../types/index.js';
 
 type Headers = {
   ST: string;
@@ -23,11 +24,11 @@ export class SSDP {
   private devices = new Map<string, TrackedDevice>();
 
   private readonly peer: any;
-  private readonly possibleEvents: Array<string> = [ssdp.ALIVE, ssdp.BYEBYE];
+  private readonly possibleEvents: Array<string> = [SsdpEvent.ALIVE, SsdpEvent.BYEBYE];
   private searchInterval?: NodeJS.Timeout;
 
   constructor(private readonly platform: SamsungPlatform) {
-    this.peer = ssdp.createPeer();
+    this.peer = createPeer();
 
     this.peer.on('ready', () => {
       this.search();
@@ -44,7 +45,7 @@ export class SSDP {
         device,
         emit: debounce((event: string) => {
           if (this.possibleEvents.includes(event)) {
-            device.emit(ssdp.UPDATE, event);
+            device.emit('ssdp:update', event);
           }
         }),
       });
@@ -92,7 +93,11 @@ export class SSDP {
     }
 
     // Send received event
-    tracked.emit(headers.NTS);
+    if (headers.NTS === SsdpEvent.ALIVE) {
+      tracked.emit(SsdpEvent.ALIVE);
+    } else if (headers.NTS === SsdpEvent.BYEBYE) {
+      tracked.emit(SsdpEvent.BYEBYE);
+    }
   }
 
   private onFound(headers: Headers, address: Address) {
@@ -104,7 +109,7 @@ export class SSDP {
     }
 
     // Send alive event
-    tracked.emit(ssdp.ALIVE);
+    tracked.emit(SsdpEvent.ALIVE);
   }
 
   public destroy() {
