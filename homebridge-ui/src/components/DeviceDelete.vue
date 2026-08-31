@@ -31,9 +31,9 @@ async function confirmDelete() {
 }
 
 watch(
-  () => [config.value, props.deviceIndex],
-  ([currentConfig, index]) => {
-    if (currentConfig && !currentConfig.devices?.[index]) {
+  () => props.deviceIndex,
+  (index) => {
+    if (!config.value?.devices?.[index]) {
       toast.error('Device not found');
       navigateTo('dashboard');
     }

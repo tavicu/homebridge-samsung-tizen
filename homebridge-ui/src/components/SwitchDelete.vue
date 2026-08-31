@@ -6,7 +6,7 @@ import { useToast } from '../composables/useToast';
 import ConfirmDelete from './ConfirmDelete.vue';
 
 const props = defineProps({
-  inputIndex: {
+  switchIndex: {
     type: Number,
     required: true,
   },
@@ -20,12 +20,12 @@ const { config, updateConfig } = useConfig();
 const { navigateTo } = useRouter();
 const toast = useToast();
 
-const inputItem = computed(() => {
+const switchItem = computed(() => {
   if (props.deviceIndex !== undefined) {
-    return config.value?.devices?.[props.deviceIndex]?.inputs?.[props.inputIndex];
+    return config.value?.devices?.[props.deviceIndex]?.switches?.[props.switchIndex];
   }
 
-  return config.value?.inputs?.[props.inputIndex];
+  return config.value?.switches?.[props.switchIndex];
 });
 
 function goBack() {
@@ -47,28 +47,28 @@ async function confirmDelete() {
 
         return {
           ...item,
-          inputs: item.inputs.filter((_, index) => index !== props.inputIndex),
+          switches: item.switches.filter((_, index) => index !== props.switchIndex),
         };
       });
 
       await updateConfig({ devices: updatedDevices });
     } else {
-      const updatedInputs = config.value.inputs.filter((_, index) => index !== props.inputIndex);
-      await updateConfig({ inputs: updatedInputs });
+      const updatedSwitches = config.value.switches.filter((_, index) => index !== props.switchIndex);
+      await updateConfig({ switches: updatedSwitches });
     }
 
-    toast.success('Input deleted successfully');
+    toast.success('Switch deleted successfully');
     goBack();
   } catch {
-    toast.error('Failed to delete input');
+    toast.error('Failed to delete switch');
   }
 }
 
 watch(
-  () => [props.inputIndex, props.deviceIndex],
+  () => [props.switchIndex, props.deviceIndex],
   () => {
-    if (!inputItem.value) {
-      toast.error('Input not found');
+    if (!switchItem.value) {
+      toast.error('Switch not found');
       goBack();
     }
   },
@@ -78,15 +78,15 @@ watch(
 
 <template>
   <div class="mb-3">
-    <h6 class="fw-bold mb-0">Delete Input</h6>
-    <div class="text-muted">Delete the input {{ inputItem?.name }}</div>
+    <h6 class="fw-bold mb-0">Delete Switch</h6>
+    <div class="text-muted">Delete the switch {{ switchItem?.name }}</div>
   </div>
 
   <ConfirmDelete
-    :title="`Delete input ${inputItem?.name}`"
-    :text="`Are you sure you want to delete the input ${inputItem?.name} from configuration?`"
-    confirm-label="Delete Input"
-    @cancel="navigateTo('input', { action: 'edit', inputIndex, deviceIndex })"
+    :title="`Delete switch ${switchItem?.name}`"
+    :text="`Are you sure you want to delete the switch ${switchItem?.name} from configuration?`"
+    confirm-label="Delete Switch"
+    @cancel="navigateTo('switch', { action: 'edit', switchIndex, deviceIndex })"
     @confirm="confirmDelete"
   />
 </template>
