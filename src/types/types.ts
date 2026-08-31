@@ -1,5 +1,6 @@
 import { PlatformIdentifier, PlatformName, Service } from 'homebridge';
 import { DeviceConfig } from './device.js';
+import { WolOptions } from './wol.js';
 
 export type LinkedService = Service & {
   linked?: boolean;
@@ -11,6 +12,7 @@ export type PlatformConfig = {
   inputs?: Array<InputConfig>;
   switches?: Array<SwitchConfig>;
   keys?: Record<string, string>;
+  wol?: WolOptions;
   clientId?: string;
   clientSecret?: string;
 };

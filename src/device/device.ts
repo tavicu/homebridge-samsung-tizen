@@ -31,6 +31,7 @@ export class Device extends EventEmitter {
         keys: platform.config.keys,
         inputs: platform.config.inputs,
         switches: platform.config.switches,
+        wol: platform.config.wol,
       },
       config,
     );
