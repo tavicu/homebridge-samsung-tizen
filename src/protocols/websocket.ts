@@ -124,7 +124,7 @@ export class WebSocket {
             // this.device.log?.debug?.(`[Remote] TV Error: ${response.data?.message}`);
           }
         } catch (e) {
-          // Ignorăm erorile de parsare JSON pentru mesaje irelevante
+          // Ignore JSON parsing errors for irrelevant messages
         }
       });
     });

@@ -4,7 +4,7 @@ import { Logger } from 'homebridge';
 import { SwitchAccessory, TelevisionAccessory } from '../accessories/index.js';
 import { Cache } from '../lib/cache.js';
 import { SamsungPlatform } from '../platform.js';
-import { DeviceConfig, DeviceOptions, DeviceState, DeviceStorage, SwitchConfig } from '../types/index.js';
+import { DeviceConfig, DeviceOptions, DeviceState, DeviceStorage, SwitchConfig, TizenApplication } from '../types/index.js';
 import { DeviceController } from './controller.js';
 
 export class Device extends EventEmitter {
@@ -120,8 +120,8 @@ export class Device extends EventEmitter {
       console.log('state:update', t, this.config.ip, this.state);
 
       this.accessories.forEach((accessory) => {
-        Object.values(accessory.services as Record<string, any>).forEach((service) => {
-          service.updateValue?.();
+        Object.values(accessory.services).forEach((wrapper) => {
+          wrapper.updateValue?.();
         });
       });
     });
@@ -190,11 +190,11 @@ export class Device extends EventEmitter {
     return this.controller.setChannel(channel);
   }
 
-  public getApplication(appId: string | number): Promise<any> {
+  public getApplication(appId: string | number): Promise<TizenApplication> {
     return this.controller.getApplication(appId);
   }
 
-  public startApplication(appId: string | number): Promise<any> {
+  public startApplication(appId: string | number): Promise<TizenApplication> {
     return this.controller.startApplication(appId);
   }
 

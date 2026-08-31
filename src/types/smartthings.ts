@@ -18,6 +18,19 @@ export type SmartThingsRequestConfig = {
   commands?: SmartThingsCommand | SmartThingsCommand[];
 };
 
+export type SmartThingsCapabilityState = {
+  value?: string | null;
+};
+
+export type SmartThingsDeviceStates = {
+  main?: {
+    tvChannel?: SmartThingsCapabilityState;
+    tvChannelName?: SmartThingsCapabilityState;
+    inputSource?: SmartThingsCapabilityState;
+    pictureMode?: SmartThingsCapabilityState;
+  };
+};
+
 export type SmartThingsClientState = {
   tvChannel: string | null;
   tvChannelName: string | null;

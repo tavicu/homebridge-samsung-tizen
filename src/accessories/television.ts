@@ -2,13 +2,20 @@ import { Categories, PlatformAccessory } from 'homebridge';
 import { Device } from '../device/index.js';
 import { SamsungPlatform } from '../platform.js';
 import { InformationService, InputService, SpeakerService, TelevisionService } from '../services/index.js';
+import { LinkedService } from '../types/index.js';
 import { SwitchAccessory } from './index.js';
+
+export type TelevisionServices = {
+  main: TelevisionService;
+  speaker: SpeakerService;
+  information: InformationService;
+};
 
 export class TelevisionAccessory {
   public platformAccessory: PlatformAccessory;
 
-  public inputs: any = [];
-  public services: any = {};
+  public inputs: InputService[] = [];
+  public services!: TelevisionServices;
 
   constructor(
     public device: Device,
@@ -38,12 +45,12 @@ export class TelevisionAccessory {
   }
 
   private createServices() {
-    // Services
-    this.services.main = new TelevisionService(this);
-    this.services.speaker = new SpeakerService(this);
-    this.services.information = new InformationService(this);
+    this.services = {
+      main: new TelevisionService(this),
+      speaker: new SpeakerService(this),
+      information: new InformationService(this),
+    };
 
-    // Add linked services
     this.getServices().forEach((service) => {
       try {
         this.platformAccessory.addService(service);
@@ -55,21 +62,17 @@ export class TelevisionAccessory {
     });
   }
 
-  private getServices() {
-    return [...Object.values(this.services).map((type: any) => type.service), ...Object.values(this.inputs).map((type: any) => type.service)].flat();
+  private getServices(): LinkedService[] {
+    return [...Object.values(this.services).map((wrapper) => wrapper.service), ...this.inputs.map((input) => input.service)];
   }
 
   public addAccessory(accessory: SwitchAccessory) {
-    if (!accessory?.services?.main) {
+    const service = accessory.services.main.service;
+
+    if (service.subtype && this.platformAccessory.getServiceById(this.platform.api.hap.Service.Switch, service.subtype)) {
       return;
     }
 
-    [accessory.services.main.service, ...(accessory.services.main.services || [])].forEach((service) => {
-      if (this.platformAccessory.getServiceById(this.platform.api.hap.Service.Switch, service.subtype)) {
-        return;
-      }
-
-      this.platformAccessory.addService(service);
-    });
+    this.platformAccessory.addService(service);
   }
 }

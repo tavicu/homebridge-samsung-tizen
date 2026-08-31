@@ -1,20 +1,28 @@
 import { Device } from '../device/index.js';
 
+type CacheEntry<T> = {
+  fetching?: boolean;
+  value?: T;
+  expire?: number;
+};
+
 export class Cache {
-  private keys: Record<string, any> = {};
+  private keys: Record<string, CacheEntry<unknown>> = {};
 
   constructor(device: Device) {
     device.on('state:update', () => this.flush());
   }
 
-  public get(key: string, run: any = Promise.resolve.bind(Promise), time = 500) {
-    if (this.keys[key] && Date.now() < this.keys[key].expire) {
-      return Promise.resolve(this.keys[key].value);
+  public get<T>(key: string, run: () => Promise<T>, time = 500): Promise<T> {
+    const entry = this.keys[key] as CacheEntry<T> | undefined;
+
+    if (entry && entry.expire && Date.now() < entry.expire) {
+      return Promise.resolve(entry.value as T);
     }
 
     // If we already have one caching
     // in progress try again in 100 ms
-    if (this.keys[key] && this.keys[key].fetching) {
+    if (entry?.fetching) {
       return new Promise((resolve, reject) => {
         setTimeout(() => {
           this.get(key, run, time).then(resolve).catch(reject);
@@ -27,15 +35,15 @@ export class Cache {
     };
 
     return run()
-      .then((value: any) => {
+      .then((value) => {
         this.keys[key] = {
-          value: value,
+          value,
           expire: Date.now() + time,
         };
 
         return value;
       })
-      .catch((error: any) => {
+      .catch((error) => {
         delete this.keys[key];
         throw error;
       });

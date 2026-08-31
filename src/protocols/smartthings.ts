@@ -2,7 +2,7 @@ import axios from 'axios';
 import { Device } from '../device/device.js';
 import { SmartThingsNotAvailable } from '../errors.js';
 import { SamsungPlatform } from '../platform.js';
-import { SmartThingsClientState, SmartThingsRequestConfig, SmartThingsStorage } from '../types/index.js';
+import { SmartThingsClientState, SmartThingsDeviceStates, SmartThingsRequestConfig, SmartThingsStorage } from '../types/index.js';
 
 const STORAGE_KEY = 'smartthings';
 
@@ -123,7 +123,7 @@ export class SmartThingsManager {
     this.platform.log.debug('[SmartThings] Access token refreshed successfully');
   }
 
-  public async send<T = any>(config: SmartThingsRequestConfig): Promise<T> {
+  public async send<T>(config: SmartThingsRequestConfig): Promise<T> {
     if (!this.isAvailable) {
       throw new SmartThingsNotAvailable();
     }
@@ -133,12 +133,7 @@ export class SmartThingsManager {
     const { endpoint, commands } = config;
 
     const method = commands ? 'POST' : config.method || 'GET';
-
-    let data: any = undefined;
-    if (commands) {
-      const payload = Array.isArray(commands) ? commands : [commands];
-      data = { commands: payload };
-    }
+    const data = commands ? { commands: Array.isArray(commands) ? commands : [commands] } : undefined;
 
     const headers = { Authorization: `Bearer ${this.storage.accessToken}`, 'Content-Type': 'application/json' };
 
@@ -194,7 +189,7 @@ export class SmartThingsClient {
     return this.manager.isAvailable && !!this.deviceId;
   }
 
-  private send<T = any>(config: SmartThingsRequestConfig): Promise<T> {
+  private send<T>(config: SmartThingsRequestConfig): Promise<T> {
     if (!this.isAvailable) {
       return Promise.reject(new SmartThingsNotAvailable());
     }
@@ -202,7 +197,7 @@ export class SmartThingsClient {
     return this.manager.send<T>(config);
   }
 
-  private refresh(): Promise<any> {
+  private refresh(): Promise<void> {
     return this.send({
       endpoint: this.apiCommandUrl,
       commands: { component: 'main', capability: 'refresh', command: 'refresh' },
@@ -227,7 +222,7 @@ export class SmartThingsClient {
     this.updatePromise = (async () => {
       try {
         await this.refresh();
-        const response = await this.send({ endpoint: this.apiStatesUrl });
+        const response = await this.send<SmartThingsDeviceStates>({ endpoint: this.apiStatesUrl });
 
         this.state = {
           tvChannel: response.main?.tvChannel?.value || null,
@@ -290,7 +285,7 @@ export class SmartThingsClient {
     return this.state.pictureMode;
   }
 
-  public setInputSource(value: string): Promise<any> {
+  public async setInputSource(value: string): Promise<void> {
     const capability = ['USB-C', 'Display Port'].includes(value) ? 'samsungvd.mediaInputSource' : 'mediaInputSource';
 
     return this.send({
@@ -299,14 +294,14 @@ export class SmartThingsClient {
     });
   }
 
-  public setPictureMode(value: string): Promise<any> {
+  public setPictureMode(value: string): Promise<void> {
     return this.send({
       endpoint: this.apiCommandUrl,
       commands: { component: 'main', capability: 'custom.picturemode', command: 'setPictureMode', arguments: [value] },
     });
   }
 
-  public setTvChannel(value: string | number): Promise<any> {
+  public setTvChannel(value: string | number): Promise<void> {
     return this.send({
       endpoint: this.apiCommandUrl,
       commands: { component: 'main', capability: 'tvChannel', command: 'setTvChannel', arguments: [value + ''] },

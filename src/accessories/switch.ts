@@ -2,12 +2,17 @@ import { Categories, PlatformAccessory } from 'homebridge';
 import { Device } from '../device/index.js';
 import { SamsungPlatform } from '../platform.js';
 import { InformationService, SwitchService } from '../services/index.js';
-import { SwitchConfig } from '../types/index.js';
+import { LinkedService, SwitchConfig } from '../types/index.js';
+
+export type SwitchServices = {
+  main: SwitchService;
+  information: InformationService;
+};
 
 export class SwitchAccessory {
   public UUID: string;
 
-  public services: any = {};
+  public services!: SwitchServices;
   public platformAccessory: PlatformAccessory;
 
   constructor(
@@ -27,11 +32,11 @@ export class SwitchAccessory {
   }
 
   private createServices() {
-    // Services
-    this.services.main = new SwitchService(this);
-    this.services.information = new InformationService(this);
+    this.services = {
+      main: new SwitchService(this),
+      information: new InformationService(this),
+    };
 
-    // Add services
     this.getServices().forEach((service) => {
       try {
         this.platformAccessory.addService(service);
@@ -39,9 +44,7 @@ export class SwitchAccessory {
     });
   }
 
-  private getServices() {
-    return Object.values(this.services)
-      .map((type: any) => type.service)
-      .flat();
+  private getServices(): LinkedService[] {
+    return Object.values(this.services).map((wrapper) => wrapper.service);
   }
 }

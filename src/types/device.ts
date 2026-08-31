@@ -7,6 +7,24 @@ export type DeviceState = {
   volume: number;
 };
 
+export type TizenDeviceInfo = {
+  version?: string;
+  device?: {
+    modelName?: string;
+    FrameTVSupport?: string;
+    TokenAuthSupport?: string;
+    PowerState?: string;
+  };
+};
+
+export type TizenApplication = {
+  id?: string;
+  name?: string;
+  running?: boolean;
+  version?: string;
+  visible?: boolean;
+};
+
 export type DeviceStorage = {
   token?: string;
   model?: string;

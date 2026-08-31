@@ -8,7 +8,7 @@ import { SamsungPlatform } from '../platform.js';
 import { LinkedService, SwitchOption } from '../types/index.js';
 
 export class SwitchService {
-  public options: any;
+  public options: SwitchOption[];
   public stateless: boolean;
   public service: LinkedService;
   private device: Device;
@@ -21,7 +21,7 @@ export class SwitchService {
     this.characteristic = this.platform.api.hap.Characteristic;
 
     this.options = getSwitchOptions(this.accessory, this.device, this);
-    this.stateless = this.options.every((option: SwitchOption) => !option.offable);
+    this.stateless = this.options.every((option) => !option.offable);
 
     const prefixName = this.device.hasOption('Switch.DeviceName.Disable') ? '' : `${this.device.config.name} `;
     const switchName = prefixName + this.accessory.config.name;

@@ -1,3 +1,4 @@
+import { Characteristic } from 'homebridge';
 import { Device } from '../device/device.js';
 
 const DEFAULTS: Record<string, string> = {
@@ -11,7 +12,7 @@ const DEFAULTS: Record<string, string> = {
   INFORMATION: 'KEY_INFO',
 };
 
-export function getRemoteKeysMap(device: Device, characteristic: any): Record<number, string> {
+export function getRemoteKeysMap(device: Device, characteristic: typeof Characteristic): Record<number, string> {
   const output: Record<number, string> = {};
   const userKeys: Record<string, string> = {};
   const RemoteKeyEnum = characteristic.RemoteKey;
