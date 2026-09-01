@@ -49,7 +49,9 @@ export class UPnPManager {
 
                 this.devices.get(deviceIp)?.emit('upnp:update', eventData);
               }
-            } catch {}
+            } catch (error: any) {
+              this.platform.log.debug(`[UPnP] Failed to parse NOTIFY from ${deviceIp}: ${error.message || error}`);
+            }
           }
 
           res.writeHead(200, { 'Content-Type': 'text/plain' });
@@ -227,7 +229,9 @@ export class UPnPClient {
       const mute = await this.getMute();
 
       this.device.emit('upnp:update', { volume, mute });
-    } catch {}
+    } catch (error: any) {
+      this.device.log.debug(`[UPnP] Failed to sync volume/mute: ${error.message || error}`);
+    }
   }
 
   public async getVolume(): Promise<number> {

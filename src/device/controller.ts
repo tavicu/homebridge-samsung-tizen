@@ -28,7 +28,9 @@ export class DeviceController {
     this.smartthings = new SmartThingsClient(this.device, platform);
 
     // Get device info on startup
-    this.getInfo().catch(() => {});
+    this.getInfo().catch((error: any) => {
+      this.device.log.debug(`Failed to fetch device info: ${error.message || error}`);
+    });
   }
 
   public ping(): Promise<boolean> {
