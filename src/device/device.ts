@@ -1,14 +1,15 @@
 import { EventEmitter } from 'events';
 import { deepmerge } from 'deepmerge-ts';
-import { Logger } from 'homebridge';
+import { Logging } from 'homebridge';
 import { SwitchAccessory, TelevisionAccessory } from '../accessories/index.js';
 import { Cache } from '../lib/cache.js';
+import { createDeviceLogger } from '../lib/logger.js';
 import { SamsungPlatform } from '../platform.js';
 import { DeviceConfig, DeviceEvents, DeviceOptions, DeviceState, DeviceStorage, SwitchConfig, TizenApplication } from '../types/index.js';
 import { DeviceController } from './controller.js';
 
 export class Device extends EventEmitter<DeviceEvents> {
-  public log: Logger;
+  public log: Logging;
   public cache: Cache;
   public storage: DeviceStorage;
   private controller: DeviceController;
@@ -59,11 +60,10 @@ export class Device extends EventEmitter<DeviceEvents> {
       throw new Error(`The MAC address is missing from the config for ${this.config.name}, skipping initialization...`);
     }
 
+    this.log = createDeviceLogger(platform.log, this.config.name);
+
     // Create UUID for device
     this.UUID = platform.api.hap.uuid.generate(this.config.mac + (this.config.uuid || ''));
-
-    // Setup logger with device name
-    this.log = { ...platform.log, prefix: this.config.name };
 
     // Setup dependencies for this device, order is important
     this.storage = platform.storage.get(this.UUID);
