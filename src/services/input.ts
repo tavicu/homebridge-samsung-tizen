@@ -1,7 +1,6 @@
 import { Characteristic } from 'homebridge';
 import { TelevisionAccessory } from '../accessories/television.js';
 import { Device } from '../device/device.js';
-import { race } from '../lib/tools.js';
 import { SamsungPlatform } from '../platform.js';
 import { InputConfig, LinkedService } from '../types/index.js';
 
@@ -82,17 +81,10 @@ export class InputService {
   }
 
   public async setInput() {
-    await race(this.runInput());
-
-    return this;
-  }
-
-  private async runInput(): Promise<void> {
     const { value, type } = this.config;
 
     if (!value) {
-      this.device.log.error(`No value is set for input "${this.config.name}" in config.`);
-      return;
+      throw new Error(`No value is set for input "${this.config.name}" in config.`);
     }
 
     switch (type) {
