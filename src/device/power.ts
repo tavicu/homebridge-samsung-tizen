@@ -34,7 +34,7 @@ export class PowerMonitor {
   ) {
     setInterval(() => void this.confirmViaPing('poll'), POLL_INTERVAL);
 
-    this.device.on('ssdp:update', (event: SsdpEvent, maxAgeSeconds?: number) => {
+    this.device.on('ssdp:update', (event, maxAgeSeconds) => {
       console.log('power:ssdp:update', this.device.config.ip, event, maxAgeSeconds ?? '');
 
       if (event === SsdpEvent.ALIVE) {

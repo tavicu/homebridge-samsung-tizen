@@ -1,10 +1,23 @@
+import { SsdpEvent } from './ssdp.js';
 import { InputConfig, SwitchConfig } from './types.js';
+import { UPnPData } from './upnp.js';
 import { WolOptions } from './wol.js';
 
 export type DeviceState = {
   power: boolean;
   mute: boolean;
   volume: number;
+};
+
+export type DevicePairedEvent = {
+  token?: string;
+};
+
+export type DeviceEvents = {
+  'ssdp:update': [event: SsdpEvent, maxAgeSeconds?: number];
+  'upnp:update': [data: UPnPData];
+  'state:update': [prop: keyof DeviceState, value: DeviceState[keyof DeviceState]];
+  paired: [data: DevicePairedEvent];
 };
 
 export type TizenDeviceInfo = {

@@ -4,10 +4,10 @@ import { Logger } from 'homebridge';
 import { SwitchAccessory, TelevisionAccessory } from '../accessories/index.js';
 import { Cache } from '../lib/cache.js';
 import { SamsungPlatform } from '../platform.js';
-import { DeviceConfig, DeviceOptions, DeviceState, DeviceStorage, SwitchConfig, TizenApplication } from '../types/index.js';
+import { DeviceConfig, DeviceEvents, DeviceOptions, DeviceState, DeviceStorage, SwitchConfig, TizenApplication } from '../types/index.js';
 import { DeviceController } from './controller.js';
 
-export class Device extends EventEmitter {
+export class Device extends EventEmitter<DeviceEvents> {
   public log: Logger;
   public cache: Cache;
   public storage: DeviceStorage;
@@ -43,7 +43,7 @@ export class Device extends EventEmitter {
         } // Do nothing if value is identical
 
         Reflect.set(target, prop, value);
-        this.emit('state:update', prop, value);
+        this.emit('state:update', prop as keyof DeviceState, value);
         return true;
       },
     });

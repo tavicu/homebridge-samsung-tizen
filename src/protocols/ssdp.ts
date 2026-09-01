@@ -18,7 +18,7 @@ type Address = {
 
 type TrackedDevice = {
   device: Device;
-  emit: (event: string, maxAgeSeconds?: number) => void;
+  emit: (event: SsdpEvent, maxAgeSeconds?: number) => void;
 };
 
 const parseMaxAge = (cacheControl?: string): number | undefined => {
@@ -30,7 +30,7 @@ export class SSDP {
   private devices = new Map<string, TrackedDevice>();
 
   private readonly peer: any;
-  private readonly possibleEvents: Array<string> = [SsdpEvent.ALIVE, SsdpEvent.BYEBYE];
+  private readonly possibleEvents: Array<SsdpEvent> = [SsdpEvent.ALIVE, SsdpEvent.BYEBYE];
   private searchInterval?: NodeJS.Timeout;
 
   constructor(private readonly platform: SamsungPlatform) {
@@ -49,14 +49,14 @@ export class SSDP {
     this.platform.devices.forEach((device) => {
       this.devices.set(device.config.ip, {
         device,
-        emit: debounce((event: string, maxAgeSeconds?: number) => {
+        emit: debounce((event: SsdpEvent, maxAgeSeconds?: number) => {
           if (this.possibleEvents.includes(event)) {
             device.emit('ssdp:update', event, maxAgeSeconds);
           }
         }),
       });
 
-      device.on('state:update', (prop: string) => {
+      device.on('state:update', (prop) => {
         if (prop === 'power') {
           this.syncSearchInterval();
         }

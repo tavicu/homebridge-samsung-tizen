@@ -1,7 +1,7 @@
 import { XMLParser } from 'fast-xml-parser';
+import { UPnPData } from '../types/index.js';
 
 type ParsedCommand = string | { key: string; time: number };
-type ParsedUPnPData = { volume?: number; mute?: boolean };
 
 export const UPnPparser = new XMLParser({
   ignoreAttributes: false,
@@ -10,7 +10,7 @@ export const UPnPparser = new XMLParser({
   parseAttributeValue: true,
 });
 
-export function parseUPnPChange(lastChangeXml: string): ParsedUPnPData {
+export function parseUPnPChange(lastChangeXml: string): UPnPData {
   try {
     const cleanXml = lastChangeXml.replace(/&lt;/g, '<').replace(/&gt;/g, '>');
     const parsed = UPnPparser.parse(cleanXml);
@@ -20,7 +20,7 @@ export function parseUPnPChange(lastChangeXml: string): ParsedUPnPData {
       return {};
     }
 
-    const result: ParsedUPnPData = {};
+    const result: UPnPData = {};
 
     if (instance.Volume) {
       result.volume = parseInt(instance.Volume['@_val'], 10);

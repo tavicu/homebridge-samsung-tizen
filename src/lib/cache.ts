@@ -10,7 +10,7 @@ export class Cache {
   private keys: Record<string, CacheEntry<unknown>> = {};
 
   constructor(device: Device) {
-    device.on('state:update', (prop: string) => prop === 'power' && this.flush());
+    device.on('state:update', (prop) => prop === 'power' && this.flush());
   }
 
   public get<T>(key: string, run: () => Promise<T>, time = 500): Promise<T> {
