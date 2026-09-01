@@ -91,9 +91,13 @@ export class DeviceController {
     return this.sleepTimeout !== null;
   }
 
-  public async setSleep(minutes: number, onComplete?: () => Promise<void> | void): Promise<void> {
+  public clearSleep(): void {
     clearTimeout(this.sleepTimeout || undefined);
     this.sleepTimeout = null;
+  }
+
+  public async setSleep(minutes: number, onComplete?: () => Promise<void> | void): Promise<void> {
+    this.clearSleep();
 
     if (!minutes) {
       return;

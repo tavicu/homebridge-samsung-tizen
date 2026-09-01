@@ -114,11 +114,15 @@ export class Device extends EventEmitter {
       this.state.mute = mute ?? this.state.mute;
     });
 
-    this.on('state:update', () => {
+    this.on('state:update', (prop) => {
       const d = new Date();
       const t = d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds() + '-' + d.getMilliseconds();
 
       console.log('state:update', t, this.config.ip, this.state);
+
+      if (prop === 'power') {
+        this.controller.clearSleep();
+      }
 
       this.accessories.forEach((accessory) => {
         Object.values(accessory.services).forEach((wrapper) => {
