@@ -1,3 +1,5 @@
+import { Socket } from 'net';
+
 export const sleep = <T>(timeout = 150, { value }: { value?: T } = {}): Promise<T | undefined> => {
   return new Promise((resolve) => setTimeout(() => resolve(value), timeout));
 };
@@ -33,4 +35,30 @@ export const debounce = <T extends (...args: any[]) => void>(callback: T, timeou
       callback.apply(this, args);
     }, timeout);
   };
+};
+
+export const isPortReachable = async (port: number, host: string, timeout = 1000): Promise<boolean> => {
+  try {
+    await new Promise<void>((resolve, reject) => {
+      const socket = new Socket();
+
+      const onError = () => {
+        socket.destroy();
+        reject();
+      };
+
+      socket.setTimeout(timeout);
+      socket.once('error', onError);
+      socket.once('timeout', onError);
+
+      socket.connect(port, host, () => {
+        socket.end();
+        resolve();
+      });
+    });
+
+    return true;
+  } catch {
+    return false;
+  }
 };

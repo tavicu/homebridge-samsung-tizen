@@ -1,8 +1,7 @@
 import axios from 'axios';
-import isPortReachable from 'is-port-reachable';
 import { IgnorableError, TvAlreadyOffError, TvAlreadyOnError, TvOfflineError, TvPoweringError } from '../errors.js';
 import { parseCommands } from '../lib/parsers.js';
-import { sleep } from '../lib/tools.js';
+import { isPortReachable, sleep } from '../lib/tools.js';
 import { wol } from '../lib/wol.js';
 import { SamsungPlatform } from '../platform.js';
 import { SmartThingsClient, UPnPClient, WebSocket } from '../protocols/index.js';
@@ -32,10 +31,7 @@ export class DeviceController {
   }
 
   public ping(): Promise<boolean> {
-    return isPortReachable(8001, {
-      host: this.device.config.ip,
-      timeout: 1000,
-    });
+    return isPortReachable(8001, this.device.config.ip);
   }
 
   public async getInfo(): Promise<TizenDeviceInfo> {
