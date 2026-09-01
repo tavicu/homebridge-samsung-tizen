@@ -14,8 +14,9 @@
   },
   "homepage": "https://tavicu.github.io/homebridge-samsung-tizen/",
   "keywords": [
-    "homebridge-plugin",
     "homebridge",
+    "homebridge-plugin",
+    "supports-hap",
     "homekit",
     "samsung",
     "remote",
