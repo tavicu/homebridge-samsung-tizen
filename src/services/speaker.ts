@@ -4,6 +4,7 @@ import { Device } from '../device/device.js';
 import { race } from '../lib/tools.js';
 import { SamsungPlatform } from '../platform.js';
 import { LinkedService } from '../types/index.js';
+import { updateValueIfChanged } from './helpers.js';
 
 export class SpeakerService {
   public service: LinkedService;
@@ -30,11 +31,8 @@ export class SpeakerService {
   }
 
   public async updateValue(): Promise<void> {
-    const mute = await this.getMute();
-    const volume = await this.getVolume();
-
-    this.service.updateCharacteristic(this.characteristic.Mute, mute);
-    this.service.updateCharacteristic(this.characteristic.Volume, volume);
+    updateValueIfChanged(this.service, this.characteristic.Mute, await this.getMute());
+    updateValueIfChanged(this.service, this.characteristic.Volume, await this.getVolume());
   }
 
   /**

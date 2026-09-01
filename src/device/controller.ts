@@ -8,16 +8,15 @@ import { SamsungPlatform } from '../platform.js';
 import { SmartThingsClient, UPnPClient, WebSocket } from '../protocols/index.js';
 import { TizenApplication, TizenDeviceInfo } from '../types/index.js';
 import { Device } from './device.js';
-
-const POWERING_TIMEOUT = 1000 * 3;
+import { PowerMonitor } from './power.js';
 
 export class DeviceController {
   private ws: WebSocket;
   private upnp: UPnPClient;
   private smartthings: SmartThingsClient;
+  private power: PowerMonitor;
 
   private sleepTimeout: NodeJS.Timeout | null = null;
-  private poweringTimeout: NodeJS.Timeout | null = null;
 
   constructor(
     private device: Device,
@@ -26,11 +25,10 @@ export class DeviceController {
     this.ws = new WebSocket(this.device);
     this.upnp = new UPnPClient(this.device, platform);
     this.smartthings = new SmartThingsClient(this.device, platform);
+    this.power = new PowerMonitor(this.device, this);
 
     // Get device info on startup
-    this.getInfo().catch((error: any) => {
-      this.device.log.debug(`Failed to fetch device info: ${error.message || error}`);
-    });
+    this.getInfo().catch(() => {});
   }
 
   public ping(): Promise<boolean> {
@@ -192,7 +190,7 @@ export class DeviceController {
   }
 
   public async powerOn(): Promise<void> {
-    if (this.poweringTimeout !== null) {
+    if (this.power.isPowering) {
       throw new TvPoweringError();
     }
 
@@ -202,19 +200,19 @@ export class DeviceController {
 
     const isSleeping = await this.ping();
 
+    this.power.latchOptimistic(true);
+
     if (isSleeping) {
-      await this.device.sendCommand('KEY_POWER');
+      await this.ws.click('KEY_POWER');
     } else {
       await wol(this.device.config.mac, { ...this.device.config.wol, ip: this.device.config.ip }).catch((error) => {
         throw new Error('Failed to wake up TV', { cause: error });
       });
     }
-
-    this.poweringTimeout = setTimeout(() => (this.poweringTimeout = null), POWERING_TIMEOUT);
   }
 
   public async powerOff(): Promise<void> {
-    if (this.poweringTimeout !== null) {
+    if (this.power.isPowering) {
       throw new TvPoweringError();
     }
 
@@ -222,15 +220,13 @@ export class DeviceController {
       throw new TvAlreadyOffError();
     }
 
-    await this.device.sendCommand('KEY_POWER');
+    this.power.latchOptimistic(false);
 
-    this.poweringTimeout = setTimeout(() => (this.poweringTimeout = null), POWERING_TIMEOUT);
+    await this.ws.click('KEY_POWER');
   }
 
-  private async waitPowering(): Promise<void> {
-    while (this.poweringTimeout !== null) {
-      await sleep(200);
-    }
+  private waitPowering(): Promise<void> {
+    return this.power.settled();
   }
 
   public destroy(): void {

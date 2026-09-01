@@ -6,20 +6,20 @@ This is a full rewrite of the plugin in TypeScript. Your existing devices are ke
 
 **Requirements**
 
-* Node.js 22.10 or newer
-* Homebridge 1.8 or newer (Homebridge 2.0 is supported)
+- Node.js 22.10 or newer
+- Homebridge 1.8 or newer (Homebridge 2.0 is supported)
 
 **New**
 
-* The plugin is now written in TypeScript and shipped as an ES module.
-* Brand new configuration interface for Config UI X, built with Vue: add, edit and delete devices, inputs and switches without touching the JSON config. Requires Config UI X v5.27.0 or newer.
-* The state of the TV is now updated in real time through SSDP announcements, without asking the TV over and over.
-* Volume and mute are read in real time from the TV through DMR (UPnP) events, so the values in Home app follow the physical remote.
-* Absolute volume control is now available without SmartThings.
-* New `Device.Disable` option, so a device can be turned off from the plugin without deleting its configuration.
-* `keys`, `inputs`, `switches` and `wol` can now be configured once at plugin level and are inherited by every device. Anything set on a device still wins.
-* Rewind, Fast Forward and Exit now work in the iOS remote. Next Track and Previous Track can be mapped through the `keys` setting, they have no default because Samsung has no matching command.
-* All dependencies were updated to their latest versions.
+- The plugin is now written in TypeScript and shipped as an ES module.
+- Brand new configuration interface for Config UI X, built with Vue: add, edit and delete devices, inputs and switches without touching the JSON config. Requires Config UI X v5.27.0 or newer.
+- The state of the TV is now updated in real time through SSDP announcements. If those announcements never arrive or stop without a goodbye, the plugin falls back to checking whether the TV is reachable.
+- Volume and mute are read in real time from the TV through DMR (UPnP) events, so the values in Home app follow the physical remote.
+- Absolute volume control is now available without SmartThings.
+- New `Device.Disable` option, so a device can be turned off from the plugin without deleting its configuration.
+- `keys`, `inputs`, `switches` and `wol` can now be configured once at plugin level and are inherited by every device. Anything set on a device still wins.
+- Rewind, Fast Forward and Exit now work in the iOS remote. Next Track and Previous Track can be mapped through the `keys` setting, they have no default because Samsung has no matching command.
+- All dependencies were updated to their latest versions.
 
 **SmartThings uses a new authorization flow**
 
@@ -29,28 +29,31 @@ SmartThings dropped support for the personal access tokens that never expire, so
 
 These were removed and are ignored if they are still present in your configuration:
 
-* `refresh` - the plugin no longer polls the TV, the state arrives through SSDP and DMR events.
-* `delay`, `timeout` and `wait_time` - these timings are now handled internally.
-* `method` and `port` - the connection to the TV is detected automatically.
-* `api_key` - replaced by the SmartThings authorization flow described above.
+- `refresh` - there is no configurable poll interval anymore. Power state arrives through SSDP, with a built-in fallback check when announcements are missing. Volume and mute arrive through DMR events.
+- `delay`, `timeout` and `wait_time` - these timings are now handled internally.
+- `method` and `port` - the connection to the TV is detected automatically.
+- `api_key` - replaced by the SmartThings authorization flow described above.
 
 **Changed**
 
-* A custom switch that has more than one option with a state, for example `sleep` together with `mute`, now shows as ON when any of those options is active. Before, all of them had to be active at the same time.
-* `device_id` was renamed to `deviceId`. The old name still works.
+- A custom switch that has more than one option with a state, for example `sleep` together with `mute`, now shows as ON when any of those options is active. Before, all of them had to be active at the same time.
+- `device_id` was renamed to `deviceId`. The old name still works.
 
 **Fixed**
 
-* Turning the TV on or off when it is already in that state, or while it is still switching, no longer makes Home app show "No Response". The command is ignored instead.
+- Turning the TV on or off when it is already in that state, or while it is still switching, no longer makes Home app show "No Response". The command is ignored instead.
+- The power switch in Home app no longer jumps back to off right after you turn the TV on, while the TV is still starting.
+- A TV that is unplugged, or loses power without sending a goodbye announcement, is no longer stuck on "on" forever.
+- TVs that keep announcing themselves while in standby are reported as off, not on.
 
 **Not available yet**
 
-* Support for Frame TVs is not implemented in this version. The `Art Mode` and `Power` switches, the `art` input type and the `Frame.RealPowerMode`, `Frame.ArtSwitch.Disable` and `Frame.PowerSwitch.Disable` options are not available for now.
+- Support for Frame TVs is not implemented in this version. The `Art Mode` and `Power` switches, the `art` input type and the `Frame.RealPowerMode`, `Frame.ArtSwitch.Disable` and `Frame.PowerSwitch.Disable` options are not available for now.
 
 ## 5.2.6
 
-* By default all custom switches have the main accessory name prepended. We have added the option to disable this. Read [the documentation](https://tavicu.github.io/homebridge-samsung-tizen/configuration/device-settings.html#options) to see how to do it. 
-* Updated the plugin to reflect our [new documentation](https://tavicu.github.io/homebridge-samsung-tizen/).
+- By default all custom switches have the main accessory name prepended. We have added the option to disable this. Read [the documentation](https://tavicu.github.io/homebridge-samsung-tizen/configuration/device-settings.html#options) to see how to do it.
+- Updated the plugin to reflect our [new documentation](https://tavicu.github.io/homebridge-samsung-tizen/).
 
 ## 5.2.5
 
@@ -70,102 +73,100 @@ Until then, don't update your Frames and make sure you disable Auto Update.
 
 ## 5.2.0
 
-* New: Add integration with SmartThings API
-* Add option to create inputs that selects a specific source (require SmartThings API)
-* Add option to select picture mode (require SmartThings API)
-* Add option to set volume with a switch (require SmartThings API)
-* If SmartThings API is configured use it for changing channels
-* Add delay when running a command right after the TV powered ON
-* Clear sleep timeout if the TV shuts down sooner
-* Fix warning when a custom switch takes longer to execute
-* Update dependencies used by the plugin
-* Remove feature to list installed applications (Samsung removed their API)
+- New: Add integration with SmartThings API
+- Add option to create inputs that selects a specific source (require SmartThings API)
+- Add option to select picture mode (require SmartThings API)
+- Add option to set volume with a switch (require SmartThings API)
+- If SmartThings API is configured use it for changing channels
+- Add delay when running a command right after the TV powered ON
+- Clear sleep timeout if the TV shuts down sooner
+- Fix warning when a custom switch takes longer to execute
+- Update dependencies used by the plugin
+- Remove feature to list installed applications (Samsung removed their API)
 
 Read here on how to setup SmartThings API: https://github.com/tavicu/homebridge-samsung-tizen/wiki/SmartThings-Setup
 
-
 ## 5.1.1
 
-* Fix compatibility with HOOBS
+- Fix compatibility with HOOBS
 
 For more informations regarding this problem please follow this link: https://github.com/hoobs-org/HOOBS/issues/1790#issuecomment-1038079128
 
 ## 5.1.0
 
-* Update and improve http requests
-* Improve listeners that update accessories
-* Improve storage of settings that are fetched automatically
-* Fix a bug that prevented the plugin to fetch the settings
-* Add option in Config UI interface to select Type of TV
-* Respond to power on/off actions in a maximum time of 1.5 seconds
+- Update and improve http requests
+- Improve listeners that update accessories
+- Improve storage of settings that are fetched automatically
+- Fix a bug that prevented the plugin to fetch the settings
+- Add option in Config UI interface to select Type of TV
+- Respond to power on/off actions in a maximum time of 1.5 seconds
 
 ## 5.0.0
 
-* Add support for Frame TVs
-* Add Power switch for Frame TVs
-* Add Art Mode switch for Frame TVs
-* Use events for initialise elements and status changes
-* Refresh all accessories when state of TV changes
+- Add support for Frame TVs
+- Add Power switch for Frame TVs
+- Add Art Mode switch for Frame TVs
+- Use events for initialise elements and status changes
+- Refresh all accessories when state of TV changes
 
 For more informations regarding Frame Support please follow this link: https://git.io/JOII1
 
-
 ## 4.4.1
 
-* Fix bug that destroy storage because of multiple savings in the same time
+- Fix bug that destroy storage because of multiple savings in the same time
 
 ## 4.4.0
 
-* Cleanup unused Keys from config
-* Accept multiple commands as string separated by comma
-* Update config schema for Config Ui X settings interface
-* If TV responds to ping, check the PowerState value if TV supports it
-* Implement a caching method for requests so we don't stress the TVs
-* Added error message when failing to fetch installed applications
-* Stylized the response for installed applications output
-* Reinitialize remote after TV informations where fetched
-* Remove sleeping mode when turning off the device if TV supports PowerState
+- Cleanup unused Keys from config
+- Accept multiple commands as string separated by comma
+- Update config schema for Config Ui X settings interface
+- If TV responds to ping, check the PowerState value if TV supports it
+- Implement a caching method for requests so we don't stress the TVs
+- Added error message when failing to fetch installed applications
+- Stylized the response for installed applications output
+- Reinitialize remote after TV informations where fetched
+- Remove sleeping mode when turning off the device if TV supports PowerState
 
 ## 4.3.7
 
-* Use POST method to open applications
+- Use POST method to open applications
 
 ## 4.3.6
 
-* Update Readme
-* Add funding option for Config Ui X
-* Replace deprecated package
+- Update Readme
+- Add funding option for Config Ui X
+- Replace deprecated package
 
 ## 4.3.4
 
-* Add error message when TV is off and is trying to fetch installed apps
-* Fix warning message from Homebridge 1.3.0
+- Add error message when TV is off and is trying to fetch installed apps
+- Fix warning message from Homebridge 1.3.0
 
 ## 4.3.0
 
-* Add support for WoL settings
-* @mxdanger helped us with adding option to customize the settings from Config UI X interface!
+- Add support for WoL settings
+- @mxdanger helped us with adding option to customize the settings from Config UI X interface!
 
 ## 4.2.1
 
-* Fix open Apple TV application
-* Add Mute Characteristic for volume
-* Add a new method to display installed apps
+- Fix open Apple TV application
+- Add Mute Characteristic for volume
+- Add a new method to display installed apps
 
 ## 4.2.0
 
-* Bug fixing
-* Group switches with the main accessory since from iOS 13.2 you have the option to show them separately.
+- Bug fixing
+- Group switches with the main accessory since from iOS 13.2 you have the option to show them separately.
 
 ## 4.1.0
 
-* Bug fixing
-* Compatible with iOS 13.
+- Bug fixing
+- Compatible with iOS 13.
 
 ## 4.0.0
 
-* Bug fixing
-* New method for declaring accessories.
+- Bug fixing
+- New method for declaring accessories.
 
 **IMPORTANT!** With this release the TVs will be declared as external accessories.
 Updating from v3 to v4 will require you to add the TVs in Home app again.
@@ -176,31 +177,31 @@ You can read how to add the TV in [Step 6 from Configuration page](https://githu
 
 ## 3.1.3
 
-* Never fail custom switches for better working with automations
+- Never fail custom switches for better working with automations
 
 ## 3.1.1
 
-* Fix a bug that didn't display installed apps when running `tizen-apps`
-* Improvements of how accessories are created
+- Fix a bug that didn't display installed apps when running `tizen-apps`
+- Improvements of how accessories are created
 
 ## 3.1.0
 
-* Bug fixing
-* Change default settings for `refresh` option
-* Option to change remote keys mapping
+- Bug fixing
+- Change default settings for `refresh` option
+- Option to change remote keys mapping
 
 ## 3.0.0
 
-* Use the new iOS 12.2 support for `Television` as accessory type
-* Option to add inputs for TV with the new iOS 12.2 feature
-* Control TV from Remote Control Center
-* Save the token automaticaly on the server
-* More options for `refresh` in real time
-* Better logging in debug mode
-* New method to check if TV is active
-* Option to hold a command key for a time
+- Use the new iOS 12.2 support for `Television` as accessory type
+- Option to add inputs for TV with the new iOS 12.2 feature
+- Control TV from Remote Control Center
+- Save the token automaticaly on the server
+- More options for `refresh` in real time
+- Better logging in debug mode
+- New method to check if TV is active
+- Option to hold a command key for a time
 
 ## 2.1.0
 
-* Option to open applications with a switch
-* New support to update the switches with state in real time
+- Option to open applications with a switch
+- New support to update the switches with state in real time

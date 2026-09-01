@@ -38,9 +38,8 @@ export function parseUPnPChange(lastChangeXml: string): ParsedUPnPData {
 }
 
 export function parseCommands(commands: string | string[]): ParsedCommand[] {
-  const commandList = Array.isArray(commands)
-    ? commands.map((cmd) => cmd.replace(/\s/g, '')).filter(Boolean)
-    : commands.replace(/\s/g, '').split(',').filter(Boolean);
+  const parts = Array.isArray(commands) ? commands : commands.split(',');
+  const commandList = parts.map((cmd) => cmd.replace(/\s/g, '')).filter(Boolean);
 
   return commandList.flatMap((cmd): ParsedCommand[] => {
     const split = cmd.split('*');

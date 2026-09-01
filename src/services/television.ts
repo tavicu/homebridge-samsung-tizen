@@ -6,6 +6,7 @@ import { getRemoteKeysMap } from '../lib/remote.js';
 import { race, sleep } from '../lib/tools.js';
 import { SamsungPlatform } from '../platform.js';
 import { LinkedService } from '../types/types.js';
+import { updateValueIfChanged } from './helpers.js';
 import { InputService } from './input.js';
 
 export class TelevisionService {
@@ -39,8 +40,7 @@ export class TelevisionService {
   }
 
   public async updateValue(): Promise<void> {
-    const value = await this.getActive();
-    this.service.updateCharacteristic(this.characteristic.Active, value);
+    updateValueIfChanged(this.service, this.characteristic.Active, await this.getActive());
   }
 
   private async getActive(): Promise<CharacteristicValue> {

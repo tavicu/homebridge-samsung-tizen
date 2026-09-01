@@ -9,6 +9,7 @@ type Headers = {
   NT: string;
   NTS: string;
   LOCATION: string;
+  'CACHE-CONTROL'?: string;
 };
 
 type Address = {
@@ -17,7 +18,12 @@ type Address = {
 
 type TrackedDevice = {
   device: Device;
-  emit: (event: string) => void;
+  emit: (event: string, maxAgeSeconds?: number) => void;
+};
+
+const parseMaxAge = (cacheControl?: string): number | undefined => {
+  const match = /max-age\s*=\s*(\d+)/i.exec(cacheControl || '');
+  return match ? parseInt(match[1], 10) : undefined;
 };
 
 export class SSDP {
@@ -43,9 +49,9 @@ export class SSDP {
     this.platform.devices.forEach((device) => {
       this.devices.set(device.config.ip, {
         device,
-        emit: debounce((event: string) => {
+        emit: debounce((event: string, maxAgeSeconds?: number) => {
           if (this.possibleEvents.includes(event)) {
-            device.emit('ssdp:update', event);
+            device.emit('ssdp:update', event, maxAgeSeconds);
           }
         }),
       });
@@ -94,8 +100,9 @@ export class SSDP {
 
     // Send received event
     if (headers.NTS === SsdpEvent.ALIVE) {
-      tracked.emit(SsdpEvent.ALIVE);
+      tracked.emit(SsdpEvent.ALIVE, parseMaxAge(headers['CACHE-CONTROL']));
     } else if (headers.NTS === SsdpEvent.BYEBYE) {
+      // byebye has no CACHE-CONTROL;
       tracked.emit(SsdpEvent.BYEBYE);
     }
   }
@@ -109,7 +116,7 @@ export class SSDP {
     }
 
     // Send alive event
-    tracked.emit(SsdpEvent.ALIVE);
+    tracked.emit(SsdpEvent.ALIVE, parseMaxAge(headers['CACHE-CONTROL']));
   }
 
   public destroy() {

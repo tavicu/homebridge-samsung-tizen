@@ -6,6 +6,7 @@ import { getSwitchOptions } from '../lib/switch.js';
 import { race, sleep } from '../lib/tools.js';
 import { SamsungPlatform } from '../platform.js';
 import { LinkedService, SwitchOption } from '../types/index.js';
+import { updateValueIfChanged } from './helpers.js';
 
 export class SwitchService {
   public options: SwitchOption[];
@@ -37,7 +38,7 @@ export class SwitchService {
   public async updateValue(value?: boolean): Promise<void> {
     const finalValue = value !== undefined ? value : await this.getSwitch();
 
-    this.service.updateCharacteristic(this.characteristic.On, finalValue);
+    updateValueIfChanged(this.service, this.characteristic.On, finalValue);
   }
 
   private async getSwitch(): Promise<CharacteristicValue> {
