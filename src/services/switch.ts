@@ -1,7 +1,7 @@
 import { Characteristic, CharacteristicValue } from 'homebridge';
 import { SwitchAccessory } from '../accessories/switch.js';
 import { Device } from '../device/device.js';
-import { TvOfflineError } from '../errors.js';
+import { IgnorableError, TvOfflineError } from '../errors.js';
 import { getSwitchOptions } from '../lib/switch.js';
 import { race, sleep } from '../lib/tools.js';
 import { SamsungPlatform } from '../platform.js';
@@ -72,6 +72,11 @@ export class SwitchService {
     try {
       await race(this.runSwitch(switchValue));
     } catch (error: any) {
+      if (error instanceof IgnorableError) {
+        this.device.log.debug(`Ignoring switch command: ${error.message}`);
+        return;
+      }
+
       this.device.log.error(`Failed to set switch state: ${error.message || error}`);
       this.device.log.debug(error.stack);
 

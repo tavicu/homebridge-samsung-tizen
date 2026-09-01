@@ -39,6 +39,10 @@ These were removed and are ignored if they are still present in your configurati
 * A custom switch that has more than one option with a state, for example `sleep` together with `mute`, now shows as ON when any of those options is active. Before, all of them had to be active at the same time.
 * `device_id` was renamed to `deviceId`. The old name still works.
 
+**Fixed**
+
+* Turning the TV on or off when it is already in that state, or while it is still switching, no longer makes Home app show "No Response". The command is ignored instead.
+
 **Not available yet**
 
 * Support for Frame TVs is not implemented in this version. The `Art Mode` and `Power` switches, the `art` input type and the `Frame.RealPowerMode`, `Frame.ArtSwitch.Disable` and `Frame.PowerSwitch.Disable` options are not available for now.

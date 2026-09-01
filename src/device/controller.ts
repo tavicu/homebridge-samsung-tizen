@@ -1,6 +1,6 @@
 import axios from 'axios';
 import isPortReachable from 'is-port-reachable';
-import { TvOfflineError } from '../errors.js';
+import { IgnorableError, TvAlreadyOffError, TvAlreadyOnError, TvOfflineError, TvPoweringError } from '../errors.js';
 import { parseCommands } from '../lib/parsers.js';
 import { sleep } from '../lib/tools.js';
 import { wol } from '../lib/wol.js';
@@ -122,6 +122,11 @@ export class DeviceController {
             Promise.resolve(onComplete()).catch(() => {});
           }
         } catch (error: any) {
+          if (error instanceof IgnorableError) {
+            this.device.log.debug(`[Sleep] Auto power off skipped: ${error.message}`);
+            return;
+          }
+
           this.device.log.error(`[Sleep] Failed to execute auto power off: ${error.message}`);
         }
       },
@@ -186,11 +191,11 @@ export class DeviceController {
 
   public async powerOn(): Promise<void> {
     if (this.poweringTimeout !== null) {
-      throw new Error('TV is currently transitioning states. Please wait.');
+      throw new TvPoweringError();
     }
 
     if (this.device.power) {
-      throw new Error('TV is already powered on');
+      throw new TvAlreadyOnError();
     }
 
     const isSleeping = await this.ping();
@@ -208,11 +213,11 @@ export class DeviceController {
 
   public async powerOff(): Promise<void> {
     if (this.poweringTimeout !== null) {
-      throw new Error('TV is currently transitioning states. Please wait.');
+      throw new TvPoweringError();
     }
 
     if (!this.device.power) {
-      throw new Error('TV is already powered off');
+      throw new TvAlreadyOffError();
     }
 
     await this.device.sendCommand('KEY_POWER');

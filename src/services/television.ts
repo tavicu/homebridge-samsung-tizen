@@ -1,6 +1,7 @@
 import { Characteristic, CharacteristicValue } from 'homebridge';
 import { TelevisionAccessory } from '../accessories/television.js';
 import { Device } from '../device/device.js';
+import { IgnorableError } from '../errors.js';
 import { getRemoteKeysMap } from '../lib/remote.js';
 import { race, sleep } from '../lib/tools.js';
 import { SamsungPlatform } from '../platform.js';
@@ -50,6 +51,11 @@ export class TelevisionService {
     try {
       await race(this.device.setPower(value as boolean));
     } catch (error: any) {
+      if (error instanceof IgnorableError) {
+        this.device.log.debug(`Ignoring power command (${value}): ${error.message}`);
+        return;
+      }
+
       this.device.log.error(`Failed to set power state to ${value}: ${error.message || error}`);
       this.device.log.debug(error.stack);
 
