@@ -34,7 +34,6 @@
     "homebridge-ui/server.js",
     "config.schema.json"
   ],
-  "customUiPath": "./dist/homebridge-ui",
   "scripts": {
     "build": "rimraf dist homebridge-ui/public && tsc && vite build --config homebridge-ui/vite.config.js",
     "watch": "npm run build && npm link && nodemon",
