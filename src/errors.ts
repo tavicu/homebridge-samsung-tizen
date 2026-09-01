@@ -7,8 +7,8 @@ class BaseError extends Error {
 }
 
 /**
- * The command was not executed, but nothing is broken. Services log these and
- * return without raising a HapStatusError, so HomeKit does not show "No Response".
+ * The command was not executed, but nothing is broken. Services swallow these
+ * without raising a HapStatusError, so HomeKit does not show "No Response".
  */
 export class IgnorableError extends BaseError {}
 

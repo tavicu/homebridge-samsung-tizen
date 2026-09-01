@@ -1,33 +1,25 @@
-import { Characteristic, CharacteristicValue } from 'homebridge';
+import { CharacteristicValue } from 'homebridge';
 import { TelevisionAccessory } from '../accessories/television.js';
-import { Device } from '../device/device.js';
-import { IgnorableError } from '../errors.js';
 import { getRemoteKeysMap } from '../lib/remote.js';
-import { race, sleep } from '../lib/tools.js';
-import { SamsungPlatform } from '../platform.js';
+import { sleep } from '../lib/tools.js';
 import { LinkedService } from '../types/types.js';
-import { updateValueIfChanged } from './helpers.js';
 import { InputService } from './input.js';
+import { CharacteristicRef, ServiceWrapper } from './wrapper.js';
 
-export class TelevisionService {
+export class TelevisionService extends ServiceWrapper {
   public service: LinkedService;
-  private device: Device;
-  private platform: SamsungPlatform;
   private remoteKeys: Record<number, string>;
-  private characteristic: typeof Characteristic;
 
   constructor(private accessory: TelevisionAccessory) {
-    this.device = this.accessory.device;
-    this.platform = this.accessory.platform;
-    this.characteristic = this.platform.api.hap.Characteristic;
+    super(accessory);
 
     this.remoteKeys = getRemoteKeysMap(this.device, this.characteristic);
 
     const displayOrder = this.accessory.inputs.map((input: InputService) => input.config.identifier);
 
-    this.service = new this.platform.api.hap.Service.Television(this.device.config.name)
+    this.service = new this.hap.Service.Television(this.device.config.name)
       .setCharacteristic(this.characteristic.ConfiguredName, this.device.config.name)
-      .setCharacteristic(this.characteristic.DisplayOrder, this.platform.api.hap.encode(1, displayOrder).toString('base64'))
+      .setCharacteristic(this.characteristic.DisplayOrder, this.hap.encode(1, displayOrder).toString('base64'))
       .setCharacteristic(this.characteristic.SleepDiscoveryMode, this.characteristic.SleepDiscoveryMode.ALWAYS_DISCOVERABLE);
 
     this.service.getCharacteristic(this.characteristic.Active).onGet(this.getActive.bind(this)).onSet(this.setActive.bind(this));
@@ -39,8 +31,8 @@ export class TelevisionService {
     return this.service.addLinkedService(newLinkedService);
   }
 
-  public async updateValue(): Promise<void> {
-    updateValueIfChanged(this.service, this.characteristic.Active, await this.getActive());
+  public async updateValue(characteristic?: CharacteristicRef, value?: CharacteristicValue): Promise<void> {
+    this.handleUpdateValue(characteristic ?? this.characteristic.Active, value !== undefined ? value : await this.getActive());
   }
 
   private async getActive(): Promise<CharacteristicValue> {
@@ -48,19 +40,7 @@ export class TelevisionService {
   }
 
   private async setActive(value: CharacteristicValue) {
-    try {
-      await race(this.device.setPower(value as boolean));
-    } catch (error: any) {
-      if (error instanceof IgnorableError) {
-        this.device.log.debug(`Ignoring power command (${value}): ${error.message}`);
-        return;
-      }
-
-      this.device.log.error(`Failed to set power state to ${value}: ${error.message || error}`);
-      this.device.log.debug(error.stack);
-
-      throw new this.platform.api.hap.HapStatusError(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
-    }
+    await this.handleSet(this.device.setPower(value as boolean), { errorMessage: `Failed to set power state to ${value}` });
   }
 
   private async setRemoteKey(value: CharacteristicValue) {
@@ -70,14 +50,7 @@ export class TelevisionService {
       return;
     }
 
-    try {
-      await race(this.device.sendCommand(tvCommand));
-    } catch (error: any) {
-      this.device.log.error(`Failed to send remote key ${tvCommand}: ${error.message || error}`);
-      this.device.log.debug(error.stack);
-
-      throw new this.platform.api.hap.HapStatusError(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
-    }
+    await this.handleSet(this.device.sendCommand(tvCommand), { errorMessage: `Failed to send remote key ${tvCommand}` });
   }
 
   private async getInput(): Promise<CharacteristicValue> {
@@ -90,26 +63,17 @@ export class TelevisionService {
 
   private async setInput(value: CharacteristicValue) {
     const targetIdentifier = value as number;
-
     const targetInput = this.accessory.inputs.find((input: InputService) => input.config.identifier === targetIdentifier);
 
     if (!targetInput) {
       this.device.log.warn(`Input with identifier ${targetIdentifier} not found.`);
-
-      throw new this.platform.api.hap.HapStatusError(this.platform.api.hap.HAPStatus.RESOURCE_DOES_NOT_EXIST);
+      this.throwStatusError(this.hap.HAPStatus.RESOURCE_DOES_NOT_EXIST);
     }
 
-    try {
-      await race(targetInput.setInput());
+    await this.handleSet(targetInput.setInput(), { errorMessage: `Failed to set input to ${targetInput.config.name}` });
 
-      if (targetInput.stateless) {
-        setTimeout(() => this.service.updateCharacteristic(this.characteristic.ActiveIdentifier, 0), 150);
-      }
-    } catch (error: any) {
-      this.device.log.error(`Failed to set input to ${targetInput.config.name}: ${error.message || error}`);
-      this.device.log.debug(error.stack);
-
-      throw new this.platform.api.hap.HapStatusError(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
+    if (targetInput.stateless) {
+      setTimeout(() => this.updateValue(this.characteristic.ActiveIdentifier, 0), 150);
     }
   }
 
@@ -135,9 +99,7 @@ export class TelevisionService {
         const isActive = await input.getInput();
 
         if (isActive) {
-          if (currentIdentifier !== input.config.identifier) {
-            this.service.updateCharacteristic(this.characteristic.ActiveIdentifier, input.config.identifier);
-          }
+          this.updateValue(this.characteristic.ActiveIdentifier, input.config.identifier);
           return;
         }
       } catch {}
@@ -145,6 +107,6 @@ export class TelevisionService {
       await sleep(100);
     }
 
-    this.service.updateCharacteristic(this.characteristic.ActiveIdentifier, 0);
+    this.updateValue(this.characteristic.ActiveIdentifier, 0);
   }
 }

@@ -1,25 +1,18 @@
-import { Characteristic, CharacteristicValue } from 'homebridge';
+import { CharacteristicValue } from 'homebridge';
 import { SwitchAccessory } from '../accessories/switch.js';
-import { Device } from '../device/device.js';
-import { IgnorableError, TvOfflineError } from '../errors.js';
+import { TvOfflineError } from '../errors.js';
 import { getSwitchOptions } from '../lib/switch.js';
-import { race, sleep } from '../lib/tools.js';
-import { SamsungPlatform } from '../platform.js';
+import { sleep } from '../lib/tools.js';
 import { LinkedService, SwitchOption } from '../types/index.js';
-import { updateValueIfChanged } from './helpers.js';
+import { ServiceWrapper } from './wrapper.js';
 
-export class SwitchService {
+export class SwitchService extends ServiceWrapper {
   public options: SwitchOption[];
   public stateless: boolean;
   public service: LinkedService;
-  private device: Device;
-  private platform: SamsungPlatform;
-  private characteristic: typeof Characteristic;
 
   constructor(private accessory: SwitchAccessory) {
-    this.device = this.accessory.device;
-    this.platform = this.accessory.platform;
-    this.characteristic = this.platform.api.hap.Characteristic;
+    super(accessory);
 
     this.options = getSwitchOptions(this.accessory, this.device, this);
     this.stateless = this.options.every((option) => !option.offable);
@@ -27,7 +20,7 @@ export class SwitchService {
     const prefixName = this.device.hasOption('Switch.DeviceName.Disable') ? '' : `${this.device.config.name} `;
     const switchName = prefixName + this.accessory.config.name;
 
-    this.service = new this.platform.api.hap.Service.Switch(switchName, `switch_${this.accessory.config.identifier}`).setCharacteristic(
+    this.service = new this.hap.Service.Switch(switchName, `switch_${this.accessory.config.identifier}`).setCharacteristic(
       this.characteristic.ConfiguredName,
       switchName,
     );
@@ -38,7 +31,7 @@ export class SwitchService {
   public async updateValue(value?: boolean): Promise<void> {
     const finalValue = value !== undefined ? value : await this.getSwitch();
 
-    updateValueIfChanged(this.service, this.characteristic.On, finalValue);
+    this.handleUpdateValue(this.characteristic.On, finalValue);
   }
 
   private async getSwitch(): Promise<CharacteristicValue> {
@@ -60,34 +53,23 @@ export class SwitchService {
       }
 
       return false;
-    } catch (error: any) {
-      this.device.log.debug(`Failed to get switch state: ${error.message || error}`);
+    } catch (error) {
+      this.device.log.debug(`Failed to get switch state: ${error?.message || error}`);
 
       return false;
     }
   }
 
   private async setSwitch(value: CharacteristicValue) {
-    const switchValue = value as boolean;
-
-    try {
-      await race(this.runSwitch(switchValue));
-    } catch (error: any) {
-      if (error instanceof IgnorableError) {
-        this.device.log.debug(`Ignoring switch command: ${error.message}`);
-        return;
-      }
-
-      this.device.log.error(`Failed to set switch state: ${error.message || error}`);
-      this.device.log.debug(error.stack);
-
-      if (error instanceof TvOfflineError) {
-        setTimeout(() => this.updateValue(false), 100);
-        return;
-      }
-
-      throw new this.platform.api.hap.HapStatusError(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
-    }
+    await this.handleSet(this.runSwitch(value as boolean), {
+      errorMessage: 'Failed to set switch state',
+      onError: (error) => {
+        if (error instanceof TvOfflineError) {
+          setTimeout(() => this.updateValue(false), 100);
+          return true;
+        }
+      },
+    });
   }
 
   private async runSwitch(value: boolean): Promise<void> {

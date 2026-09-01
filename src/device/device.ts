@@ -110,7 +110,7 @@ export class Device extends EventEmitter<DeviceEvents> {
 
       this.accessories.forEach((accessory) => {
         Object.values(accessory.services).forEach((wrapper) => {
-          wrapper.updateValue?.();
+          void wrapper.updateValue();
         });
       });
     });

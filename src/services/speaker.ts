@@ -1,24 +1,16 @@
-import { Characteristic, CharacteristicValue } from 'homebridge';
+import { CharacteristicValue } from 'homebridge';
 import { TelevisionAccessory } from '../accessories/television.js';
-import { Device } from '../device/device.js';
-import { race } from '../lib/tools.js';
-import { SamsungPlatform } from '../platform.js';
 import { LinkedService } from '../types/index.js';
-import { updateValueIfChanged } from './helpers.js';
+import { ServiceWrapper } from './wrapper.js';
 
-export class SpeakerService {
+export class SpeakerService extends ServiceWrapper {
   public service: LinkedService;
-  private device: Device;
-  private platform: SamsungPlatform;
-  private characteristic: typeof Characteristic;
 
-  constructor(private accessory: TelevisionAccessory) {
-    this.device = this.accessory.device;
-    this.platform = this.accessory.platform;
-    this.characteristic = this.platform.api.hap.Characteristic;
+  constructor(accessory: TelevisionAccessory) {
+    super(accessory);
 
     // Create the service and force ABSOLUTE volume control type (0-100)
-    this.service = new this.platform.api.hap.Service.TelevisionSpeaker(`${this.device.config.name} Volume`).setCharacteristic(
+    this.service = new this.hap.Service.TelevisionSpeaker(`${this.device.config.name} Volume`).setCharacteristic(
       this.characteristic.VolumeControlType,
       this.characteristic.VolumeControlType.ABSOLUTE,
     );
@@ -31,8 +23,8 @@ export class SpeakerService {
   }
 
   public async updateValue(): Promise<void> {
-    updateValueIfChanged(this.service, this.characteristic.Mute, await this.getMute());
-    updateValueIfChanged(this.service, this.characteristic.Volume, await this.getVolume());
+    this.handleUpdateValue(this.characteristic.Mute, await this.getMute());
+    this.handleUpdateValue(this.characteristic.Volume, await this.getVolume());
   }
 
   /**
@@ -46,14 +38,7 @@ export class SpeakerService {
    * Handles the Mute toggle from HomeKit
    */
   private async setMute(value: CharacteristicValue): Promise<void> {
-    try {
-      await race(this.device.setMute(value as boolean));
-    } catch (error: any) {
-      this.device.log.error(`Failed to set mute: ${error.message || error}`);
-      this.device.log.debug(error.stack);
-
-      throw new this.platform.api.hap.HapStatusError(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
-    }
+    await this.handleSet(this.device.setMute(value as boolean), { errorMessage: 'Failed to set mute' });
   }
 
   /**
@@ -67,33 +52,22 @@ export class SpeakerService {
    * Handles direct percentage inputs (0-100) via Siri or Automations
    */
   private async setVolume(value: CharacteristicValue): Promise<void> {
-    try {
-      await race(this.device.setVolume(value as number));
-    } catch (error: any) {
-      this.device.log.error(`Failed to set volume to ${value}: ${error.message || error}`);
-      this.device.log.debug(error.stack);
-
-      throw new this.platform.api.hap.HapStatusError(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
-    }
+    await this.handleSet(this.device.setVolume(value as number), { errorMessage: `Failed to set volume to ${value}` });
   }
 
   /**
    * Handles physical Volume Up / Volume Down buttons from iOS Remote
    */
   private async setVolumeSelector(value: CharacteristicValue): Promise<void> {
-    try {
-      const direction = value as number;
+    const command = {
+      [this.characteristic.VolumeSelector.INCREMENT]: 'KEY_VOLUP',
+      [this.characteristic.VolumeSelector.DECREMENT]: 'KEY_VOLDOWN',
+    }[value as number];
 
-      if (direction === this.characteristic.VolumeSelector.INCREMENT) {
-        await race(this.device.sendCommand('KEY_VOLUP'));
-      } else if (direction === this.characteristic.VolumeSelector.DECREMENT) {
-        await race(this.device.sendCommand('KEY_VOLDOWN'));
-      }
-    } catch (error: any) {
-      this.device.log.error(`Failed to send volume step: ${error.message || error}`);
-      this.device.log.debug(error.stack);
-
-      throw new this.platform.api.hap.HapStatusError(this.platform.api.hap.HAPStatus.SERVICE_COMMUNICATION_FAILURE);
+    if (!command) {
+      return;
     }
+
+    await this.handleSet(this.device.sendCommand(command), { errorMessage: 'Failed to send volume step' });
   }
 }
