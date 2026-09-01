@@ -77,7 +77,7 @@ export class TelevisionService {
   private async getInput(): Promise<CharacteristicValue> {
     const currentIdentifier = (this.service.getCharacteristic(this.characteristic.ActiveIdentifier).value as number) || 0;
 
-    this.runAsyncInputUpdate().catch();
+    this.runAsyncInputUpdate().catch(() => {});
 
     return currentIdentifier;
   }

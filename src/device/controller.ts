@@ -115,7 +115,7 @@ export class DeviceController {
           }
 
           if (onComplete) {
-            Promise.resolve(onComplete()).catch();
+            Promise.resolve(onComplete()).catch(() => {});
           }
         } catch (error: any) {
           this.device.log.error(`[Sleep] Failed to execute auto power off: ${error.message}`);
