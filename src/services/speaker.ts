@@ -10,11 +10,11 @@ export class SpeakerService extends ServiceWrapper {
     super(accessory);
 
     // Create the service and force ABSOLUTE volume control type (0-100)
-    this.service = new this.hap.Service.TelevisionSpeaker(`${this.device.config.name} Volume`).setCharacteristic(
-      this.characteristic.VolumeControlType,
-      this.characteristic.VolumeControlType.ABSOLUTE,
-    );
+    this.service = new this.hap.Service.TelevisionSpeaker(`${this.device.config.name} Volume`)
+      .setCharacteristic(this.characteristic.VolumeControlType, this.characteristic.VolumeControlType.ABSOLUTE)
+      .setCharacteristic(this.characteristic.Active, this.getActive());
 
+    this.service.getCharacteristic(this.characteristic.Active).onGet(this.getActive.bind(this));
     this.service.getCharacteristic(this.characteristic.Mute).onGet(this.getMute.bind(this)).onSet(this.setMute.bind(this));
     this.service.getCharacteristic(this.characteristic.Volume).onGet(this.getVolume.bind(this)).onSet(this.setVolume.bind(this));
     this.service.getCharacteristic(this.characteristic.VolumeSelector).onSet(this.setVolumeSelector.bind(this));
@@ -23,8 +23,13 @@ export class SpeakerService extends ServiceWrapper {
   }
 
   public async updateValue(): Promise<void> {
+    this.handleUpdateValue(this.characteristic.Active, this.getActive());
     this.handleUpdateValue(this.characteristic.Mute, await this.getMute());
     this.handleUpdateValue(this.characteristic.Volume, await this.getVolume());
+  }
+
+  private getActive(): CharacteristicValue {
+    return this.device.power ? this.characteristic.Active.ACTIVE : this.characteristic.Active.INACTIVE;
   }
 
   /**
