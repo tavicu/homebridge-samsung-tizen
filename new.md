@@ -1,4 +1,0 @@
-- Migrate to ESM
-- Update dependenceies to latest version
-- Use DMR to get the status of device instant
--

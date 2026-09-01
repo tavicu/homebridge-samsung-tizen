@@ -1,5 +1,48 @@
 # Change Log
 
+## 6.0.0
+
+This is a full rewrite of the plugin in TypeScript. Your existing devices are kept, you don't have to add the TVs in Home app again, but a few settings changed and SmartThings has to be authorized again.
+
+**Requirements**
+
+* Node.js 22.10 or newer
+* Homebridge 1.8 or newer (Homebridge 2.0 is supported)
+
+**New**
+
+* The plugin is now written in TypeScript and shipped as an ES module.
+* Brand new configuration interface for Config UI X, built with Vue: add, edit and delete devices, inputs and switches without touching the JSON config. Requires Config UI X v5.27.0 or newer.
+* The state of the TV is now updated in real time through SSDP announcements, without asking the TV over and over.
+* Volume and mute are read in real time from the TV through DMR (UPnP) events, so the values in Home app follow the physical remote.
+* Absolute volume control is now available without SmartThings.
+* New `Device.Disable` option, so a device can be turned off from the plugin without deleting its configuration.
+* `keys`, `inputs`, `switches` and `wol` can now be configured once at plugin level and are inherited by every device. Anything set on a device still wins.
+* Rewind, Fast Forward and Exit now work in the iOS remote. Next Track and Previous Track can be mapped through the `keys` setting, they have no default because Samsung has no matching command.
+* All dependencies were updated to their latest versions.
+
+**SmartThings uses a new authorization flow**
+
+SmartThings dropped support for the personal access tokens that never expire, so the `api_key` setting is gone. The plugin now uses the official OAuth flow: you create a SmartThings app once, fill in the client ID and client secret, and the plugin refreshes the access token on its own. There is a step by step wizard in the new configuration interface. Until you go through it, every feature that depends on SmartThings (inputs that select a source, picture mode, and changing channels through the API) stays unavailable.
+
+**Settings that are no longer used**
+
+These were removed and are ignored if they are still present in your configuration:
+
+* `refresh` - the plugin no longer polls the TV, the state arrives through SSDP and DMR events.
+* `delay`, `timeout` and `wait_time` - these timings are now handled internally.
+* `method` and `port` - the connection to the TV is detected automatically.
+* `api_key` - replaced by the SmartThings authorization flow described above.
+
+**Changed**
+
+* A custom switch that has more than one option with a state, for example `sleep` together with `mute`, now shows as ON when any of those options is active. Before, all of them had to be active at the same time.
+* `device_id` was renamed to `deviceId`. The old name still works.
+
+**Not available yet**
+
+* Support for Frame TVs is not implemented in this version. The `Art Mode` and `Power` switches, the `art` input type and the `Frame.RealPowerMode`, `Frame.ArtSwitch.Disable` and `Frame.PowerSwitch.Disable` options are not available for now.
+
 ## 5.2.6
 
 * By default all custom switches have the main accessory name prepended. We have added the option to disable this. Read [the documentation](https://tavicu.github.io/homebridge-samsung-tizen/configuration/device-settings.html#options) to see how to do it. 

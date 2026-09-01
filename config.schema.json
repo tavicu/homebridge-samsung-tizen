@@ -50,12 +50,17 @@
       "keys": {
         "type": "object",
         "properties": {
+          "REWIND": { "type": "string" },
+          "FAST_FORWARD": { "type": "string" },
+          "NEXT_TRACK": { "type": "string" },
+          "PREVIOUS_TRACK": { "type": "string" },
           "ARROW_UP": { "type": "string" },
           "ARROW_DOWN": { "type": "string" },
           "ARROW_LEFT": { "type": "string" },
           "ARROW_RIGHT": { "type": "string" },
           "SELECT": { "type": "string" },
           "BACK": { "type": "string" },
+          "EXIT": { "type": "string" },
           "PLAY_PAUSE": { "type": "string" },
           "INFORMATION": { "type": "string" }
         }
