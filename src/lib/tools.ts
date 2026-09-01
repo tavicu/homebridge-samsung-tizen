@@ -16,6 +16,9 @@ export const retry = async <T>(run: () => Promise<T>, { retries = 3, delay = 100
 };
 
 export const race = <T>(promise: Promise<T>, timeout = 2500): Promise<T | void> => {
+  // Prevents an unhandled rejection if `promise` rejects after `timeoutPromise` already won the race.
+  promise.catch(() => {});
+
   const timeoutPromise = new Promise<void>((resolve) => setTimeout(resolve, timeout));
   return Promise.race([promise, timeoutPromise]);
 };
