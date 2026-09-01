@@ -62,6 +62,10 @@ export class InputService {
   public async getInput(): Promise<boolean> {
     const { type, value } = this.config;
 
+    if (!value) {
+      return false;
+    }
+
     if (type === 'app') {
       try {
         const application = await this.device.getApplication(value);
@@ -85,6 +89,11 @@ export class InputService {
 
   private async runInput(): Promise<void> {
     const { value, type } = this.config;
+
+    if (!value) {
+      this.device.log.error(`No value is set for input "${this.config.name}" in config.`);
+      return;
+    }
 
     switch (type) {
       case 'app':
