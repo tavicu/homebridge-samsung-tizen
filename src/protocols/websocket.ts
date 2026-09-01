@@ -50,7 +50,7 @@ export class WebSocket {
 
     return new Promise((resolve, reject) => {
       if (this.ws?.readyState !== WsClient.OPEN) {
-        return reject();
+        return reject(new Error('Socket is not open'));
       }
 
       this.ws.send(JSON.stringify(data), (error) => {
@@ -96,6 +96,7 @@ export class WebSocket {
       });
 
       socket.on('close', () => {
+        this.forgetSocket(socket);
         reject(new Error('Socket closed during connection'));
       });
 
@@ -104,6 +105,7 @@ export class WebSocket {
       });
 
       socket.on('error', (error) => {
+        this.forgetSocket(socket);
         reject(error);
       });
 
@@ -146,6 +148,15 @@ export class WebSocket {
 
     await sleep(1000);
     await this.connect();
+  }
+
+  private forgetSocket(socket: WsClient) {
+    if (this.ws !== socket) {
+      return;
+    }
+
+    clearTimeout(this.heartbeatTimeout);
+    this.ws = null;
   }
 
   private disconnect() {
