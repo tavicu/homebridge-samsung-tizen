@@ -33,7 +33,7 @@ export type SwitchConfig = {
   volume?: number;
   app?: string;
   input?: string;
-  channel: number;
+  channel?: number;
   picture_mode?: string;
   command?: string;
 };
