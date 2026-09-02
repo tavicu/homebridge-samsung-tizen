@@ -4,22 +4,24 @@ import path from 'path';
 import { HomebridgePluginUiServer } from '@homebridge/plugin-ui-utils';
 
 class PluginUiServer extends HomebridgePluginUiServer {
+  #storagePath;
+
   constructor() {
     super();
 
-    this.storagePath = path.join(this.homebridgeStoragePath, 'accessories', 'samsung-tizen.json');
+    this.#storagePath = path.join(this.homebridgeStoragePath, 'accessories', 'samsung-tizen.json');
 
-    this.onRequest('/smartthings/auth-url', this.authUrl.bind(this));
-    this.onRequest('/smartthings/auth-token', this.authToken.bind(this));
-    this.onRequest('/smartthings/save-token', this.saveToken.bind(this));
-    this.onRequest('/smartthings/get-token', this.getToken.bind(this));
-    this.onRequest('/smartthings/disconnect', this.disconnect.bind(this));
-    this.onRequest('/smartthings/get-devices', this.getDevices.bind(this));
+    this.onRequest('/smartthings/auth-url', this.stAuthUrl.bind(this));
+    this.onRequest('/smartthings/auth-token', this.stAuthToken.bind(this));
+    this.onRequest('/smartthings/save-token', this.stSaveToken.bind(this));
+    this.onRequest('/smartthings/get-token', this.stGetToken.bind(this));
+    this.onRequest('/smartthings/disconnect', this.stDisconnect.bind(this));
+    this.onRequest('/smartthings/get-devices', this.stGetDevices.bind(this));
 
     this.ready();
   }
 
-  async authUrl(config) {
+  async stAuthUrl(config) {
     const { clientId, clientSecret } = config;
 
     if (!clientId || !clientSecret) {
@@ -32,7 +34,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
     return `https://api.smartthings.com/oauth/authorize?client_id=${clientId}&response_type=code&redirect_uri=${encodeURIComponent(redirectUrl)}&scope=${scopes}`;
   }
 
-  async authToken(config) {
+  async stAuthToken(config) {
     const { clientId, clientSecret, authorizationCode } = config;
 
     if (!clientId || !clientSecret || !authorizationCode) {
@@ -61,8 +63,8 @@ class PluginUiServer extends HomebridgePluginUiServer {
     return data;
   }
 
-  async saveToken(data) {
-    const storedData = await this.patchStoredData({
+  async stSaveToken(data) {
+    const storedData = await this.#patchStoredData({
       smartthings: {
         accessToken: data.access_token,
         refreshToken: data.refresh_token,
@@ -73,21 +75,21 @@ class PluginUiServer extends HomebridgePluginUiServer {
     return storedData;
   }
 
-  async getToken() {
-    const storedData = await this.readStoredData();
+  async stGetToken() {
+    const storedData = await this.#readStoredData();
     const stData = storedData?.smartthings;
 
     return Object.keys(stData || {}).length ? stData : null;
   }
 
-  async disconnect() {
-    await this.patchStoredData({ smartthings: undefined });
+  async stDisconnect() {
+    await this.#patchStoredData({ smartthings: undefined });
 
     return null;
   }
 
-  async getDevices() {
-    const stData = await this.getToken();
+  async stGetDevices() {
+    const stData = await this.stGetToken();
 
     if (!stData?.accessToken) {
       return [];
@@ -109,11 +111,11 @@ class PluginUiServer extends HomebridgePluginUiServer {
     }
   }
 
-  async readStoredData() {
+  async #readStoredData() {
     let raw;
 
     try {
-      raw = await fs.readFile(this.storagePath, 'utf-8');
+      raw = await fs.readFile(this.#storagePath, 'utf-8');
     } catch (error) {
       if (error.code === 'ENOENT') {
         return {};
@@ -136,13 +138,13 @@ class PluginUiServer extends HomebridgePluginUiServer {
     }
   }
 
-  async patchStoredData(partial) {
-    await fs.mkdir(path.dirname(this.storagePath), { recursive: true });
+  async #patchStoredData(partial) {
+    await fs.mkdir(path.dirname(this.#storagePath), { recursive: true });
 
     let storedData;
 
     try {
-      storedData = await this.readStoredData();
+      storedData = await this.#readStoredData();
     } catch (error) {
       if (error.code !== 'EBADCACHE') {
         throw error;
@@ -150,17 +152,17 @@ class PluginUiServer extends HomebridgePluginUiServer {
 
       // Unreadable content can never be merged and retrying will not fix it, so keep the
       // file aside for manual recovery instead of blocking the write on it.
-      await fs.rename(this.storagePath, `${this.storagePath}.invalid.${Date.now()}`);
+      await fs.rename(this.#storagePath, `${this.#storagePath}.invalid.${Date.now()}`);
       storedData = {};
     }
 
     const nextData = Object.fromEntries(Object.entries({ ...storedData, ...partial }).filter(([, value]) => value !== undefined));
 
-    const tmpPath = `${this.storagePath}.tmp`;
+    const tmpPath = `${this.#storagePath}.tmp`;
 
     try {
       await fs.writeFile(tmpPath, JSON.stringify(nextData, null, 2), 'utf-8');
-      await fs.rename(tmpPath, this.storagePath);
+      await fs.rename(tmpPath, this.#storagePath);
     } catch (error) {
       await fs.unlink(tmpPath).catch(() => {});
       throw error;
