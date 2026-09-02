@@ -7,7 +7,7 @@ import { useRouter } from '../composables/useRouter';
 import { useToast } from '../composables/useToast';
 
 const { currentParams, navigateTo } = useRouter();
-const { disableSaveButton } = useHomebridge();
+const { disableSaveButton, hideModalFooter } = useHomebridge();
 const toast = useToast();
 
 const action = computed(() => currentParams.value?.action || 'add');
@@ -15,6 +15,7 @@ const switchIndex = computed(() => currentParams.value?.switchIndex);
 const deviceIndex = computed(() => currentParams.value?.deviceIndex);
 
 onMounted(() => {
+  hideModalFooter();
   disableSaveButton();
 });
 

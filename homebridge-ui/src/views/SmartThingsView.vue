@@ -6,12 +6,13 @@ import SmartThingsWizard from '../components/SmartThingsWizard.vue';
 import { useHomebridge } from '../composables/useHomebridge';
 import { useRouter } from '../composables/useRouter';
 
-const { disableSaveButton } = useHomebridge();
+const { disableSaveButton, hideModalFooter } = useHomebridge();
 const { currentParams } = useRouter();
 
 const action = computed(() => currentParams.value?.action);
 
 onMounted(() => {
+  hideModalFooter();
   disableSaveButton();
 });
 </script>

@@ -1,3 +1,17 @@
+function getHostModalFooter() {
+  try {
+    const iframe = window.frameElement;
+    if (!iframe) {
+      return null;
+    }
+
+    const modalContent = iframe.closest('.modal-content');
+    return modalContent?.querySelector(':scope > .modal-footer') ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export function useHomebridge() {
   const hb = window.homebridge;
 
@@ -7,6 +21,16 @@ export function useHomebridge() {
 
   function disableSaveButton() {
     hb?.disableSaveButton();
+  }
+
+  function hideModalFooter() {
+    const footer = getHostModalFooter();
+    footer?.style.setProperty('display', 'none');
+  }
+
+  function showModalFooter() {
+    const footer = getHostModalFooter();
+    footer?.style.removeProperty('display');
   }
 
   function showSpinner() {
@@ -29,6 +53,8 @@ export function useHomebridge() {
     hb,
     enableSaveButton,
     disableSaveButton,
+    hideModalFooter,
+    showModalFooter,
     showSpinner,
     hideSpinner,
     showSchemaForm,

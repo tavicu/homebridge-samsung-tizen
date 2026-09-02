@@ -8,9 +8,10 @@ import { useHomebridge } from '../composables/useHomebridge';
 import { useRouter } from '../composables/useRouter';
 
 const { navigateTo } = useRouter();
-const { enableSaveButton } = useHomebridge();
+const { enableSaveButton, showModalFooter } = useHomebridge();
 
 onMounted(() => {
+  showModalFooter();
   enableSaveButton();
 });
 </script>

@@ -2,18 +2,19 @@
 import { computed, onMounted, watch } from 'vue';
 import DeviceDelete from '../components/DeviceDelete.vue';
 import DeviceForm from '../components/DeviceForm.vue';
-import { useRouter } from '../composables/useRouter';
 import { useHomebridge } from '../composables/useHomebridge';
+import { useRouter } from '../composables/useRouter';
 import { useToast } from '../composables/useToast';
 
 const { currentParams, navigateTo } = useRouter();
-const { disableSaveButton } = useHomebridge();
+const { disableSaveButton, hideModalFooter } = useHomebridge();
 const toast = useToast();
 
 const action = computed(() => currentParams.value?.action || 'add');
 const deviceIndex = computed(() => currentParams.value?.deviceIndex);
 
 onMounted(() => {
+  hideModalFooter();
   disableSaveButton();
 });
 
