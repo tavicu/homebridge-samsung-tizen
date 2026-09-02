@@ -60,33 +60,85 @@ class PluginUiServer extends HomebridgePluginUiServer {
   }
 
   async saveToken(data) {
-    const storedData = await this.getStoredData();
-
-    storedData.smartthings = {
-      accessToken: data.access_token,
-      refreshToken: data.refresh_token,
-      expiresAt: Date.now() + data.expires_in * 1000,
-    };
-
-    await fs.writeFile(this.storagePath, JSON.stringify(storedData, null, 2), 'utf-8');
+    const storedData = await this.patchStoredData({
+      smartthings: {
+        accessToken: data.access_token,
+        refreshToken: data.refresh_token,
+        expiresAt: Date.now() + data.expires_in * 1000,
+      },
+    });
 
     return storedData;
   }
 
   async getToken() {
-    const storedData = await this.getStoredData();
+    const storedData = await this.readStoredData();
     const stData = storedData?.smartthings;
 
     return Object.keys(stData || {}).length ? stData : null;
   }
 
-  async getStoredData() {
+  async readStoredData() {
+    let raw;
+
     try {
-      const data = await fs.readFile(this.storagePath, 'utf-8');
-      return JSON.parse(data);
+      raw = await fs.readFile(this.storagePath, 'utf-8');
     } catch (error) {
-      return {};
+      if (error.code === 'ENOENT') {
+        return {};
+      }
+
+      throw error;
     }
+
+    try {
+      const parsed = JSON.parse(raw);
+
+      if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
+        throw new Error('Plugin storage file is not a valid JSON object');
+      }
+
+      return parsed;
+    } catch (error) {
+      error.code = 'EBADCACHE';
+      throw error;
+    }
+  }
+
+  async patchStoredData(partial) {
+    await fs.mkdir(path.dirname(this.storagePath), { recursive: true });
+
+    let storedData;
+
+    try {
+      storedData = await this.readStoredData();
+    } catch (error) {
+      if (error.code !== 'EBADCACHE') {
+        throw error;
+      }
+
+      // Unreadable content can never be merged and retrying will not fix it, so keep the
+      // file aside for manual recovery instead of blocking the write on it.
+      await fs.rename(this.storagePath, `${this.storagePath}.invalid.${Date.now()}`);
+      storedData = {};
+    }
+
+    const nextData = {
+      ...storedData,
+      ...partial,
+    };
+
+    const tmpPath = `${this.storagePath}.tmp`;
+
+    try {
+      await fs.writeFile(tmpPath, JSON.stringify(nextData, null, 2), 'utf-8');
+      await fs.rename(tmpPath, this.storagePath);
+    } catch (error) {
+      await fs.unlink(tmpPath).catch(() => {});
+      throw error;
+    }
+
+    return nextData;
   }
 }
 
