@@ -220,19 +220,32 @@ watch(
       </div>
 
       <div v-if="form.type === 'input'">
-        <label for="value-input" class="form-label">Input Value <strong class="text-danger">*</strong></label>
-        <input id="value-input" v-model="form.valueInput" type="text" class="form-control" placeholder="e.g. digitalTv" required />
-        <div class="invalid-feedback">Please enter a valid input value.</div>
-        <small class="form-text text-muted">
-          This type of input requires a SmartThings connection. Possible values for this input type: digitalTv, USB, HDMI1, HDMI2, HDMI3, HDMI4, HDMI5, HDMI6
-        </small>
+        <label for="value-input" class="form-label">Input Source <strong class="text-danger">*</strong></label>
+        <select id="value-input" v-model="form.valueInput" class="form-select" required>
+          <option disabled value="">Choose input source ...</option>
+          <option value="digitalTv">Digital TV</option>
+          <option value="HDMI1">HDMI 1</option>
+          <option value="HDMI2">HDMI 2</option>
+          <option value="HDMI3">HDMI 3</option>
+          <option value="HDMI4">HDMI 4</option>
+          <option value="HDMI5">HDMI 5</option>
+          <option value="HDMI6">HDMI 6</option>
+          <option value="USB">USB</option>
+          <option value="USB-C">USB-C</option>
+          <option value="Display Port">Display Port</option>
+        </select>
+        <div class="invalid-feedback">Please choose an input source.</div>
+        <small class="form-text text-muted">Requires a SmartThings connection.</small>
       </div>
 
       <div v-if="form.type === 'app'">
         <label for="value-app" class="form-label">Application ID <strong class="text-danger">*</strong></label>
         <input id="value-app" v-model="form.valueApp" type="text" class="form-control" placeholder="e.g. 111299001912" pattern="^[0-9]+$" inputmode="numeric" required />
         <div class="invalid-feedback">Please enter a valid application ID.</div>
-        <small class="form-text text-muted">You can find a list with available application IDs over here.</small>
+        <small class="form-text text-muted">
+          You can find a list of available application IDs in the
+          <a href="https://tavicu.github.io/homebridge-samsung-tizen/extra/applications.html" target="_blank" rel="noopener noreferrer">documentation</a>.
+        </small>
       </div>
 
       <div v-if="form.type === 'command'">

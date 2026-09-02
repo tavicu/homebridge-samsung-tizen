@@ -285,7 +285,10 @@ watch(
         <div class="col-md-6">
           <label for="app" class="form-label">Application ID <span class="text-muted">(optional)</span></label>
           <input id="app" v-model="form.app" type="text" class="form-control" placeholder="e.g. 111299001912" pattern="^[0-9]+$" inputmode="numeric" />
-          <small class="form-text text-muted">Opens the selected application.</small>
+          <small class="form-text text-muted">
+            Opens the selected application. See the
+            <a href="https://tavicu.github.io/homebridge-samsung-tizen/extra/applications.html" target="_blank" rel="noopener noreferrer">application IDs list</a>.
+          </small>
         </div>
         <div class="col-md-6">
           <label for="channel" class="form-label">Channel <span class="text-muted">(optional)</span></label>
@@ -296,14 +299,26 @@ watch(
       <div class="row mb-3">
         <div class="col-md-6">
           <label for="input" class="form-label">Input Source <span class="text-muted">(optional)</span></label>
-          <input id="input" v-model="form.input" type="text" class="form-control" placeholder="e.g. HDMI1" />
-          <small class="form-text text-muted">Requires SmartThings. Examples: digitalTv, HDMI1, HDMI2.</small>
+          <select id="input" v-model="form.input" class="form-select">
+            <option value="">None</option>
+            <option value="digitalTv">Digital TV</option>
+            <option value="HDMI1">HDMI 1</option>
+            <option value="HDMI2">HDMI 2</option>
+            <option value="HDMI3">HDMI 3</option>
+            <option value="HDMI4">HDMI 4</option>
+            <option value="HDMI5">HDMI 5</option>
+            <option value="HDMI6">HDMI 6</option>
+            <option value="USB">USB</option>
+            <option value="USB-C">USB-C</option>
+            <option value="Display Port">Display Port</option>
+          </select>
+          <small class="form-text text-muted">Requires SmartThings.</small>
         </div>
 
         <div class="col-md-6">
           <label for="picture_mode" class="form-label">Picture Mode <span class="text-muted">(optional)</span></label>
           <input id="picture_mode" v-model="form.picture_mode" type="text" class="form-control" placeholder="e.g. movie" />
-          <small class="form-text text-muted">Requires SmartThings.</small>
+          <small class="form-text text-muted">Requires SmartThings. Enter the exact name shown on the TV (for example movie, standard, or dynamic). Names vary by model.</small>
         </div>
       </div>
 

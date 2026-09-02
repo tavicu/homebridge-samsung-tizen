@@ -14,6 +14,7 @@ This is a full rewrite of the plugin in TypeScript. Your existing devices are ke
 - The plugin is now written in TypeScript and shipped as an ES module.
 - Brand new configuration interface for Config UI X, built with Vue: add, edit and delete devices, inputs and switches without touching the JSON config. Requires Config UI X v5.27.0 or newer.
 - When SmartThings is connected, the device form lists TVs from your account so you can pick a Device ID instead of typing the UUID. Other still opens the manual field.
+- Input source is a dropdown in the configuration interface (Digital TV, HDMI 1–6, USB, USB-C, Display Port), on both inputs and switches.
 - The state of the TV is now updated in real time through SSDP announcements. If those announcements never arrive or stop without a goodbye, the plugin falls back to checking whether the TV is reachable.
 - Volume and mute are read in real time from the TV through DMR (UPnP) events, so the values in Home app follow the physical remote.
 - Absolute volume control is now available without SmartThings.
