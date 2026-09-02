@@ -61,7 +61,7 @@ export class InputService {
   public async getInput(): Promise<boolean> {
     const { type, value } = this.config;
 
-    if (!value) {
+    if (!value || typeof value !== 'string') {
       return false;
     }
 
@@ -89,11 +89,11 @@ export class InputService {
 
     switch (type) {
       case 'app':
-        await this.device.startApplication(value);
+        await this.device.startApplication(value as string);
         break;
 
       case 'input':
-        await this.device.setInputSource(value);
+        await this.device.setInputSource(value as string);
         break;
 
       case 'command':

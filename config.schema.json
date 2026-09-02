@@ -18,7 +18,15 @@
           "properties": {
             "type": { "type": "string" },
             "name": { "type": "string" },
-            "value": { "type": "string" }
+            "value": {
+              "oneOf": [
+                { "type": "string" },
+                {
+                  "type": "array",
+                  "items": { "type": "string" }
+                }
+              ]
+            }
           }
         }
       },
@@ -38,10 +46,13 @@
             "channel": { "type": "integer" },
             "picture_mode": { "type": "string" },
             "command": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
+              "oneOf": [
+                { "type": "string" },
+                {
+                  "type": "array",
+                  "items": { "type": "string" }
+                }
+              ]
             }
           }
         }

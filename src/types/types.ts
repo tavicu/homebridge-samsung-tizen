@@ -20,7 +20,7 @@ export type PlatformConfig = {
 export type InputConfig = {
   name: string;
   type: 'app' | 'input' | 'command';
-  value: string;
+  value: string | string[];
   identifier: number;
 };
 
@@ -35,7 +35,7 @@ export type SwitchConfig = {
   input?: string;
   channel?: number;
   picture_mode?: string;
-  command?: string;
+  command?: string | string[];
 };
 
 export type SwitchOption = {
