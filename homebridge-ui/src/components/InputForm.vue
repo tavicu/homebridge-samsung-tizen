@@ -141,6 +141,8 @@ async function persistInputs(nextInputs) {
 }
 
 async function handleSubmit() {
+  form.name = form.name.trim();
+
   if (!formEl.value?.checkValidity()) {
     validated.value = true;
     return;
@@ -204,7 +206,7 @@ watch(
     <div class="card-body">
       <div class="mb-3">
         <label for="name" class="form-label">Input Name <strong class="text-danger">*</strong></label>
-        <input id="name" v-model="form.name" type="text" class="form-control" placeholder="e.g. YouTube" pattern="^[a-zA-Z0-9 ]+$" required />
+        <input id="name" v-model="form.name" type="text" class="form-control" placeholder="e.g. YouTube" maxlength="64" required />
         <div class="invalid-feedback">Please enter a valid input name.</div>
       </div>
 
