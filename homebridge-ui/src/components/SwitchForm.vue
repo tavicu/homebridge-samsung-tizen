@@ -333,6 +333,9 @@ watch(
           </div>
         </div>
         <button type="button" class="btn btn-outline-primary mt-2" @click="addCommand"><i class="fas fa-plus" /> Add Command</button>
+        <small class="form-text text-muted d-block mt-2">
+          Repeat a key with <code>KEY_VOLUP*3</code>. Hold it with <code>KEY_POWER*2.5s</code> (time in seconds).
+        </small>
       </div>
     </div>
 
