@@ -13,6 +13,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
     this.onRequest('/smartthings/auth-token', this.authToken.bind(this));
     this.onRequest('/smartthings/save-token', this.saveToken.bind(this));
     this.onRequest('/smartthings/get-token', this.getToken.bind(this));
+    this.onRequest('/smartthings/disconnect', this.disconnect.bind(this));
 
     this.ready();
   }
@@ -78,6 +79,12 @@ class PluginUiServer extends HomebridgePluginUiServer {
     return Object.keys(stData || {}).length ? stData : null;
   }
 
+  async disconnect() {
+    await this.patchStoredData({ smartthings: undefined });
+
+    return null;
+  }
+
   async readStoredData() {
     let raw;
 
@@ -123,10 +130,9 @@ class PluginUiServer extends HomebridgePluginUiServer {
       storedData = {};
     }
 
-    const nextData = {
-      ...storedData,
-      ...partial,
-    };
+    const nextData = Object.fromEntries(
+      Object.entries({ ...storedData, ...partial }).filter(([, value]) => value !== undefined),
+    );
 
     const tmpPath = `${this.storagePath}.tmp`;
 

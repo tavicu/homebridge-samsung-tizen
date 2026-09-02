@@ -31,6 +31,7 @@ function formatDate(timestamp) {
       <div>Connected</div>
       <p>Your account is authorized and active. Devices are synchronized via the SmartThings API.</p>
       <button type="button" class="btn btn-primary" @click="navigateTo('smartthings')"><i class="fas fa-pen me-1" /> Edit Credentials</button>
+      <button type="button" class="btn btn-outline-danger" @click="navigateTo('smartthings', { action: 'disconnect' })">Disconnect</button>
     </template>
 
     <template v-else-if="smartthings && isExpired">
@@ -41,6 +42,7 @@ function formatDate(timestamp) {
       </p>
       <p>You can re-authorize using your existing credentials or update them if your Client ID or Secret has changed.</p>
       <button type="button" class="btn btn-danger" @click="navigateTo('smartthings')"><i class="fas fa-arrows-rotate me-1" /> Re-authorize SmartThings</button>
+      <button type="button" class="btn btn-outline-secondary" @click="navigateTo('smartthings', { action: 'disconnect' })">Disconnect</button>
     </template>
 
     <template v-else>

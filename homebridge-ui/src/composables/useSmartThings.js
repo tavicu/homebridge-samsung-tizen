@@ -31,6 +31,11 @@ export function useSmartThings() {
     return serverRequest('/smartthings/save-token', token);
   }
 
+  async function disconnect() {
+    await serverRequest('/smartthings/disconnect');
+    smartthings.value = null;
+  }
+
   const isExpired = computed(() => {
     if (!smartthings.value?.expiresAt) {
       return true;
@@ -47,5 +52,6 @@ export function useSmartThings() {
     getAuthToken,
     getToken,
     saveToken,
+    disconnect,
   };
 }

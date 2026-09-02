@@ -1,9 +1,15 @@
 <script setup>
-import { onMounted } from 'vue';
+import { computed, onMounted } from 'vue';
+import SmartThingsIcon from '../assets/icons/smartthings.svg';
+import SmartThingsDisconnect from '../components/SmartThingsDisconnect.vue';
 import SmartThingsWizard from '../components/SmartThingsWizard.vue';
 import { useHomebridge } from '../composables/useHomebridge';
+import { useRouter } from '../composables/useRouter';
 
 const { disableSaveButton } = useHomebridge();
+const { currentParams } = useRouter();
+
+const action = computed(() => currentParams.value?.action);
 
 onMounted(() => {
   disableSaveButton();
@@ -11,11 +17,15 @@ onMounted(() => {
 </script>
 
 <template>
-  <div>
-    <SmartThingsIcon width="52" />
-    <h6 class="fw-bold mt-2 mb-0">SmartThings Authorization</h6>
-    <small class="text-muted">Connect your Samsung SmartThings account to Homebridge</small>
-  </div>
+  <SmartThingsDisconnect v-if="action === 'disconnect'" />
 
-  <SmartThingsWizard />
+  <template v-else>
+    <div>
+      <SmartThingsIcon width="52" />
+      <h6 class="fw-bold mt-2 mb-0">SmartThings Authorization</h6>
+      <small class="text-muted">Connect your Samsung SmartThings account to Homebridge</small>
+    </div>
+
+    <SmartThingsWizard />
+  </template>
 </template>
