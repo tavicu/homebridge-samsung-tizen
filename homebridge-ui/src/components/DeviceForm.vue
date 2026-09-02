@@ -87,6 +87,10 @@ onMounted(async () => {
   stDevices.value = await getDevices();
 });
 
+function normalizeMac(mac) {
+  return mac?.toUpperCase().replaceAll('-', ':') || '';
+}
+
 function buildDeviceData(existingDevice = {}) {
   const next = { ...existingDevice };
 
@@ -98,7 +102,7 @@ function buildDeviceData(existingDevice = {}) {
   const data = {
     name: form.name,
     ip: form.ip,
-    mac: form.mac?.toUpperCase().replaceAll('-', ':'),
+    mac: normalizeMac(form.mac),
     deviceId: form.deviceId,
     uuid: form.uuid,
     options: form.options,
@@ -117,6 +121,13 @@ async function handleSubmit() {
   }
 
   const currentDevices = config.value?.devices || [];
+  const mac = normalizeMac(form.mac);
+  const isDuplicate = currentDevices.some((device, index) => (!isEdit.value || index !== props.deviceIndex) && normalizeMac(device.mac) === mac);
+
+  if (isDuplicate) {
+    toast.error('A device with this MAC address already exists');
+    return;
+  }
 
   try {
     if (isEdit.value) {
