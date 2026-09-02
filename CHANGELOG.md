@@ -1,5 +1,9 @@
 # Change Log
 
+## Unreleased
+
+- Config UI: when SmartThings is connected, the device form lists TVs from your account so you can pick a Device ID instead of typing the UUID. Other still opens the manual field.
+
 ## 6.0.0
 
 This is a full rewrite of the plugin in TypeScript. Your existing devices are kept, you don't have to add the TVs in Home app again, but a few settings changed and SmartThings has to be authorized again.

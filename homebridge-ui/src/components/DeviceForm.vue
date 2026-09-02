@@ -1,7 +1,8 @@
 <script setup>
-import { computed, reactive, ref, watch } from 'vue';
+import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { useConfig } from '../composables/useConfig';
 import { useRouter } from '../composables/useRouter';
+import { useSmartThings } from '../composables/useSmartThings';
 import { useToast } from '../composables/useToast';
 import InputsList from './InputsList.vue';
 import SwitchesList from './SwitchesList.vue';
@@ -19,6 +20,7 @@ const props = defineProps({
 
 const { config, updateConfig, cleanConfig } = useConfig();
 const { navigateTo } = useRouter();
+const { getDevices } = useSmartThings();
 const toast = useToast();
 
 const isEdit = computed(() => props.action === 'edit');
@@ -32,6 +34,17 @@ const form = reactive({
   deviceId: '',
   uuid: '',
   options: [],
+});
+
+const stDevices = ref([]);
+
+const deviceIdSelect = computed({
+  get() {
+    return stDevices.value.some((device) => device.deviceId === form.deviceId) ? form.deviceId : 'other';
+  },
+  set(value) {
+    form.deviceId = value === 'other' ? '' : value;
+  },
 });
 
 function resetForm() {
@@ -69,6 +82,10 @@ function init() {
     resetForm();
   }
 }
+
+onMounted(async () => {
+  stDevices.value = await getDevices();
+});
 
 function buildDeviceData(existingDevice = {}) {
   const next = { ...existingDevice };
@@ -190,8 +207,14 @@ watch(
 
       <div class="mb-3">
         <label for="deviceId" class="form-label">SmartThings Device ID <span class="text-muted">(optional)</span></label>
+
+        <select v-if="stDevices.length" id="deviceId" v-model="deviceIdSelect" class="form-select mb-2">
+          <option v-for="device in stDevices" :key="device.deviceId" :value="device.deviceId">{{ device.name }} ({{ device.deviceId }})</option>
+          <option value="other">Other</option>
+        </select>
+
         <input
-          id="deviceId"
+          v-if="!stDevices.length || deviceIdSelect === 'other'"
           v-model="form.deviceId"
           type="text"
           class="form-control"

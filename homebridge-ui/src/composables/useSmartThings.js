@@ -36,6 +36,10 @@ export function useSmartThings() {
     smartthings.value = null;
   }
 
+  async function getDevices() {
+    return serverRequest('/smartthings/get-devices');
+  }
+
   const isExpired = computed(() => {
     if (!smartthings.value?.expiresAt) {
       return true;
@@ -53,5 +57,6 @@ export function useSmartThings() {
     getToken,
     saveToken,
     disconnect,
+    getDevices,
   };
 }

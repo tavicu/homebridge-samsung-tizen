@@ -14,6 +14,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
     this.onRequest('/smartthings/save-token', this.saveToken.bind(this));
     this.onRequest('/smartthings/get-token', this.getToken.bind(this));
     this.onRequest('/smartthings/disconnect', this.disconnect.bind(this));
+    this.onRequest('/smartthings/get-devices', this.getDevices.bind(this));
 
     this.ready();
   }
@@ -85,6 +86,29 @@ class PluginUiServer extends HomebridgePluginUiServer {
     return null;
   }
 
+  async getDevices() {
+    const stData = await this.getToken();
+
+    if (!stData?.accessToken) {
+      return [];
+    }
+
+    try {
+      const response = await fetch('https://api.smartthings.com/v1/devices', {
+        headers: { Authorization: `Bearer ${stData.accessToken}` },
+      });
+
+      const data = await response.json();
+      const tvCapabilities = ['tvChannel', 'mediaInputSource', 'samsungvd.mediaInputSource', 'custom.picturemode'];
+
+      return (data.items || [])
+        .filter((item) => item.components?.some((component) => component.capabilities?.some((capability) => tvCapabilities.includes(capability.id))))
+        .map((item) => ({ deviceId: item.deviceId, name: item.label || item.name }));
+    } catch {
+      return [];
+    }
+  }
+
   async readStoredData() {
     let raw;
 
@@ -130,9 +154,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
       storedData = {};
     }
 
-    const nextData = Object.fromEntries(
-      Object.entries({ ...storedData, ...partial }).filter(([, value]) => value !== undefined),
-    );
+    const nextData = Object.fromEntries(Object.entries({ ...storedData, ...partial }).filter(([, value]) => value !== undefined));
 
     const tmpPath = `${this.storagePath}.tmp`;
 
