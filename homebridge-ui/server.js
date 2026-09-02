@@ -17,6 +17,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
     this.onRequest('/smartthings/get-token', this.stGetToken.bind(this));
     this.onRequest('/smartthings/disconnect', this.stDisconnect.bind(this));
     this.onRequest('/smartthings/get-devices', this.stGetDevices.bind(this));
+    this.onRequest('/device/test-connection', this.deviceTestConnection.bind(this));
 
     this.ready();
   }
@@ -108,6 +109,28 @@ class PluginUiServer extends HomebridgePluginUiServer {
         .map((item) => ({ deviceId: item.deviceId, name: item.label || item.name }));
     } catch {
       return [];
+    }
+  }
+
+  async deviceTestConnection({ ip } = {}) {
+    try {
+      const response = await fetch(`http://${ip}:8001/api/v2/`, {
+        signal: AbortSignal.timeout(3000),
+        redirect: 'error',
+      });
+
+      if (!response.ok) {
+        return { reachable: false };
+      }
+
+      const data = await response.json().catch(() => null);
+
+      return {
+        reachable: true,
+        mac: data?.device?.wifiMac || null,
+      };
+    } catch {
+      return { reachable: false };
     }
   }
 

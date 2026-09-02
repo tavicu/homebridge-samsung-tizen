@@ -1,6 +1,7 @@
 <script setup>
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { useConfig } from '../composables/useConfig';
+import { useDevice } from '../composables/useDevice';
 import { useRouter } from '../composables/useRouter';
 import { useSmartThings } from '../composables/useSmartThings';
 import { useToast } from '../composables/useToast';
@@ -19,9 +20,14 @@ const props = defineProps({
 });
 
 const { config, updateConfig, cleanConfig } = useConfig();
+const { isTesting, canTest, testConnection } = useDevice();
 const { navigateTo } = useRouter();
 const { getDevices } = useSmartThings();
 const toast = useToast();
+
+function normalizeMac(mac) {
+  return mac?.toUpperCase().replaceAll('-', ':') || '';
+}
 
 const isEdit = computed(() => props.action === 'edit');
 
@@ -37,6 +43,7 @@ const form = reactive({
 });
 
 const stDevices = ref([]);
+const testResult = ref(null);
 
 const deviceIdSelect = computed({
   get() {
@@ -67,6 +74,7 @@ function fillForm(device) {
 
 function init() {
   validated.value = false;
+  testResult.value = null;
 
   if (isEdit.value) {
     const device = config.value?.devices?.[props.deviceIndex];
@@ -87,8 +95,18 @@ onMounted(async () => {
   stDevices.value = await getDevices();
 });
 
-function normalizeMac(mac) {
-  return mac?.toUpperCase().replaceAll('-', ':') || '';
+async function handleTestConnection() {
+  if (!canTest(formEl.value?.ip)) {
+    return;
+  }
+
+  const result = await testConnection(form.ip);
+
+  testResult.value = result;
+
+  if (!form.mac.trim() && result.reachable && result.mac) {
+    form.mac = normalizeMac(result.mac);
+  }
 }
 
 function buildDeviceData(existingDevice = {}) {
@@ -155,6 +173,13 @@ watch(
   () => init(),
   { immediate: true },
 );
+
+watch(
+  () => form.ip,
+  () => {
+    testResult.value = null;
+  },
+);
 </script>
 
 <template>
@@ -190,6 +215,7 @@ watch(
           <input
             id="ipAddress"
             v-model="form.ip"
+            name="ip"
             type="text"
             class="form-control"
             placeholder="e.g. 192.168.1.100"
@@ -215,6 +241,15 @@ watch(
           <small class="form-text text-muted">The MAC address of your Samsung TV</small>
         </div>
       </div>
+
+      <div class="mb-3">
+        <button type="button" class="btn btn-outline-secondary" :disabled="!canTest(formEl?.ip)" @click="handleTestConnection">
+          <i v-if="isTesting" class="fas fa-spinner fa-spin me-1" />
+          {{ isTesting ? 'Testing...' : 'Test connection' }}
+        </button>
+      </div>
+
+      <div v-if="testResult" class="mb-3" :class="testResult.reachable ? 'text-success' : 'text-danger'">{{ testResult.message }}</div>
 
       <hr class="my-4 text-muted" />
 
