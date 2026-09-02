@@ -13,7 +13,7 @@ export function useDevice() {
     isTesting.value = true;
 
     try {
-      const result = await serverRequest('/device/test-connection', { ip });
+      const result = await serverRequest('/device/get-info', { ip });
 
       if (result?.reachable) {
         return {
