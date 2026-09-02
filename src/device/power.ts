@@ -11,19 +11,9 @@ type Source = 'ssdp' | 'ping' | 'command';
 type Trigger = 'poll' | 'powering';
 
 const POLL_INTERVAL = 1000 * 45;
-
-// How long an announcement keeps SSDP authoritative over the fallback. TVs advertise
-// a max-age of 30 minutes, which would leave an unplugged TV showing as on for that long.
 const SSDP_FRESH_LIMIT = 1000 * 60;
-
-// The TV ignores any new command for ~3s after power on/off. Same window in which we
-// trust our own optimistic guess over contradicting reports.
 const POWERING_TIMEOUT = 1000 * 3;
 
-/**
- * `device.power` is driven by SSDP first. Ping/PowerState is only a fallback for
- * when multicast never arrives, or when it goes silent without a byebye.
- */
 export class PowerMonitor {
   private ssdpFreshUntil = 0;
   private latch: { value: boolean; expiresAt: number; timer: NodeJS.Timeout } | null = null;
@@ -39,7 +29,7 @@ export class PowerMonitor {
 
       if (event === SsdpEvent.ALIVE) {
         void this.handleSsdpAlive(maxAgeSeconds);
-      } else {
+      } else if (event === SsdpEvent.BYEBYE) {
         this.handleSsdpByebye();
       }
     });
@@ -49,7 +39,6 @@ export class PowerMonitor {
     return this.latch !== null;
   }
 
-  /** Call right after a power command, before the TV had any chance to confirm it. */
   public latchOptimistic(value: boolean): void {
     this.clearLatch();
 
@@ -65,10 +54,10 @@ export class PowerMonitor {
     this.applyPower(value, 'command');
   }
 
-  /** Resolves once the TV is ready to accept commands again. */
   public async settled(): Promise<void> {
     if (this.latch) {
-      await sleep(this.latch.expiresAt - Date.now());
+      const waitTime = Math.max(0, this.latch.expiresAt - Date.now());
+      await sleep(waitTime);
     }
   }
 
@@ -85,7 +74,6 @@ export class PowerMonitor {
   }
 
   private async confirmViaPing(trigger: Trigger): Promise<void> {
-    // Check if SSDP is still fresh
     if (Date.now() < this.ssdpFreshUntil) {
       return;
     }
@@ -105,10 +93,6 @@ export class PowerMonitor {
     }
   }
 
-  /**
-   * Caller already knows the TV is on the network (SSDP alive, or port 8001 open).
-   * Some sets stay reachable in standby, so when they report PowerState, that decides.
-   */
   private async isOn(): Promise<boolean> {
     if (!this.device.storage.powerStateSupport) {
       return true;
