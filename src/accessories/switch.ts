@@ -25,7 +25,7 @@ export class SwitchAccessory {
       throw new Error(`Switch name is required for ${device.config.name}`);
     }
 
-    this.UUID = this.platform.api.hap.uuid.generate(device.UUID + config.identifier + config.name);
+    this.UUID = this.platform.api.hap.uuid.generate(device.UUID + config.identifier);
     this.platformAccessory = new this.platform.api.platformAccessory(`${device.config.name} ${config.name}`, this.UUID, Categories.SWITCH);
 
     this.createServices();

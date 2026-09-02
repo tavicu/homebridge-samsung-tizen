@@ -3,9 +3,10 @@ import { deepmerge } from 'deepmerge-ts';
 import { Logging } from 'homebridge';
 import { SwitchAccessory, TelevisionAccessory } from '../accessories/index.js';
 import { Cache } from '../lib/cache.js';
+import { withSwitchIdentifiers } from '../lib/identifiers.js';
 import { createDeviceLogger } from '../lib/logger.js';
 import { SamsungPlatform } from '../platform.js';
-import { DeviceConfig, DeviceEvents, DeviceOptions, DeviceState, DeviceStorage, SwitchConfig, TizenApplication } from '../types/index.js';
+import { DeviceConfig, DeviceEvents, DeviceOptions, DeviceState, DeviceStorage, TizenApplication } from '../types/index.js';
 import { DeviceController } from './controller.js';
 
 export class Device extends EventEmitter<DeviceEvents> {
@@ -73,20 +74,10 @@ export class Device extends EventEmitter<DeviceEvents> {
     this.accessories = [new TelevisionAccessory(this, platform)];
 
     // Switches
-    this.config.switches?.forEach((switchConfig: SwitchConfig, index: number) => {
+    withSwitchIdentifiers(this.config.switches).forEach((switchConfig) => {
       try {
-        this.accessories.push(
-          new SwitchAccessory(
-            {
-              ...switchConfig,
-              identifier: index + 1,
-            },
-            this,
-            platform,
-          ),
-        );
+        this.accessories.push(new SwitchAccessory(switchConfig, this, platform));
       } catch (error) {
-        console.log('error', error);
         this.log.error(error.message);
       }
     });

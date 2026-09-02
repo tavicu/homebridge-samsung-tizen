@@ -19,6 +19,10 @@ export class InputService {
     this.platform = this.accessory.platform;
     this.characteristic = this.platform.api.hap.Characteristic;
 
+    if (!config.name) {
+      throw new Error(`Input name is required for ${this.device.config.name}`);
+    }
+
     this.stateless = !['input', 'app'].includes(config.type);
 
     this.service = new this.platform.api.hap.Service.InputSource(config.name, `input_${config.identifier}`)

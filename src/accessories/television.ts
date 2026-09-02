@@ -1,5 +1,6 @@
 import { Categories, PlatformAccessory } from 'homebridge';
 import { Device } from '../device/index.js';
+import { withInputIdentifiers } from '../lib/identifiers.js';
 import { SamsungPlatform } from '../platform.js';
 import { InformationService, InputService, SpeakerService, TelevisionService } from '../services/index.js';
 import { LinkedService } from '../types/index.js';
@@ -28,20 +29,13 @@ export class TelevisionAccessory {
   }
 
   private createInputs() {
-    const { inputs = [] } = this.device.config;
-
-    // Create inputs
-    inputs.forEach((inputConfig) =>
-      this.inputs.push(
-        new InputService(
-          {
-            ...inputConfig,
-            identifier: this.inputs.length + 1,
-          },
-          this,
-        ),
-      ),
-    );
+    withInputIdentifiers(this.device.config.inputs).forEach((inputConfig) => {
+      try {
+        this.inputs.push(new InputService(inputConfig, this));
+      } catch (error) {
+        this.device.log.error(error.message);
+      }
+    });
   }
 
   private createServices() {

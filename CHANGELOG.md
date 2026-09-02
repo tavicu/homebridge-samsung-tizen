@@ -2,7 +2,7 @@
 
 ## 6.0.0
 
-This is a full rewrite of the plugin in TypeScript. Your existing devices are kept, you don't have to add the TVs in Home app again, but a few settings changed and SmartThings has to be authorized again.
+This is a full rewrite of the plugin in TypeScript. Your existing devices are kept, you don't have to add the TVs in Home app again, but a few settings changed and SmartThings has to be authorized again. Inputs and custom switches in Home are identified differently than in 5.x, so hidden sources, custom names and scenes that targeted a specific input may need to be set up once after the upgrade.
 
 **Requirements**
 
@@ -41,6 +41,7 @@ These were removed and are ignored if they are still present in your configurati
 
 - A custom switch that has more than one option with a state, for example `sleep` together with `mute`, now shows as ON when any of those options is active. Before, all of them had to be active at the same time.
 - `device_id` was renamed to `deviceId`. The old name still works.
+- Inputs and custom switches are identified in Home by what they do (source, app, commands, switch actions), not by their position in the config. Reordering the list only changes the order they appear in Home. Renaming a switch no longer creates a new accessory. An input or switch without a name is skipped and logged, instead of taking down the whole TV.
 
 **Fixed**
 

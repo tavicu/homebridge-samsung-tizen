@@ -1,16 +1,28 @@
-import { SwitchAccessory } from '../accessories/index.js';
-import { Device } from '../device/device.js';
+import type { SwitchAccessory } from '../accessories/index.js';
+import type { Device } from '../device/device.js';
 import { TvOfflineError } from '../errors.js';
-import { SwitchService } from '../services/index.js';
+import type { SwitchService } from '../services/index.js';
 import { SwitchOption } from '../types/types.js';
 import { sleep } from './tools.js';
 
-export function getSwitchOptions(accessory: SwitchAccessory, device: Device, service: SwitchService): SwitchOption[] {
-  const { config } = accessory;
+type SwitchOptionContext = {
+  config: SwitchAccessory['config'];
+  device: Device;
+  service: SwitchService;
+};
 
-  const options: SwitchOption[] = [
-    {
-      key: 'power',
+type SwitchOptionDefinition = Pick<SwitchOption, 'key' | 'offable'> & {
+  build: (ctx: SwitchOptionContext) => Pick<SwitchOption, 'get' | 'set'>;
+};
+
+/**
+ * One definition per config key a switch can act on. `key` is only written here; identifier
+ * fingerprints in identifiers.ts derive the list of keys from this array.
+ */
+const OPTION_DEFINITIONS: Array<SwitchOptionDefinition> = [
+  {
+    key: 'power',
+    build: ({ config, device }) => ({
       set: async (_switchValue: boolean) => {
         if (!config.power && !device.power) {
           throw new TvOfflineError();
@@ -23,34 +35,36 @@ export function getSwitchOptions(accessory: SwitchAccessory, device: Device, ser
         await device.setPower(true);
         await sleep(3000);
       },
-    },
+    }),
+  },
 
-    {
-      key: 'sleep',
-      offable: true,
-      get: async () => {
-        return !!device.sleep;
-      },
+  {
+    key: 'sleep',
+    offable: true,
+    build: ({ config, device, service }) => ({
+      get: async () => !!device.sleep,
       set: async (switchValue: boolean) => {
         await device.setSleep(switchValue ? config.sleep || 0 : 0, () => {
           service.updateValue(false);
         });
       },
-    },
+    }),
+  },
 
-    {
-      key: 'mute',
-      offable: true,
-      get: async () => {
-        return device.mute;
-      },
+  {
+    key: 'mute',
+    offable: true,
+    build: ({ device }) => ({
+      get: async () => device.mute,
       set: async (switchValue: boolean) => {
         await device.setMute(switchValue);
       },
-    },
+    }),
+  },
 
-    {
-      key: 'app',
+  {
+    key: 'app',
+    build: ({ config, device, service }) => ({
       set: async (switchValue: boolean) => {
         if (!switchValue) {
           setTimeout(() => service.updateValue(), 100);
@@ -59,43 +73,65 @@ export function getSwitchOptions(accessory: SwitchAccessory, device: Device, ser
 
         await device.startApplication(config.app as string | number);
       },
-    },
+    }),
+  },
 
-    {
-      key: 'input',
+  {
+    key: 'input',
+    build: ({ config, device }) => ({
       set: async (_switchValue: boolean) => {
         await device.setInputSource(config.input as string);
       },
-    },
+    }),
+  },
 
-    {
-      key: 'channel',
+  {
+    key: 'channel',
+    build: ({ config, device }) => ({
       set: async (_switchValue: boolean) => {
         await device.setChannel(config.channel as number | string);
       },
-    },
+    }),
+  },
 
-    {
-      key: 'picture_mode',
+  {
+    key: 'picture_mode',
+    build: ({ config, device }) => ({
       set: async (_switchValue: boolean) => {
         await device.setPictureMode(config.picture_mode as string);
       },
-    },
+    }),
+  },
 
-    {
-      key: 'volume',
+  {
+    key: 'volume',
+    build: ({ config, device }) => ({
       set: async (_switchValue: boolean) => {
         await device.setVolume(config.volume as number);
       },
-    },
+    }),
+  },
 
-    {
-      key: 'command',
+  {
+    key: 'command',
+    build: ({ config, device }) => ({
       set: async (_switchValue: boolean) => {
         await device.sendCommand(config.command as string | string[]);
       },
-    },
-  ];
+    }),
+  },
+];
+
+export const SWITCH_OPTION_KEYS = OPTION_DEFINITIONS.map((definition) => definition.key);
+
+export function getSwitchOptions(accessory: SwitchAccessory, device: Device, service: SwitchService): SwitchOption[] {
+  const { config } = accessory;
+
+  const options = OPTION_DEFINITIONS.map(({ key, offable, build }) => ({
+    key,
+    offable,
+    ...build({ config, device, service }),
+  }));
 
   return options.filter((option) => option.key === 'power' || config[option.key] !== undefined);
 }
