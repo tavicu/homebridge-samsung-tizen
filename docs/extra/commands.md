@@ -36,13 +36,13 @@ This is not an official list from Samsung and some of the keys may not work with
 
 ### Power Key
 
-``` textile
+``` text
 KEY_POWER
 ```
 
 ### Menus
 
-``` textile
+``` text
 KEY_MENU
 KEY_TOPMENU
 KEY_TOOLS
@@ -56,7 +56,7 @@ KEY_DVR_MENU
 
 ### Direction Keys
 
-``` textile
+``` text
 KEY_UP
 KEY_DOWN
 KEY_LEFT
@@ -67,7 +67,7 @@ KEY_RETURN
 
 ### Number Keys
 
-``` textile
+``` text
 KEY_0
 KEY_1
 KEY_2
@@ -84,7 +84,7 @@ KEY_12
 
 ### Channel Keys
 
-``` textile
+``` text
 KEY_CHUP
 KEY_CHDOWN
 KEY_PRECH
@@ -96,7 +96,7 @@ KEY_MAGIC_CHANNEL
 
 ### Volume Keys
 
-``` textile
+``` text
 KEY_VOLUP
 KEY_VOLDOWN
 KEY_MUTE
@@ -104,7 +104,7 @@ KEY_MUTE
 
 ### Input Keys
 
-``` textile
+``` text
 KEY_SOURCE
 KEY_HDMI
 KEY_COMPONENT1
@@ -126,7 +126,7 @@ KEY_AMBIENT
 
 ### Media Keys
 
-``` textile
+``` text
 KEY_REWIND
 KEY_STOP
 KEY_PLAY
@@ -141,7 +141,7 @@ KEY_INSTANT_REPLAY
 
 ### Extended Keys
 
-``` textile
+``` text
 KEY_EXT1
 KEY_EXT2
 KEY_EXT3
@@ -160,7 +160,7 @@ KEY_EXT41
 
 ### Other Keys
 
-``` textile
+``` text
 KEY_GREEN
 KEY_YELLOW
 KEY_CYAN
