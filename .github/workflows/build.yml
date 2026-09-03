@@ -1,6 +1,12 @@
 name: Build and Lint
 
-on: [push, pull_request]
+on:
+    push:
+        branches: [master]
+    pull_request:
+
+permissions:
+    contents: read
 
 jobs:
     build:
@@ -9,7 +15,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                node-version: [20.x, 22.x, 24.x]
+                node-version: [22.x, 24.x, 26.x]
 
         steps:
             - uses: actions/checkout@v5
@@ -18,20 +24,16 @@ jobs:
               uses: actions/setup-node@v6
               with:
                   node-version: ${{ matrix.node-version }}
+                  cache: npm
 
             - name: Install dependencies
-              run: npm install
+              run: npm ci
 
             - name: Lint the project
               run: npm run lint
 
+            - name: Check formatting
+              run: npm run format:check
+
             - name: Build the project
               run: npm run build
-
-            - name: List, audit, fix outdated dependencies and build again
-              run: |
-                  npm list --outdated
-                  npm audit || true  # ignore failures
-                  npm audit fix || true
-                  npm list --outdated
-                  npm run build

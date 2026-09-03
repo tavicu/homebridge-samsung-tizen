@@ -25,8 +25,6 @@ export class PowerMonitor {
     setInterval(() => void this.confirmViaPing('poll'), POLL_INTERVAL);
 
     this.device.on('ssdp:update', (event, maxAgeSeconds) => {
-      console.log('power:ssdp:update', this.device.config.ip, event, maxAgeSeconds ?? '');
-
       if (event === SsdpEvent.ALIVE) {
         void this.handleSsdpAlive(maxAgeSeconds);
       } else if (event === SsdpEvent.BYEBYE) {
@@ -82,7 +80,6 @@ export class PowerMonitor {
       const reachable = await retry(async () => (await this.probe.ping()) || Promise.reject(), { retries: 1, delay: 1000 }).catch(() => false);
 
       if (!reachable) {
-        console.log('power:confirmViaPing:reachable', reachable);
         this.reconcile(false, 'ping');
         return;
       }
@@ -100,7 +97,6 @@ export class PowerMonitor {
 
     try {
       const { device = {} } = await this.probe.getInfo();
-      console.log('power:isOn:powerState', device.PowerState);
       return device.PowerState === 'on';
     } catch {
       return true;
@@ -116,9 +112,7 @@ export class PowerMonitor {
     this.applyPower(candidate, source);
   }
 
-  private applyPower(value: boolean, source: Source): void {
-    console.log('power:applyPower', value, source);
-
+  private applyPower(value: boolean, _source: Source): void {
     this.device.power = value;
   }
 

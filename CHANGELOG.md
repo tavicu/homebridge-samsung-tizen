@@ -6,7 +6,7 @@ This is a full rewrite of the plugin in TypeScript. Your existing devices are ke
 
 **Requirements**
 
-- Node.js 22.10 or newer
+- Node.js 22.10+, 24, or 26
 - Homebridge 1.8 or newer (Homebridge 2.0 is supported)
 
 **New**
