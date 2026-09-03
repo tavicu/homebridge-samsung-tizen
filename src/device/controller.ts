@@ -155,13 +155,11 @@ export class DeviceController {
       return response.data;
     };
 
-    return this.device.cache.get(`app-${appId}`, fetchApp, 1000);
+    return this.device.cache.get(`app-${appId}`, fetchApp, 3000);
   }
 
   public async startApplication(appId: string | number): Promise<TizenApplication> {
     await this.waitPowering();
-
-    // TODO: check data.code when invalid app id is provided
 
     const response = await axios.post<TizenApplication>(`http://${this.device.config.ip}:8001/api/v2/applications/${appId}`, null, { timeout: 600 });
     return response.data;

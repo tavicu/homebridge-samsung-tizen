@@ -1,7 +1,7 @@
 import { Device } from '../device/index.js';
 
 type CacheEntry<T> = {
-  fetching?: boolean;
+  promise?: Promise<T>;
   value?: T;
   expire?: number;
 };
@@ -16,25 +16,15 @@ export class Cache {
   public get<T>(key: string, run: () => Promise<T>, time = 500): Promise<T> {
     const entry = this.keys[key] as CacheEntry<T> | undefined;
 
-    if (entry && entry.expire && Date.now() < entry.expire) {
+    if (entry?.promise) {
+      return entry.promise;
+    }
+
+    if (entry?.expire && Date.now() < entry.expire) {
       return Promise.resolve(entry.value as T);
     }
 
-    // If we already have one caching
-    // in progress try again in 100 ms
-    if (entry?.fetching) {
-      return new Promise((resolve, reject) => {
-        setTimeout(() => {
-          this.get(key, run, time).then(resolve).catch(reject);
-        }, 100);
-      });
-    }
-
-    this.keys[key] = {
-      fetching: true,
-    };
-
-    return run()
+    const promise = run()
       .then((value) => {
         this.keys[key] = {
           value,
@@ -47,6 +37,10 @@ export class Cache {
         delete this.keys[key];
         throw error;
       });
+
+    this.keys[key] = { promise };
+
+    return promise;
   }
 
   public forget(key: string): Cache {

@@ -40,6 +40,7 @@ These were removed and are ignored if they are still present in your configurati
 
 **Changed**
 
+- When Home asks which input is active, the plugin now checks the currently selected source first, then non-app sources (HDMI, TV, USB), and only then apps. Each app needs a request to the TV, so this order cuts down extra requests when the source is already known or is a physical input.
 - A custom switch that has more than one option with a state, for example `sleep` together with `mute`, now shows as ON when any of those options is active. Before, all of them had to be active at the same time.
 - Custom switches that launch an app or select an input source now stay ON in Home while that app or source is active on the TV. They are checked automatically while the TV is on. Command, volume and channel switches still behave as momentary and turn off after a short delay.
 - Using a switch while the TV is off, when that switch is not set to turn the TV on, no longer looks like a failure in Home. The switch turns back off and a warning is written to the log.

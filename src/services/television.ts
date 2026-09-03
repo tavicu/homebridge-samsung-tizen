@@ -9,6 +9,7 @@ import { CharacteristicRef, ServiceWrapper } from './wrapper.js';
 export class TelevisionService extends ServiceWrapper {
   public service: LinkedService;
   private remoteKeys: Record<number, string>;
+  private inputUpdatePromise: Promise<void> | null = null;
 
   constructor(private accessory: TelevisionAccessory) {
     super(accessory);
@@ -78,35 +79,50 @@ export class TelevisionService extends ServiceWrapper {
   }
 
   private async runAsyncInputUpdate(): Promise<void> {
-    if (!this.device.power) {
-      return;
+    if (this.inputUpdatePromise) {
+      return this.inputUpdatePromise;
     }
 
-    const currentIdentifier = (this.service.getCharacteristic(this.characteristic.ActiveIdentifier).value as number) || 0;
+    this.inputUpdatePromise = (async () => {
+      if (!this.device.power) {
+        return;
+      }
 
-    const prioritizedInputs = [...this.accessory.inputs].sort((a, b) => {
-      if (a.config.identifier === currentIdentifier) {
-        return -1;
+      const currentIdentifier = (this.service.getCharacteristic(this.characteristic.ActiveIdentifier).value as number) || 0;
+
+      // Stop at the first match, so check cheapest-first: current input, then non-app sources, then apps (each app hits the TV).
+      const inputPriority = (input: InputService): number => {
+        if (currentIdentifier && input.config.identifier === currentIdentifier) {
+          return 0;
+        }
+
+        if (input.config.type !== 'app') {
+          return 1;
+        }
+
+        return 2;
+      };
+
+      const prioritizedInputs = [...this.accessory.inputs].sort((a, b) => inputPriority(a) - inputPriority(b));
+
+      for (const input of prioritizedInputs) {
+        try {
+          const isActive = await input.getInput();
+
+          if (isActive) {
+            this.updateValue(this.characteristic.ActiveIdentifier, input.config.identifier);
+            return;
+          }
+        } catch {}
+
+        await sleep(100);
       }
-      if (b.config.identifier === currentIdentifier) {
-        return 1;
-      }
-      return 0;
+
+      this.updateValue(this.characteristic.ActiveIdentifier, 0);
+    })().finally(() => {
+      this.inputUpdatePromise = null;
     });
 
-    for (const input of prioritizedInputs) {
-      try {
-        const isActive = await input.getInput();
-
-        if (isActive) {
-          this.updateValue(this.characteristic.ActiveIdentifier, input.config.identifier);
-          return;
-        }
-      } catch {}
-
-      await sleep(100);
-    }
-
-    this.updateValue(this.characteristic.ActiveIdentifier, 0);
+    return this.inputUpdatePromise;
   }
 }
