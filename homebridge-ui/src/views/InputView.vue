@@ -24,7 +24,7 @@ watch(
   ([currentAction, index]) => {
     if ((currentAction === 'edit' || currentAction === 'delete') && index === undefined) {
       toast.error('Input not found');
-      navigateTo('dashboard');
+      navigateTo('dashboard', { tab: 'inputs' });
     }
   },
   { immediate: true },

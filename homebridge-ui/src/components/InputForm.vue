@@ -74,7 +74,7 @@ function goBack() {
     return;
   }
 
-  navigateTo('dashboard');
+  navigateTo('dashboard', { tab: 'inputs' });
 }
 
 function getCurrentInputs() {

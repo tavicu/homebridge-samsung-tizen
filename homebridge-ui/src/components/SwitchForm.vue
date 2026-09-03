@@ -103,7 +103,7 @@ function goBack() {
     return;
   }
 
-  navigateTo('dashboard');
+  navigateTo('dashboard', { tab: 'switches' });
 }
 
 function getCurrentSwitches() {

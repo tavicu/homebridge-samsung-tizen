@@ -23,7 +23,7 @@ watch(
   ([currentAction, index]) => {
     if ((currentAction === 'edit' || currentAction === 'delete') && index === undefined) {
       toast.error('Device not found');
-      navigateTo('dashboard');
+      navigateTo('dashboard', { tab: 'devices' });
     }
   },
   { immediate: true },

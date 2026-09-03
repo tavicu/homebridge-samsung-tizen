@@ -24,7 +24,7 @@ async function confirmDelete() {
     await updateConfig({ devices: updatedDevices });
 
     toast.success('Device deleted successfully');
-    navigateTo('dashboard');
+    navigateTo('dashboard', { tab: 'devices' });
   } catch {
     toast.error('Failed to delete device');
   }
@@ -35,7 +35,7 @@ watch(
   (index) => {
     if (!config.value?.devices?.[index]) {
       toast.error('Device not found');
-      navigateTo('dashboard');
+      navigateTo('dashboard', { tab: 'devices' });
     }
   },
   { immediate: true },

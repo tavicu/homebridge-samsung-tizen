@@ -81,7 +81,7 @@ function init() {
 
     if (!device) {
       toast.error('Device not found');
-      navigateTo('dashboard');
+      navigateTo('dashboard', { tab: 'devices' });
       return;
     }
 
@@ -159,7 +159,7 @@ async function handleSubmit() {
       toast.success('Device added successfully');
     }
 
-    navigateTo('dashboard');
+    navigateTo('dashboard', { tab: 'devices' });
   } catch {
     toast.error(isEdit.value ? 'Failed to update device' : 'Failed to add device');
   }
@@ -295,7 +295,7 @@ watch(
     </div>
 
     <div class="card-footer text-end">
-      <button type="button" class="btn btn-outline-secondary" @click="navigateTo('dashboard')">Cancel</button>
+      <button type="button" class="btn btn-outline-secondary" @click="navigateTo('dashboard', { tab: 'devices' })">Cancel</button>
       <button type="submit" class="btn btn-primary">{{ isEdit ? 'Save Device' : 'Add Device' }} <i class="fas fa-arrow-right" /></button>
     </div>
   </form>

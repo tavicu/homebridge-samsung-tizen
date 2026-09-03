@@ -34,7 +34,7 @@ function goBack() {
     return;
   }
 
-  navigateTo('dashboard');
+  navigateTo('dashboard', { tab: 'switches' });
 }
 
 async function confirmDelete() {
