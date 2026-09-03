@@ -8,12 +8,14 @@ import { createDeviceLogger } from '../lib/logger.js';
 import { SamsungPlatform } from '../platform.js';
 import { DeviceConfig, DeviceEvents, DeviceOptions, DeviceState, DeviceStorage, TizenApplication } from '../types/index.js';
 import { DeviceController } from './controller.js';
+import { AccessoryPoller } from './poller.js';
 
 export class Device extends EventEmitter<DeviceEvents> {
   public log: Logging;
   public cache: Cache;
   public storage: DeviceStorage;
   private controller: DeviceController;
+  private poller: AccessoryPoller;
 
   public UUID: string;
   public config: DeviceConfig;
@@ -70,6 +72,7 @@ export class Device extends EventEmitter<DeviceEvents> {
     this.storage = platform.storage.get(this.UUID);
     this.cache = new Cache(this);
     this.controller = new DeviceController(this, platform);
+    this.poller = new AccessoryPoller(this);
 
     this.accessories = [new TelevisionAccessory(this, platform)];
 
@@ -82,34 +85,25 @@ export class Device extends EventEmitter<DeviceEvents> {
       }
     });
 
+    // Events
     this.on('upnp:update', ({ volume, mute }) => {
-      console.log('upnp:update', this.config.ip, volume, mute);
-
       this.state.volume = volume ?? this.state.volume;
       this.state.mute = mute ?? this.state.mute;
     });
 
     this.on('state:update', (prop) => {
-      const d = new Date();
-      const t = d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds() + '-' + d.getMilliseconds();
-
-      console.log('state:update', t, this.config.ip, this.state);
-
       if (prop === 'power') {
         this.controller.clearSleep();
       }
 
       this.accessories.forEach((accessory) => {
-        Object.values(accessory.services).forEach((wrapper) => {
-          void wrapper.updateValue();
-        });
+        Object.values(accessory.services).forEach((wrapper) => void wrapper.updateValue());
       });
     });
 
     this.on('paired', ({ token }) => {
       this.log.debug(`Device paired with success (token: ${token})`);
-
-      // TODO: add refresh interval
+      this.poller.sync();
     });
   }
 
@@ -191,6 +185,7 @@ export class Device extends EventEmitter<DeviceEvents> {
   }
 
   public destroy(): void {
+    this.poller.destroy();
     this.controller.destroy();
   }
 

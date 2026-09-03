@@ -41,6 +41,7 @@ export type SwitchConfig = {
 export type SwitchOption = {
   key: string;
   offable?: boolean;
+  polled?: boolean;
   get?: () => Promise<boolean>;
   set: (switchValue: boolean) => Promise<void>;
 };

@@ -34,6 +34,8 @@ export abstract class ServiceWrapper {
 
   public async updateValue(): Promise<void> {}
 
+  public async pollValue(): Promise<void> {}
+
   protected handleUpdateValue(characteristic: CharacteristicRef, value: CharacteristicValue): void {
     if (this.service.getCharacteristic(characteristic)?.value === value) {
       return;
@@ -54,14 +56,14 @@ export abstract class ServiceWrapper {
         return;
       }
 
+      if (onError?.(error)) {
+        return;
+      }
+
       this.device.log.error(errorMessage || error?.message || error);
 
       if (error.stack) {
         this.device.log.debug(error.stack);
-      }
-
-      if (onError?.(error)) {
-        return;
       }
 
       this.throwStatusError();

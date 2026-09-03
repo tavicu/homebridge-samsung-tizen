@@ -11,13 +11,19 @@ type SwitchOptionContext = {
   service: SwitchService;
 };
 
-type SwitchOptionDefinition = Pick<SwitchOption, 'key' | 'offable'> & {
+type SwitchOptionDefinition = Pick<SwitchOption, 'key' | 'offable' | 'polled'> & {
   build: (ctx: SwitchOptionContext) => Pick<SwitchOption, 'get' | 'set'>;
 };
 
 /**
  * One definition per config key a switch can act on. `key` is only written here; identifier
  * fingerprints in identifiers.ts derive the list of keys from this array.
+ *
+ * `offable` is about set: Home can turn the option off (mute, sleep). Without it, OFF is ignored
+ * (app, input, command) because there is no matching TV action.
+ * `polled` is about get: state is not in DeviceState / events, so AccessoryPoller must ask the TV
+ * (app visibility, HDMI source). mute/sleep have get but are not polled.
+ * A switch is stateless when no option has get (command, volume, channel).
  */
 const OPTION_DEFINITIONS: Array<SwitchOptionDefinition> = [
   {
@@ -64,7 +70,20 @@ const OPTION_DEFINITIONS: Array<SwitchOptionDefinition> = [
 
   {
     key: 'app',
+    polled: true,
     build: ({ config, device, service }) => ({
+      get: async () => {
+        if (!device.power) {
+          return false;
+        }
+
+        try {
+          const application = await device.getApplication(config.app as string | number);
+          return application?.visible ?? false;
+        } catch {
+          return false;
+        }
+      },
       set: async (switchValue: boolean) => {
         if (!switchValue) {
           setTimeout(() => service.updateValue(), 100);
@@ -78,7 +97,19 @@ const OPTION_DEFINITIONS: Array<SwitchOptionDefinition> = [
 
   {
     key: 'input',
+    polled: true,
     build: ({ config, device }) => ({
+      get: async () => {
+        if (!device.power) {
+          return false;
+        }
+
+        try {
+          return (await device.getInputSource()) === config.input;
+        } catch {
+          return false;
+        }
+      },
       set: async (_switchValue: boolean) => {
         await device.setInputSource(config.input as string);
       },
@@ -127,9 +158,10 @@ export const SWITCH_OPTION_KEYS = OPTION_DEFINITIONS.map((definition) => definit
 export function getSwitchOptions(accessory: SwitchAccessory, device: Device, service: SwitchService): SwitchOption[] {
   const { config } = accessory;
 
-  const options = OPTION_DEFINITIONS.map(({ key, offable, build }) => ({
+  const options = OPTION_DEFINITIONS.map(({ key, offable, polled, build }) => ({
     key,
     offable,
+    polled,
     ...build({ config, device, service }),
   }));
 

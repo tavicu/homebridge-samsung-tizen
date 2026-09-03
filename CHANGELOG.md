@@ -33,7 +33,7 @@ SmartThings dropped support for the personal access tokens that never expire, so
 
 These were removed and are ignored if they are still present in your configuration:
 
-- `refresh` - there is no configurable poll interval anymore. Power state arrives through SSDP, with a built-in fallback check when announcements are missing. Volume and mute arrive through DMR events.
+- `refresh` - there is no configurable poll interval anymore. Power state arrives through SSDP, with a built-in fallback check when announcements are missing. Volume and mute arrive through DMR events. Switches that track an app or an input source are checked on a fixed internal interval, only while the TV is on.
 - `delay`, `timeout` and `wait_time` - these timings are now handled internally.
 - `method` and `port` - the connection to the TV is detected automatically.
 - `api_key` - replaced by the SmartThings authorization flow described above.
@@ -41,6 +41,8 @@ These were removed and are ignored if they are still present in your configurati
 **Changed**
 
 - A custom switch that has more than one option with a state, for example `sleep` together with `mute`, now shows as ON when any of those options is active. Before, all of them had to be active at the same time.
+- Custom switches that launch an app or select an input source now stay ON in Home while that app or source is active on the TV. They are checked automatically while the TV is on. Command, volume and channel switches still behave as momentary and turn off after a short delay.
+- Using a switch while the TV is off, when that switch is not set to turn the TV on, no longer looks like a failure in Home. The switch turns back off and a warning is written to the log.
 - `device_id` was renamed to `deviceId`. The old name still works.
 - Inputs and custom switches are identified in Home by what they do (source, app, commands, switch actions), not by their position in the config. Reordering the list only changes the order they appear in Home. Renaming a switch no longer creates a new accessory. An input or switch without a name is skipped and logged, instead of taking down the whole TV.
 

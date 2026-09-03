@@ -73,7 +73,7 @@ export class TelevisionService extends ServiceWrapper {
     await this.handleSet(targetInput.setInput(), { errorMessage: `Failed to set input to ${targetInput.config.name}` });
 
     if (targetInput.stateless) {
-      setTimeout(() => this.updateValue(this.characteristic.ActiveIdentifier, 0), 150);
+      setTimeout(() => this.updateValue(this.characteristic.ActiveIdentifier, 0), 500);
     }
   }
 
