@@ -6,58 +6,59 @@
   "disableChildBridges": true,
   "schema": {
     "type": "object",
-    "properties": {
-      "name": { "type": "string" },
-      "clientId": { "type": "string" },
-      "clientSecret": { "type": "string" },
-
-      "inputs": {
-        "type": "array",
-        "items": {
-          "type": "object",
-          "properties": {
-            "type": { "type": "string" },
-            "name": { "type": "string" },
-            "value": {
-              "oneOf": [
-                { "type": "string" },
-                {
-                  "type": "array",
-                  "items": { "type": "string" }
-                }
-              ]
-            }
+    "definitions": {
+      "inputSource": {
+        "type": "string",
+        "enum": ["digitalTv", "HDMI1", "HDMI2", "HDMI3", "HDMI4", "HDMI5", "HDMI6", "USB", "USB-C", "Display Port"]
+      },
+      "input": {
+        "type": "object",
+        "required": ["name", "type", "value"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "required": true
+          },
+          "type": {
+            "type": "string",
+            "required": true,
+            "enum": ["input", "app", "command"]
+          },
+          "value": {
+            "type": "string",
+            "required": true
           }
         }
       },
-
-      "switches": {
-        "type": "array",
-        "items": {
-          "type": "object",
-          "properties": {
-            "name": { "type": "string" },
-            "power": { "type": "boolean" },
-            "app": { "type": "string" },
-            "input": { "type": "string" },
-            "sleep": { "type": "integer" },
-            "mute": { "type": "boolean" },
-            "volume": { "type": "integer" },
-            "channel": { "type": "integer" },
-            "picture_mode": { "type": "string" },
-            "command": {
-              "oneOf": [
-                { "type": "string" },
-                {
-                  "type": "array",
-                  "items": { "type": "string" }
-                }
-              ]
-            }
-          }
+      "switch": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "required": true
+          },
+          "power": { "type": "boolean" },
+          "mute": { "type": "boolean" },
+          "sleep": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "volume": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "app": { "type": "string" },
+          "input": { "$ref": "#/definitions/inputSource" },
+          "channel": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "picture_mode": { "type": "string" },
+          "command": { "type": "string" }
         }
       },
-
       "keys": {
         "type": "object",
         "properties": {
@@ -76,14 +77,47 @@
           "INFORMATION": { "type": "string" }
         }
       },
-
+      "wol": {
+        "type": "object",
+        "properties": {
+          "from": { "type": "string" },
+          "address": { "type": "string" },
+          "port": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 65535
+          },
+          "count": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "interval": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      }
+    },
+    "properties": {
+      "name": { "type": "string" },
+      "clientId": { "type": "string" },
+      "clientSecret": { "type": "string" },
+      "inputs": {
+        "type": "array",
+        "items": { "$ref": "#/definitions/input" }
+      },
+      "switches": {
+        "type": "array",
+        "items": { "$ref": "#/definitions/switch" }
+      },
+      "keys": { "$ref": "#/definitions/keys" },
+      "wol": { "$ref": "#/definitions/wol" },
       "devices": {
         "type": "array",
         "items": {
           "type": "object",
+          "required": ["name", "ip", "mac"],
           "properties": {
-            "wol": { "type": "object" },
-            "deviceId": { "type": "string" },
             "name": {
               "type": "string",
               "required": true
@@ -98,21 +132,31 @@
               "required": true,
               "pattern": "^([A-Fa-f0-9]{2}:){5}[A-Fa-f0-9]{2}$"
             },
-            "uuid": {
-              "type": "string"
-            },
+            "uuid": { "type": "string" },
+            "deviceId": { "type": "string" },
+            "device_id": { "type": "string" },
             "options": {
               "type": "array",
               "items": {
-                "type": "string"
+                "type": "string",
+                "enum": ["Device.Disable", "Switch.DeviceName.Disable"]
               }
-            }
+            },
+            "inputs": {
+              "type": "array",
+              "items": { "$ref": "#/definitions/input" }
+            },
+            "switches": {
+              "type": "array",
+              "items": { "$ref": "#/definitions/switch" }
+            },
+            "keys": { "$ref": "#/definitions/keys" },
+            "wol": { "$ref": "#/definitions/wol" }
           }
         }
       }
     }
   },
-
   "layout": [
     {
       "type": "help",
@@ -129,7 +173,7 @@
             {
               "key": "devices[].name",
               "title": "Device Name",
-              "default": "Bedroom TV"
+              "placeholder": "Bedroom TV"
             },
             {
               "type": "help",
@@ -148,6 +192,202 @@
                   "key": "devices[].mac",
                   "title": "MAC Address",
                   "placeholder": "A0:B1:C2:D3:E4:F5"
+                }
+              ]
+            },
+            {
+              "key": "devices[].uuid",
+              "title": "UUID",
+              "placeholder": "A1",
+              "description": "If you have problems adding the TV to Home app, set this field to a unique value."
+            },
+            {
+              "key": "devices[].options",
+              "title": "Options",
+              "titleMap": {
+                "Device.Disable": "Disable this device without deleting it",
+                "Switch.DeviceName.Disable": "Disable prepending the device name on custom switches"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "fieldset",
+      "title": "Inputs",
+      "expandable": true,
+      "expanded": false,
+      "items": [
+        {
+          "type": "help",
+          "helpvalue": "<p class='help-block'>These inputs are used by every TV, unless a device has its own list. Source inputs need SmartThings, which is only available in the new configuration interface.</p>"
+        },
+        {
+          "key": "inputs",
+          "type": "array",
+          "notitle": true,
+          "items": [
+            {
+              "type": "div",
+              "items": [
+                {
+                  "type": "flex",
+                  "flex-flow": "row wrap",
+                  "items": [
+                    {
+                      "key": "inputs[].type",
+                      "title": "Type",
+                      "titleMap": {
+                        "input": "Input",
+                        "app": "Application",
+                        "command": "Command"
+                      }
+                    },
+                    {
+                      "key": "inputs[].name",
+                      "title": "Input Name",
+                      "placeholder": "Netflix"
+                    }
+                  ]
+                },
+                {
+                  "key": "inputs[].value",
+                  "title": "Input Source",
+                  "enum": ["digitalTv", "HDMI1", "HDMI2", "HDMI3", "HDMI4", "HDMI5", "HDMI6", "USB", "USB-C", "Display Port"],
+                  "titleMap": {
+                    "digitalTv": "Digital TV",
+                    "HDMI1": "HDMI 1",
+                    "HDMI2": "HDMI 2",
+                    "HDMI3": "HDMI 3",
+                    "HDMI4": "HDMI 4",
+                    "HDMI5": "HDMI 5",
+                    "HDMI6": "HDMI 6",
+                    "USB": "USB",
+                    "USB-C": "USB-C",
+                    "Display Port": "Display Port"
+                  },
+                  "condition": {
+                    "functionBody": "return model.inputs && model.inputs[arrayIndices[0]] && model.inputs[arrayIndices[0]].type == 'input';"
+                  }
+                },
+                {
+                  "key": "inputs[].value",
+                  "title": "Application ID",
+                  "placeholder": "111299001912",
+                  "condition": {
+                    "functionBody": "return model.inputs && model.inputs[arrayIndices[0]] && model.inputs[arrayIndices[0]].type == 'app';"
+                  }
+                },
+                {
+                  "key": "inputs[].value",
+                  "title": "Command",
+                  "placeholder": "KEY_VOLUP",
+                  "condition": {
+                    "functionBody": "return model.inputs && model.inputs[arrayIndices[0]] && model.inputs[arrayIndices[0]].type == 'command';"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "fieldset",
+      "title": "Switches",
+      "expandable": true,
+      "expanded": false,
+      "items": [
+        {
+          "type": "help",
+          "helpvalue": "<p class='help-block'>These switches are created for every TV, unless a device has its own list. Input source, picture mode and channel need SmartThings, which is only available in the new configuration interface.</p>"
+        },
+        {
+          "key": "switches",
+          "type": "array",
+          "notitle": true,
+          "items": [
+            {
+              "type": "div",
+              "items": [
+                {
+                  "key": "switches[].name",
+                  "title": "Switch Name",
+                  "placeholder": "Sleep"
+                },
+                {
+                  "key": "switches[].power",
+                  "title": "Power on the TV before running any action"
+                },
+                {
+                  "key": "switches[].mute",
+                  "title": "Mute"
+                },
+                {
+                  "type": "flex",
+                  "flex-flow": "row wrap",
+                  "items": [
+                    {
+                      "key": "switches[].sleep",
+                      "title": "Sleep (minutes)",
+                      "placeholder": "60"
+                    },
+                    {
+                      "key": "switches[].volume",
+                      "title": "Volume",
+                      "placeholder": "10"
+                    }
+                  ]
+                },
+                {
+                  "type": "flex",
+                  "flex-flow": "row wrap",
+                  "items": [
+                    {
+                      "key": "switches[].app",
+                      "title": "Application ID",
+                      "placeholder": "111299001912"
+                    },
+                    {
+                      "key": "switches[].channel",
+                      "title": "Channel",
+                      "placeholder": "13"
+                    }
+                  ]
+                },
+                {
+                  "type": "flex",
+                  "flex-flow": "row wrap",
+                  "items": [
+                    {
+                      "key": "switches[].input",
+                      "title": "Input Source",
+                      "enum": ["digitalTv", "HDMI1", "HDMI2", "HDMI3", "HDMI4", "HDMI5", "HDMI6", "USB", "USB-C", "Display Port"],
+                      "titleMap": {
+                        "digitalTv": "Digital TV",
+                        "HDMI1": "HDMI 1",
+                        "HDMI2": "HDMI 2",
+                        "HDMI3": "HDMI 3",
+                        "HDMI4": "HDMI 4",
+                        "HDMI5": "HDMI 5",
+                        "HDMI6": "HDMI 6",
+                        "USB": "USB",
+                        "USB-C": "USB-C",
+                        "Display Port": "Display Port"
+                      }
+                    },
+                    {
+                      "key": "switches[].picture_mode",
+                      "title": "Picture Mode",
+                      "placeholder": "movie"
+                    }
+                  ]
+                },
+                {
+                  "key": "switches[].command",
+                  "title": "Command",
+                  "placeholder": "KEY_VOLUP"
                 }
               ]
             }

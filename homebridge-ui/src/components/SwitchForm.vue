@@ -294,7 +294,7 @@ watch(
         </div>
         <div class="col-md-6">
           <label for="channel" class="form-label">Channel <span class="text-muted">(optional)</span></label>
-          <input id="channel" v-model="form.channel" type="number" class="form-control" min="0" step="1" placeholder="e.g. 13" />
+          <input id="channel" v-model="form.channel" type="number" class="form-control" min="1" step="1" placeholder="e.g. 13" />
         </div>
       </div>
 
