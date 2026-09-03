@@ -2,6 +2,7 @@
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { useConfig } from '../composables/useConfig';
 import { useDevice } from '../composables/useDevice';
+import { useForm } from '../composables/useForm';
 import { useRouter } from '../composables/useRouter';
 import { useSmartThings } from '../composables/useSmartThings';
 import { useToast } from '../composables/useToast';
@@ -31,8 +32,7 @@ function normalizeMac(mac) {
 
 const isEdit = computed(() => props.action === 'edit');
 
-const validated = ref(false);
-const formEl = ref(null);
+const { formEl, validated, checkValidity } = useForm();
 const form = reactive({
   name: '',
   ip: '',
@@ -133,10 +133,7 @@ function buildDeviceData(existingDevice = {}) {
 }
 
 async function handleSubmit() {
-  form.name = form.name.trim();
-
-  if (!formEl.value?.checkValidity()) {
-    validated.value = true;
+  if (!checkValidity()) {
     return;
   }
 

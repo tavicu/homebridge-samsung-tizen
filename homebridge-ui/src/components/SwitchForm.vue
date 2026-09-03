@@ -1,6 +1,7 @@
 <script setup>
-import { computed, reactive, ref, watch } from 'vue';
+import { computed, reactive, watch } from 'vue';
 import { useConfig } from '../composables/useConfig';
+import { useForm } from '../composables/useForm';
 import { useRouter } from '../composables/useRouter';
 import { useToast } from '../composables/useToast';
 
@@ -42,8 +43,7 @@ const toast = useToast();
 const isEdit = computed(() => props.action === 'edit');
 const isDeviceScoped = computed(() => props.deviceIndex !== undefined);
 
-const validated = ref(false);
-const formEl = ref(null);
+const { formEl, validated, checkValidity } = useForm();
 const form = reactive({
   name: '',
   power: false,
@@ -169,10 +169,7 @@ async function persistSwitches(nextSwitches) {
 }
 
 async function handleSubmit() {
-  form.name = form.name.trim();
-
-  if (!formEl.value?.checkValidity()) {
-    validated.value = true;
+  if (!checkValidity()) {
     return;
   }
 

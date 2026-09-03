@@ -1,6 +1,7 @@
 <script setup>
 import { reactive, ref, watch } from 'vue';
 import { useConfig } from '../composables/useConfig';
+import { useForm } from '../composables/useForm';
 import { useHomebridge } from '../composables/useHomebridge';
 import { useRouter } from '../composables/useRouter';
 import { useSmartThings } from '../composables/useSmartThings';
@@ -13,8 +14,7 @@ const { navigateTo } = useRouter();
 const toast = useToast();
 
 const currentStep = ref(1);
-const validated = ref(false);
-const formEl = ref(null);
+const { formEl, validated, checkValidity } = useForm();
 
 const state = reactive({
   clientId: config.value?.clientId || '',
@@ -66,8 +66,7 @@ async function submitStep2() {
 }
 
 async function handleSubmit() {
-  if (!formEl.value?.checkValidity()) {
-    validated.value = true;
+  if (!checkValidity()) {
     return;
   }
 
@@ -138,9 +137,9 @@ function handleRetry() {
     <div class="card-body">
       <div class="mb-3">
         <label class="form-label">Authorization URL</label>
-        <div>
-          <a :href="state.authorizationUrl" target="_blank" class="text-truncate me-2"> <i class="fas fa-link me-1" /> https://api.smartthings.com/oauth/authorize </a>
-          <a :href="state.authorizationUrl" target="_blank" class="btn btn-sm btn-outline-secondary">Open</a>
+        <div class="d-flex align-items-center gap-5">
+          <a :href="state.authorizationUrl" target="_blank" class="text-truncate min-w-0"> <i class="fas fa-link me-1" /> {{ state.authorizationUrl }}</a>
+          <a :href="state.authorizationUrl" target="_blank" class="btn btn-sm btn-outline-secondary flex-shrink-0">Open</a>
         </div>
       </div>
 
