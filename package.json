@@ -14,6 +14,7 @@
   "author": "Octavian Ruda",
   "homepage": "https://tavicu.github.io/homebridge-samsung-tizen",
   "devDependencies": {
+    "medium-zoom": "^1.1.0",
     "vitepress": "^1.6.3"
   }
 }
