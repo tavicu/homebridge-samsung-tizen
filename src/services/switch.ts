@@ -44,25 +44,21 @@ export class SwitchService extends ServiceWrapper {
       return false;
     }
 
-    try {
-      for (const option of this.options) {
-        if (!option.get) {
-          continue;
-        }
-
-        const isOptionActive = await option.get();
-
-        if (isOptionActive) {
-          return true;
-        }
+    for (const option of this.options) {
+      if (!option.get || (option.polled && !this.device.power)) {
+        continue;
       }
 
-      return false;
-    } catch (error) {
-      this.device.log.debug(`Failed to get switch state: ${error?.message || error}`);
-
-      return false;
+      try {
+        if (await option.get()) {
+          return true;
+        }
+      } catch (error) {
+        this.device.log.debug(`Failed to get switch state: ${error?.message || error}`);
+      }
     }
+
+    return false;
   }
 
   private async setSwitch(value: CharacteristicValue) {

@@ -22,7 +22,8 @@ type SwitchOptionDefinition = Pick<SwitchOption, 'key' | 'offable' | 'polled'> &
  * `offable` is about set: Home can turn the option off (mute, sleep). Without it, OFF is ignored
  * (app, input, command) because there is no matching TV action.
  * `polled` is about get: state is not in DeviceState / events, so AccessoryPoller must ask the TV
- * (app visibility, HDMI source). mute/sleep have get but are not polled.
+ * (app visibility, HDMI source, picture mode). Those gets are skipped when the TV is off.
+ * mute/sleep have get but are not polled.
  * A switch is stateless when no option has get (command, volume, channel).
  */
 const OPTION_DEFINITIONS: Array<SwitchOptionDefinition> = [
@@ -73,16 +74,8 @@ const OPTION_DEFINITIONS: Array<SwitchOptionDefinition> = [
     polled: true,
     build: ({ config, device, service }) => ({
       get: async () => {
-        if (!device.power) {
-          return false;
-        }
-
-        try {
-          const application = await device.getApplication(config.app as string | number);
-          return application?.visible ?? false;
-        } catch {
-          return false;
-        }
+        const application = await device.getApplication(config.app as string | number);
+        return application?.visible ?? false;
       },
       set: async (switchValue: boolean) => {
         if (!switchValue) {
@@ -99,17 +92,7 @@ const OPTION_DEFINITIONS: Array<SwitchOptionDefinition> = [
     key: 'input',
     polled: true,
     build: ({ config, device }) => ({
-      get: async () => {
-        if (!device.power) {
-          return false;
-        }
-
-        try {
-          return (await device.getInputSource()) === config.input;
-        } catch {
-          return false;
-        }
-      },
+      get: async () => (await device.getInputSource()) === config.input,
       set: async (_switchValue: boolean) => {
         await device.setInputSource(config.input as string);
       },
@@ -127,7 +110,9 @@ const OPTION_DEFINITIONS: Array<SwitchOptionDefinition> = [
 
   {
     key: 'picture_mode',
+    polled: true,
     build: ({ config, device }) => ({
+      get: async () => (await device.getPictureMode()) === config.picture_mode,
       set: async (_switchValue: boolean) => {
         await device.setPictureMode(config.picture_mode as string);
       },
