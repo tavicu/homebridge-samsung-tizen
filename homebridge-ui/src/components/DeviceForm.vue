@@ -191,7 +191,7 @@ watch(
     <button v-if="isEdit" type="button" class="btn btn-outline-danger" @click="navigateTo('device', { action: 'delete', deviceIndex })">Delete Device</button>
   </div>
 
-  <div v-if="!isEdit" class="ht-callout callout-info mb-3">
+  <div v-if="!isEdit" class="mb-3">
     <div class="fw-semibold mb-1">Just fill in the essential details to add your TV</div>
     This initial step covers basic setup. Additional features (inputs, custom switches, power options) can be fully customized from the Edit Device menu after adding.
   </div>
@@ -320,19 +320,3 @@ watch(
     </div>
   </template>
 </template>
-
-<style scoped>
-.ht-callout {
-  background: var(--bs-light);
-  border: 1px solid #e7e9eb;
-  border-left: 3px solid var(--bs-gray-200);
-  border-radius: 0.375rem;
-  padding: 0.7rem 0.875rem;
-  font-size: 0.8rem;
-  line-height: 1.25rem;
-}
-
-.ht-callout.callout-info {
-  border-left-color: var(--bs-info);
-}
-</style>

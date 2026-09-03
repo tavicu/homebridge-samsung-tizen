@@ -40,18 +40,22 @@ export function useSmartThings() {
     return serverRequest('/smartthings/get-devices');
   }
 
-  const isExpired = computed(() => {
-    if (!smartthings.value?.expiresAt) {
-      return true;
+  const status = computed(() => {
+    if (!smartthings.value) {
+      return 'disconnected';
     }
 
-    return smartthings.value.expiresAt <= Date.now();
+    if (!smartthings.value.expiresAt || smartthings.value.expiresAt <= Date.now()) {
+      return 'expired';
+    }
+
+    return 'connected';
   });
 
   return {
     smartthings,
     isLoading,
-    isExpired,
+    status,
     getAuthUrl,
     getAuthToken,
     getToken,

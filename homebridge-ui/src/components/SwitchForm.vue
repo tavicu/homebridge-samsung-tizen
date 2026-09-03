@@ -233,7 +233,7 @@ watch(
     <button v-if="isEdit" type="button" class="btn btn-outline-danger" @click="navigateTo('switch', { action: 'delete', switchIndex, deviceIndex })">Delete Switch</button>
   </div>
 
-  <div v-if="!isEdit" class="ht-callout callout-info mb-3">
+  <div v-if="!isEdit" class="mb-3">
     <div class="fw-semibold mb-1">Combine one or more actions</div>
     A switch can run multiple actions at once — for example power on the TV, set volume, then send a remote command.
   </div>
@@ -332,9 +332,7 @@ watch(
           </div>
         </div>
         <button type="button" class="btn btn-outline-primary mt-2" @click="addCommand"><i class="fas fa-plus" /> Add Command</button>
-        <small class="form-text text-muted d-block mt-2">
-          Repeat a key with <code>KEY_VOLUP*3</code>. Hold it with <code>KEY_POWER*2.5s</code> (time in seconds).
-        </small>
+        <small class="form-text text-muted d-block mt-2"> Repeat a key with <code>KEY_VOLUP*3</code>. Hold it with <code>KEY_POWER*2.5s</code> (time in seconds). </small>
       </div>
     </div>
 
@@ -344,19 +342,3 @@ watch(
     </div>
   </form>
 </template>
-
-<style scoped>
-.ht-callout {
-  background: var(--bs-light);
-  border: 1px solid #e7e9eb;
-  border-left: 3px solid var(--bs-gray-200);
-  border-radius: 0.375rem;
-  padding: 0.7rem 0.875rem;
-  font-size: 0.8rem;
-  line-height: 1.25rem;
-}
-
-.ht-callout.callout-info {
-  border-left-color: var(--bs-info);
-}
-</style>

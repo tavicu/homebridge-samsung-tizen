@@ -20,8 +20,6 @@ onMounted(() => {
   <p class="small" v-html="$t('dashboard.alert', { url: 'https://tavicu.github.io/homebridge-samsung-tizen/' })" />
 
   <div class="mb-4">
-    <h5 class="fw-semibold mb-2">SmartThings Integration</h5>
-
     <SmartThingsCard />
   </div>
 

@@ -67,7 +67,6 @@ export class SmartThingsManager {
         this.isAvailable = true;
       } catch (error: any) {
         this.isAvailable = false;
-        this.storage.clear();
         throw error;
       } finally {
         this.refreshPromise = null;
