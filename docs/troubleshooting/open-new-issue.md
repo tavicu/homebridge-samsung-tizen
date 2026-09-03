@@ -18,11 +18,11 @@ If you have a technical problem and something it's not working as it should you 
 
 To identify what logs are helpful you must look for logs that include the name of the TV you set in config file or for the plugin name (for example `Bedroom TV` or `homebridge-samsung-tizen`).
 
-![Troubleshooting console one](~@images/trouble.console-one.png)
+![Troubleshooting console one](/images/trouble.console-one.png)
 
 The logs in gray are debug logs and the ones in red are failures. Usually if you start the plugin in debug mode right after a failure log you will have some debug lines that tells why the command failed and the root of the problem. This is very important in finding a solution to your problem!
 
-![Troubleshooting console two](~@images/trouble.console-two.png)
+![Troubleshooting console two](/images/trouble.console-two.png)
 
 Once you are sure you want to open a new issue you can access the [Issues page](https://github.com/tavicu/homebridge-samsung-tizen/issues) from GitHub. Please make sure to follow instructions from there.
 
@@ -34,7 +34,7 @@ Press the three dots from the upper-right corner then select `Homebridge Setting
 
 Then on the `Startup Options` make sure to enable the radio button for `Homebridge Debug Mode -D`.
 
-![Troubleshooting enable debug mode](~@images/trouble.open-issue.png)
+![Troubleshooting enable debug mode](/images/trouble.open-issue.png)
 
 ***
 

@@ -10,12 +10,12 @@ At the moment the plugin works with HOOBS too but unfortunately we cannot offer 
 If you are unsing Config UI X you can install the plugin right from the interface.
 
 First access the interface and select the `Plugins` tab from the navbar.
-![Plugin installation select Plugins](~@images/install.plugin-ui-x-one.png)
+![Plugin installation select Plugins](/images/install.plugin-ui-x-one.png)
 
 Then search for `homebridge-samsung-tizen` in the search box and press `enter` key on your keyboard.
 
 You should now see the plugin and click `INSTALL`.
-![Plugin installation search and install](~@images/install.plugin-ui-x-two.png)
+![Plugin installation search and install](/images/install.plugin-ui-x-two.png)
 
 Wait for the installation to finish and a modal will appear where you can configure the devices.
 

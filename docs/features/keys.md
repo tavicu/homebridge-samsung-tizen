@@ -12,7 +12,7 @@ If you don't have the icon on the Control Center it can be activated by going in
 
 From here you can also change the speaker volume of TV by pressing the phisical volume buttons on your phone / tablet.
 
-![Features Keys](~@images/features.keys.jpg)
+![Features Keys](/images/features.keys.jpg)
 
 ## Default mapping
 

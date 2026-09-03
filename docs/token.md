@@ -1,9 +1,6 @@
 ---
 title: SmartThings Authorization
-navbar: false
-sidebar: false
+layout: false
 ---
-
-# SmartThings Authorization
 
 <SmartThingsToken />

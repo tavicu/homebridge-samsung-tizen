@@ -49,7 +49,7 @@ Login with the same credentials you used in the SmartThings application.
 
 Click on `Generate new token` button:
 
-![SmartThings Generate token](~@images/smartthings.generate-token.png)
+![SmartThings Generate token](/images/smartthings.generate-token.png)
 
 On `Token Name` insert a name for your token so you will be able to identify it. For example `Homebridge Samsung-Tizen`.
 
@@ -59,7 +59,7 @@ _If you don't want to select everything from the `Authorized Scopes` the minimum
 
 Click `Generate token` button on the lower part of the screen then copy the token key! Please make sure you copy it now because after refresh you will not be able to see the token key ever again and you will have to generate a new token.
 
-![SmartThings Generate token](~@images/smartthings.copy-token.png)
+![SmartThings Generate token](/images/smartthings.copy-token.png)
 
 ## Getting the device id
 
@@ -69,11 +69,11 @@ Login with the same credentials you used in the SmartThings application.
 
 Now you should see the Dashboard with your rooms and devices. Click on the device you want to get the ID for.
 
-![SmartThings Dashboard](~@images/smartthings.dashboard.png)
+![SmartThings Dashboard](/images/smartthings.dashboard.png)
 
 After you click on the device a popup should open and on the left side you should have the `device_id` (`5d9215vx-c421-4e12-a998-c4ec48754f08` from our example).
 
-![SmartThings Device ID](~@images/smartthings.device-id.png)
+![SmartThings Device ID](/images/smartthings.device-id.png)
 
 If you have multiple TVs click on each one to see the popup and copy the `device_id` for each one.
 

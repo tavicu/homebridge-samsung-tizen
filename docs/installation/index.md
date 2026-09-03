@@ -12,7 +12,7 @@ Some older TVs respond to that API even if they use PIN method as pairing. Start
 
 | Compatible                                     | Not compatible                                         |
 | ---------------------------------------------- | ------------------------------------------------------ |
-| ![Compatible](~@images/install.compatible.jpg) | ![Not Compatible](~@images/install.not-compatible.jpg) |
+| ![Compatible](/images/install.compatible.jpg) | ![Not Compatible](/images/install.not-compatible.jpg) |
 
 ## Homebridge Server
 

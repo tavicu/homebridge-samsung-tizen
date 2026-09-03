@@ -18,7 +18,7 @@ Access the Homebridge UI and select `Plugins` tab from the navbar.
 
 After that click the `SETTINGS` button on the plugin and a modal will appear.
 
-![Setting device open configuration](~@images/install.setting-device-one.png)
+![Setting device open configuration](/images/install.setting-device-one.png)
 
 The minimum configuration for each device are the inputs **Name**, **IP Address** and **MAC Address**. Without one of this the plugin will fail to initialize the device.
 
@@ -26,7 +26,7 @@ You can add multiple devices by pressing `ADD DEVICE` button for each new device
 
 After entering your device informations you can click the `SAVE` button to update the configuration.
 
-![Setting device saving configuration](~@images/install.setting-device-two.png)
+![Setting device saving configuration](/images/install.setting-device-two.png)
 
 Once the configuration was saved you will have to restart Homebridge server to apply the changes.
 

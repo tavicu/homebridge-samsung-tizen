@@ -155,7 +155,7 @@ Most of the IDs changed starting with year 2020. If you know your TV model is fr
 
 You can view list of application on [Samsung website](https://www.samsung.com/us/tvs/smart-tv/samsung-tv-plus-and-smart-hub/). Right click on an app icon and click "Inspect Element". The `<button>` element has an attribute `data-app-id` containing the ID of selected application.
 
-![App ID HTML](~@images/extra.app-id-html.png)
+![App ID HTML](/images/extra.app-id-html.png)
 
 ::: tip Enabling developer mode in Safari
 To be able to use Inspect Element functionality in Safari, you should have developer mode enabled. Go to Safari Settings > Advanced > Check "Show features for web developers" checkbox.
@@ -175,10 +175,10 @@ Unfortunately Samsung decided to remove the API that we used in the past to get 
 
 3. In Tizen Studio Device Manager, right click on the entry with your TV and select `Installed Web App List` from the dropdown.
 If you can't see `Installed Web App List` in the dropdown, make sure you installed the TV Extenstion from the first step!
-![Device Manager](~@images/extra.app-device-manager.png)
+![Device Manager](/images/extra.app-device-manager.png)
 
 4. A list with all installed applications should appear
-![App List](~@images/extra.app-list.png)
+![App List](/images/extra.app-list.png)
 
 5. As ID use the value from `App ID - WAS`
 

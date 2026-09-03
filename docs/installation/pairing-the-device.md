@@ -8,7 +8,7 @@ The pairing process will be initiated after Homebridge server started and it cas
 
 After the Homebridge server starts you should see a popup on your TV asking to give permissions for connection. You need to click **Allow** button.
 
-![Setting device saving configuration](~@images/install.pairing-device.jpg)
+![Setting device saving configuration](/images/install.pairing-device.jpg)
 
 ### Clicked Deny by mistake
 
