@@ -38,6 +38,10 @@ These were removed and are ignored if they are still present in your configurati
 - `method` and `port` - the connection to the TV is detected automatically.
 - `api_key` - replaced by the SmartThings authorization flow described above.
 
+**Improved**
+
+- Storage backups: Plugin storage (`samsung-tizen.json`) is now automatically backed up before each write to `backups/samsung-tizen/`, keeping the last 10 backups for recovery.
+
 **Changed**
 
 - When Home asks which input is active, the plugin now checks the currently selected source first, then non-app sources (HDMI, TV, USB), and only then apps. Each app needs a request to the TV, so this order cuts down extra requests when the source is already known or is a physical input.

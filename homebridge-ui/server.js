@@ -5,11 +5,13 @@ import { HomebridgePluginUiServer } from '@homebridge/plugin-ui-utils';
 
 class PluginUiServer extends HomebridgePluginUiServer {
   #storagePath;
+  #backupDir;
 
   constructor() {
     super();
 
     this.#storagePath = path.join(this.homebridgeStoragePath, 'accessories', 'samsung-tizen.json');
+    this.#backupDir = path.join(this.homebridgeStoragePath, 'backups', 'samsung-tizen');
 
     this.onRequest('/smartthings/auth-url', this.stAuthUrl.bind(this));
     this.onRequest('/smartthings/auth-token', this.stAuthToken.bind(this));
@@ -180,10 +182,11 @@ class PluginUiServer extends HomebridgePluginUiServer {
     }
 
     const nextData = Object.fromEntries(Object.entries({ ...storedData, ...partial }).filter(([, value]) => value !== undefined));
-
     const tmpPath = `${this.#storagePath}.tmp`;
 
     try {
+      await this.#backupStoredData();
+
       await fs.writeFile(tmpPath, JSON.stringify(nextData, null, 2), 'utf-8');
       await fs.rename(tmpPath, this.#storagePath);
     } catch (error) {
@@ -192,6 +195,30 @@ class PluginUiServer extends HomebridgePluginUiServer {
     }
 
     return nextData;
+  }
+
+  async #backupStoredData() {
+    try {
+      await fs.mkdir(this.#backupDir, { recursive: true });
+
+      const backupPath = path.join(this.#backupDir, `${path.basename(this.#storagePath)}.${Date.now()}`);
+      await fs.copyFile(this.#storagePath, backupPath);
+
+      await this.#pruneStoredBackups();
+    } catch {
+      // Backups are best-effort and should never block writing the actual data.
+    }
+  }
+
+  async #pruneStoredBackups() {
+    const maxBackups = 10;
+    const prefix = `${path.basename(this.#storagePath)}.`;
+    const entries = await fs.readdir(this.#backupDir);
+
+    const backups = entries.filter((entry) => entry.startsWith(prefix)).sort((a, b) => Number(a.slice(prefix.length)) - Number(b.slice(prefix.length)));
+    const outdated = backups.slice(0, Math.max(0, backups.length - maxBackups));
+
+    await Promise.all(outdated.map((entry) => fs.unlink(path.join(this.#backupDir, entry)).catch(() => {})));
   }
 }
 
