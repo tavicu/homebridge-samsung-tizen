@@ -3,16 +3,23 @@ on:
   push:
     branches:
       - docs
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
 
 jobs:
-  docs:
+  build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v7
-        with:
-          ref: 'docs'
 
       - name: Setup Node
         uses: actions/setup-node@v7
@@ -26,10 +33,18 @@ jobs:
       - name: Build VitePress
         run: npm run docs:build
 
-      - name: Deploy to GitHub Pages
-        uses: crazy-max/ghaction-github-pages@v5
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v5
         with:
-          target_branch: gh-pages
-          build_dir: docs/.vitepress/dist
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          path: docs/.vitepress/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
