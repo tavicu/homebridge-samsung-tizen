@@ -96,11 +96,7 @@ export class TelevisionService extends ServiceWrapper {
           return 0;
         }
 
-        if (input.config.type !== 'app') {
-          return 1;
-        }
-
-        return 2;
+        return input.config.type === 'app' ? 2 : 1;
       };
 
       const prioritizedInputs = [...this.accessory.inputs].sort((a, b) => inputPriority(a) - inputPriority(b));
@@ -115,7 +111,7 @@ export class TelevisionService extends ServiceWrapper {
           }
         } catch {}
 
-        await sleep(100);
+        await sleep(150);
       }
 
       this.updateValue(this.characteristic.ActiveIdentifier, 0);
