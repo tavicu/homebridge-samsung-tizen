@@ -31,7 +31,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
       throw new Error('Client ID and client secret are required');
     }
 
-    const redirectUrl = 'https://httpbin.org/get';
+    const redirectUrl = 'https://tavicu.github.io/homebridge-samsung-tizen/token.html';
     const scopes = 'r:devices:* x:devices:*'.replace(' ', '%20');
 
     return `https://api.smartthings.com/oauth/authorize?client_id=${clientId}&response_type=code&redirect_uri=${encodeURIComponent(redirectUrl)}&scope=${scopes}`;
@@ -44,7 +44,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
       throw new Error('Client ID, client secret, and authorization code are required');
     }
 
-    const redirectUrl = 'https://httpbin.org/get';
+    const redirectUrl = 'https://tavicu.github.io/homebridge-samsung-tizen/token.html';
     const credentialsBase64 = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
 
     const body = new URLSearchParams({
