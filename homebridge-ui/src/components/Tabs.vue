@@ -66,14 +66,7 @@ onUnmounted(() => observer?.disconnect());
 
 <template>
   <div ref="tablist" class="hst-tablist d-flex gap-1 mb-4 position-relative" role="tablist">
-    <button
-      v-for="tab in tabs"
-      :key="tab.id"
-      type="button"
-      role="tab"
-      :aria-selected="currentTab === tab.id"
-      @click="currentTab = tab.id"
-    >
+    <button v-for="tab in tabs" :key="tab.id" type="button" role="tab" :aria-selected="currentTab === tab.id" @click="currentTab = tab.id">
       {{ tab.label }}
     </button>
     <span ref="ink" class="hst-tab-ink" />
@@ -136,7 +129,8 @@ onUnmounted(() => observer?.disconnect());
   color: rgba(255, 255, 255, 0.55);
 }
 
-.dark-mode .hst-tablist button:hover {
+.dark-mode .hst-tablist button:hover,
+.dark-mode .hst-tablist button[aria-selected='true'] {
   color: #fff;
 }
 </style>

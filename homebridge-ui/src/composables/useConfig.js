@@ -47,6 +47,10 @@ export function useConfig() {
     return config.value;
   }
 
+  async function saveConfig() {
+    await hb.savePluginConfig();
+  }
+
   async function updateConfig(partialConfig, save = true) {
     try {
       const updatedConfig = JSON.parse(
@@ -73,6 +77,7 @@ export function useConfig() {
   return {
     config,
     getConfig,
+    saveConfig,
     cleanConfig,
     updateConfig,
   };

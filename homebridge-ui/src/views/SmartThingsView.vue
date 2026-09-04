@@ -21,7 +21,7 @@ onMounted(() => {
   <SmartThingsDisconnect v-if="action === 'disconnect'" />
 
   <template v-else>
-    <div>
+    <div class="text-center">
       <SmartThingsIcon width="52" />
       <h6 class="fw-bold mt-2 mb-0">SmartThings Authorization</h6>
       <small class="text-muted">Connect your Samsung SmartThings account to Homebridge</small>

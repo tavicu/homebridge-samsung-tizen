@@ -6,8 +6,9 @@ import { useHomebridge } from '../composables/useHomebridge';
 import { useRouter } from '../composables/useRouter';
 import { useSmartThings } from '../composables/useSmartThings';
 import { useToast } from '../composables/useToast';
+import WizardSteps from './WizardSteps.vue';
 
-const { config, updateConfig } = useConfig();
+const { config, updateConfig, saveConfig } = useConfig();
 const { showSpinner, hideSpinner } = useHomebridge();
 const { getAuthUrl, getAuthToken, saveToken } = useSmartThings();
 const { navigateTo } = useRouter();
@@ -37,10 +38,13 @@ async function submitStep1() {
 
   state.authorizationUrl = authorizationUrl;
 
-  await updateConfig({
-    clientId: state.clientId,
-    clientSecret: state.clientSecret,
-  });
+  await updateConfig(
+    {
+      clientId: state.clientId,
+      clientSecret: state.clientSecret,
+    },
+    false,
+  );
 
   currentStep.value = 2;
 }
@@ -59,6 +63,7 @@ async function submitStep2() {
     state.error = authorizationToken.error_description || authorizationToken.error;
   } else {
     await saveToken(authorizationToken);
+    await saveConfig();
     state.status = 'success';
   }
 
@@ -95,6 +100,8 @@ function handleRetry() {
 </script>
 
 <template>
+  <WizardSteps :current="currentStep" :outcome="state.status" :steps="['Credentials', 'Auth Code', 'Authorization']" class="mt-4 mb-5 mx-sm-5" />
+
   <form v-if="currentStep === 1" ref="formEl" class="card rounded" :class="{ 'was-validated': validated }" novalidate @submit.prevent="handleSubmit">
     <div class="card-header">Step 1 — Enter API Credentials</div>
     <div class="card-body">

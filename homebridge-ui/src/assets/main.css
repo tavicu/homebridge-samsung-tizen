@@ -54,7 +54,9 @@
 }
 
 .dark-mode #app-tizen {
+  --bs-body-color: #a5a5a5;
   --bs-box-shadow: 0 0.25rem 0.8rem rgba(0, 0, 0, 0.4);
+  --bs-secondary-color: rgba(130, 130, 130, 0.75);
 }
 
 .dark-mode .text-abbr {

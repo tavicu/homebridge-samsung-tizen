@@ -28,7 +28,7 @@ function formatDate(timestamp) {
 </script>
 
 <template>
-  <div class="hst-card d-flex align-items-center gap-4 shadow">
+  <div class="st-card d-flex align-items-center gap-4 shadow">
     <div class="flex-grow-1">
       <div class="d-flex align-items-center flex-wrap gap-2 mb-2">
         <h5 class="fw-semibold mb-0">SmartThings Integration</h5>
@@ -67,7 +67,7 @@ function formatDate(timestamp) {
 </template>
 
 <style scoped>
-.hst-card {
+.st-card {
   background: linear-gradient(135deg, rgb(4 121 208 / 100%) 0%, rgb(0 141 247 / 80%) 100%);
   border-radius: 0.375rem;
   box-shadow: 0 1px 4px rgb(0 40 80 / 12%);
