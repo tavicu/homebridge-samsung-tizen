@@ -2,6 +2,7 @@
   --bs-box-shadow: 0 0.25rem 0.7rem rgba(0, 0, 0, 0.075);
   --form-control-bg: #fcfcfc;
   --form-control-border: #e4e7ec;
+  --form-control-hover-bg: #fff;
   --form-control-active-bg: #fff;
   --form-control-active-border: var(--bs-primary);
   --form-control-active-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
@@ -13,6 +14,7 @@
   --bs-secondary-color: rgba(130, 130, 130, 0.75);
   --form-control-bg: rgba(255, 255, 255, 0.06);
   --form-control-border: rgba(255, 255, 255, 0.14);
+  --form-control-hover-bg: rgba(255, 255, 255, 0.1);
   --form-control-active-bg: rgba(255, 255, 255, 0.1);
   --form-control-active-border: var(--bs-primary);
   --form-control-active-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
@@ -53,6 +55,11 @@
   border-radius: 0.4rem;
   background-color: var(--form-control-bg);
   border-color: var(--form-control-border);
+}
+
+.form-control:hover,
+.form-select:hover {
+  background-color: var(--form-control-hover-bg);
 }
 
 .form-control:focus,

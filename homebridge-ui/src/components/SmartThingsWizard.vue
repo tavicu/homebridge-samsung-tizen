@@ -171,28 +171,36 @@ function handleRetry() {
     </div>
   </form>
 
-  <div v-if="currentStep === 3">
+  <div v-if="currentStep === 3" class="text-center mt-5">
     <template v-if="state.status === 'success'">
-      <h4 class="fw-bold">Connection successful</h4>
-      <p>Homebridge is now authorized to access your Samsung SmartThings account.</p>
-
-      <button type="button" class="btn btn-success" @click="navigateTo('dashboard')">Go to dashboard <i class="fas fa-arrow-right ms-1" /></button>
+      <i class="wizard-icon fas fa-check text-success mb-3" />
+      <h5 class="fw-semibold mb-0">Connection successful</h5>
+      <p class="wizard-outcome-text small text-secondary mt-2 mb-3">Homebridge is now authorized to access your Samsung SmartThings account.</p>
+      <button type="button" class="btn btn-success" @click="navigateTo('dashboard')">Go to dashboard <i class="fas fa-arrow-right" /></button>
     </template>
 
     <template v-else-if="state.status === 'error'">
-      <h4 class="fw-bold">Authorization failed</h4>
-      <p>
-        The backend could not exchange your authorization code for an access token. The authorization code may have been incorrect, expired, or already used. Please go back and try
-        again with a fresh authorization code.
-      </p>
-      <div v-if="state.error">
-        <code>{{ state.error }}</code>
-      </div>
-
-      <div>
+      <i class="wizard-icon fas fa-exclamation-triangle text-danger mb-3" />
+      <h5 class="fw-semibold mb-0">Authorization failed</h5>
+      <p class="wizard-outcome-text small text-secondary mt-2 mb-3">The authorization code may have been incorrect, expired, or already used. Try again with a fresh code.</p>
+      <code v-if="state.error" class="d-block mb-3">{{ state.error }}</code>
+      <div class="d-flex justify-content-center gap-2">
         <button type="button" class="btn btn-outline-secondary" @click="navigateTo('dashboard')">Cancel</button>
         <button type="button" class="btn btn-danger" @click="handleRetry">Try again</button>
       </div>
     </template>
   </div>
 </template>
+
+<style scoped>
+.wizard-icon {
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.wizard-outcome-text {
+  max-width: 22rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+</style>
