@@ -100,10 +100,13 @@ function handleRetry() {
 </script>
 
 <template>
-  <WizardSteps :current="currentStep" :outcome="state.status" :steps="['Credentials', 'Auth Code', 'Authorization']" class="mt-4 mb-5 mx-sm-5" />
+  <WizardSteps :current="currentStep" :outcome="state.status" :steps="['Credentials', 'Auth Code', 'Authorization']" class="my-4 mx-sm-5" />
 
-  <form v-if="currentStep === 1" ref="formEl" class="card rounded" :class="{ 'was-validated': validated }" novalidate @submit.prevent="handleSubmit">
-    <div class="card-header">Step 1 — Enter API Credentials</div>
+  <form v-if="currentStep === 1" ref="formEl" class="card shadow" :class="{ 'was-validated': validated }" novalidate @submit.prevent="handleSubmit">
+    <div class="card-header">
+      <h6 class="fw-semibold mb-0">API Credentials</h6>
+      <p class="small text-secondary mb-0 mt-1">Enter your SmartThings OAuth client ID and secret.</p>
+    </div>
     <div class="card-body">
       <div class="mb-3">
         <label for="clientId" class="form-label">Client ID <strong class="text-danger">*</strong></label>
@@ -119,7 +122,7 @@ function handleRetry() {
         <div class="invalid-feedback">Please enter a valid OAuth Client ID</div>
       </div>
 
-      <div>
+      <div class="mb-2">
         <label for="clientSecret" class="form-label">Client Secret <strong class="text-danger">*</strong></label>
         <input
           id="clientSecret"
@@ -133,30 +136,36 @@ function handleRetry() {
         <div class="invalid-feedback">Please enter a valid OAuth Client Secret</div>
       </div>
     </div>
-    <div class="card-footer">
+    <div class="card-footer card-actions">
       <button type="button" class="btn btn-outline-secondary" @click="navigateTo('dashboard')">Cancel</button>
       <button type="submit" class="btn btn-primary">Continue to authorization <i class="fas fa-arrow-right"></i></button>
     </div>
   </form>
 
-  <form v-if="currentStep === 2" ref="formEl" class="card rounded" :class="{ 'was-validated': validated }" novalidate @submit.prevent="handleSubmit">
-    <div class="card-header">Step 2 — Authorize with SmartThings</div>
+  <form v-if="currentStep === 2" ref="formEl" class="card shadow" :class="{ 'was-validated': validated }" novalidate @submit.prevent="handleSubmit">
+    <div class="card-header">
+      <h6 class="fw-semibold mb-0">Authorization Code</h6>
+      <p class="small text-secondary mb-0 mt-1">Open the authorization URL, then paste the code you receive.</p>
+    </div>
     <div class="card-body">
       <div class="mb-3">
         <label class="form-label">Authorization URL</label>
-        <div class="d-flex align-items-center gap-5">
-          <a :href="state.authorizationUrl" target="_blank" class="text-truncate min-w-0"> <i class="fas fa-link me-1" /> {{ state.authorizationUrl }}</a>
-          <a :href="state.authorizationUrl" target="_blank" class="btn btn-sm btn-outline-secondary flex-shrink-0">Open</a>
+        <div class="code-box">
+          <a :href="state.authorizationUrl" target="_blank" rel="noopener noreferrer" class="code-box-value font-monospace text-truncate">
+            <i class="fas fa-link" />
+            {{ state.authorizationUrl }}
+          </a>
+          <a :href="state.authorizationUrl" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary flex-shrink-0">Open</a>
         </div>
       </div>
 
-      <div>
+      <div class="mb-2">
         <label for="authorizationCode" class="form-label">Authorization Code <strong class="text-danger">*</strong></label>
         <input id="authorizationCode" v-model="state.authorizationCode" type="text" class="form-control" placeholder="e.g. 4euLqN" pattern="[a-zA-Z0-9]+" required />
         <div class="invalid-feedback">Please enter a valid authorization code</div>
       </div>
     </div>
-    <div class="card-footer">
+    <div class="card-footer card-actions">
       <button type="button" class="btn btn-outline-secondary" @click="currentStep--">Back</button>
       <button type="submit" class="btn btn-primary">Authorize SmartThings <i class="fas fa-arrow-right"></i></button>
     </div>

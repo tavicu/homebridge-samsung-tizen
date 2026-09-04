@@ -24,8 +24,8 @@ const devices = computed(() => config.value?.devices || []);
 </script>
 
 <template>
-  <div class="card card-table shadow">
-    <div class="card-header d-flex align-items-center justify-content-between gap-3">
+  <div class="card shadow">
+    <div class="card-header d-flex align-items-center justify-content-between gap-3 bg-transparent">
       <div>
         <h6 class="fw-semibold mb-0">{{ title }}</h6>
         <p v-if="description" class="small text-secondary mb-0 mt-1">{{ description }}</p>

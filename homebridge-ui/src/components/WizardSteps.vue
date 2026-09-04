@@ -83,6 +83,7 @@ const resolvedSteps = computed(() =>
   --wizard-border: #6a6a6a;
   --wizard-marker: var(--bs-body-color);
   --wizard-secondary: var(--bs-secondary-color);
+  --wizard-marker-text: rgba(33, 37, 41, 0.75);
 }
 
 .wizard-marker {
