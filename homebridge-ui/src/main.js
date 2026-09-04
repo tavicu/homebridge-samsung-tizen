@@ -12,8 +12,10 @@ async function startApp() {
     return;
   }
 
+  const { moveModalPadding, showSchemaForm } = useHomebridge();
+
   if (!isConfigUiXSupported()) {
-    useHomebridge().showSchemaForm();
+    showSchemaForm();
     return;
   }
 
@@ -24,6 +26,7 @@ async function startApp() {
 
     await Promise.all([getConfig(), setupI18n(app)]);
 
+    moveModalPadding(root);
     app.mount(root);
   } catch (err) {
     root.innerHTML = `<div class="alert alert-danger">There was an error initializing the app: ${err.message}</div>`;

@@ -1,4 +1,4 @@
-function getHostModalFooter() {
+function getHostModalElement(selector) {
   try {
     const iframe = window.frameElement;
     if (!iframe) {
@@ -6,7 +6,7 @@ function getHostModalFooter() {
     }
 
     const modalContent = iframe.closest('.modal-content');
-    return modalContent?.querySelector(':scope > .modal-footer') ?? null;
+    return modalContent?.querySelector(selector) ?? null;
   } catch {
     return null;
   }
@@ -24,12 +24,12 @@ export function useHomebridge() {
   }
 
   function hideModalFooter() {
-    const footer = getHostModalFooter();
+    const footer = getHostModalElement(':scope > .modal-footer');
     footer?.style.setProperty('display', 'none');
   }
 
   function showModalFooter() {
-    const footer = getHostModalFooter();
+    const footer = getHostModalElement(':scope > .modal-footer');
     footer?.style.removeProperty('display');
   }
 
@@ -49,6 +49,16 @@ export function useHomebridge() {
     return hb.request(path, payload);
   }
 
+  function moveModalPadding(root) {
+    const modalBody = getHostModalElement(':scope > .modal-body');
+    if (!modalBody || !root) {
+      return;
+    }
+
+    root.style.setProperty('padding', getComputedStyle(modalBody).padding);
+    modalBody.style.setProperty('padding', '0');
+  }
+
   return {
     hb,
     enableSaveButton,
@@ -59,5 +69,6 @@ export function useHomebridge() {
     hideSpinner,
     showSchemaForm,
     serverRequest,
+    moveModalPadding,
   };
 }

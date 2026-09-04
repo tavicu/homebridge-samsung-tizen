@@ -28,7 +28,7 @@ function formatDate(timestamp) {
 </script>
 
 <template>
-  <div class="hst-card d-flex align-items-center gap-4">
+  <div class="hst-card d-flex align-items-center gap-4 shadow">
     <div class="flex-grow-1">
       <div class="d-flex align-items-center flex-wrap gap-2 mb-2">
         <h5 class="fw-semibold mb-0">SmartThings Integration</h5>
