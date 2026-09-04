@@ -60,4 +60,18 @@ onUnmounted(() => {
   opacity: 0.7;
   margin-right: 0.25rem;
 }
+
+.dark-mode .btn-icon-only {
+  --bs-btn-active-border-color: rgba(255, 255, 255, 0.18);
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.dark-mode .btn-icon-only:hover,
+.dark-mode .btn-icon-only.active {
+  color: #fff;
+}
+
+.dark-mode .dropdown-menu {
+  --bs-dropdown-border-color: rgba(255, 255, 255, 0.12);
+}
 </style>

@@ -52,3 +52,44 @@
 .card-table tr:last-child td {
   border-bottom: 0;
 }
+
+.dark-mode #app-tizen {
+  --bs-box-shadow: 0 0.25rem 0.8rem rgba(0, 0, 0, 0.4);
+}
+
+.dark-mode .text-abbr {
+  text-decoration-color: rgba(255, 255, 255, 0.45);
+}
+
+.dark-mode .card-table {
+  --bs-card-border-color: rgba(255, 255, 255, 0.1);
+  --bs-card-cap-bg: transparent;
+  background-color: rgba(255, 255, 255, 0.04);
+  color: #f8f9fa;
+}
+
+.dark-mode .card-table .card-header,
+.dark-mode .card-table .text-body {
+  color: #f8f9fa !important;
+}
+
+.dark-mode .card-table .text-secondary {
+  color: rgba(255, 255, 255, 0.55) !important;
+}
+
+.dark-mode .card-table .table {
+  --bs-table-color: #f8f9fa;
+  --bs-table-bg: transparent;
+  --bs-table-border-color: rgba(255, 255, 255, 0.08);
+  color: #f8f9fa;
+}
+
+.dark-mode .card-table tbody td {
+  color: #f8f9fa;
+}
+
+.dark-mode .card-table thead th {
+  background-color: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.65);
+  border-color: rgba(255, 255, 255, 0.08);
+}

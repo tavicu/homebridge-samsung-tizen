@@ -64,4 +64,13 @@ defineEmits(['action']);
 .empty-state-text {
   max-width: 22rem;
 }
+
+.dark-mode .empty-state-icon {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.dark-mode .empty-state-title {
+  color: #f8f9fa;
+}
 </style>

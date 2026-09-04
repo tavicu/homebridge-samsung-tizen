@@ -127,4 +127,16 @@ onUnmounted(() => observer?.disconnect());
     transition: none;
   }
 }
+
+.dark-mode .hst-tablist {
+  border-bottom-color: rgba(255, 255, 255, 0.15);
+}
+
+.dark-mode .hst-tablist button {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.dark-mode .hst-tablist button:hover {
+  color: #fff;
+}
 </style>

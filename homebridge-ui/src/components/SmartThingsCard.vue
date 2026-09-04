@@ -71,8 +71,8 @@ function formatDate(timestamp) {
   background: linear-gradient(135deg, rgb(4 121 208 / 100%) 0%, rgb(0 141 247 / 80%) 100%);
   border-radius: 0.375rem;
   box-shadow: 0 1px 4px rgb(0 40 80 / 12%);
-  min-height: 8rem;
-  padding: 0.7rem;
+  min-height: 7rem;
+  padding: 0.825rem;
   color: #fff;
 }
 
