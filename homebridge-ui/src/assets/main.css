@@ -10,10 +10,6 @@
   line-height: 1.5;
 }
 
-.border-dashed {
-  border-style: dashed;
-}
-
 .text-abbr {
   text-decoration: underline dotted #6c757d;
   text-underline-offset: 3px;

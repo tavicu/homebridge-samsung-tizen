@@ -1,8 +1,10 @@
 <script setup>
 import { computed } from 'vue';
+import TvIcon from '../assets/icons/tv.svg';
 import { useConfig } from '../composables/useConfig';
 import { useRouter } from '../composables/useRouter';
 import Dropdown from './Dropdown.vue';
+import EmptyState from './EmptyState.vue';
 
 defineProps({
   title: {
@@ -22,16 +24,16 @@ const devices = computed(() => config.value?.devices || []);
 </script>
 
 <template>
-  <div v-if="devices.length > 0" class="card card-table shadow">
+  <div class="card card-table shadow">
     <div class="card-header d-flex align-items-center justify-content-between gap-3">
       <div>
         <h6 class="fw-semibold mb-0">{{ title }}</h6>
         <p v-if="description" class="small text-secondary mb-0 mt-1">{{ description }}</p>
       </div>
-      <button type="button" class="btn btn-primary flex-shrink-0" @click="navigateTo('device', { action: 'add' })"><i class="fas fa-plus" /> Add device</button>
+      <button v-if="devices.length" type="button" class="btn btn-primary flex-shrink-0" @click="navigateTo('device', { action: 'add' })"><i class="fas fa-plus" /> Add device</button>
     </div>
 
-    <table class="table mb-0">
+    <table v-if="devices.length" class="table mb-0">
       <thead>
         <tr class="text-secondary">
           <th>Name</th>
@@ -54,14 +56,14 @@ const devices = computed(() => config.value?.devices || []);
         </tr>
       </tbody>
     </table>
-  </div>
 
-  <div v-else class="card text-center mb-4 border-dashed">
-    <div class="card-body">
-      <h6 class="fw-semibold">No devices configured</h6>
-      <p class="small">Add your first Samsung TV to get started with Homebridge control</p>
-
-      <button type="button" class="btn btn-primary" @click="navigateTo('device', { action: 'add' })"><i class="fas fa-plus" /> Add your first device</button>
-    </div>
+    <EmptyState
+      v-else
+      :icon="TvIcon"
+      title="No devices yet"
+      description="You haven't added any TVs yet. Add one to start controlling it from Homebridge and the Home app."
+      action-label="Add first device"
+      @action="navigateTo('device', { action: 'add' })"
+    />
   </div>
 </template>
