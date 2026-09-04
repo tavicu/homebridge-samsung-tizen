@@ -24,13 +24,11 @@ onMounted(() => {
 <template>
   <p class="small" v-html="$t('dashboard.alert', { url: 'https://tavicu.github.io/homebridge-samsung-tizen/' })" />
 
-  <div class="mb-4">
-    <SmartThingsCard />
-  </div>
+  <SmartThingsCard class="mb-4" />
 
   <Tabs v-slot="{ currentTab }" :tabs="tabs">
-    <DevicesList v-if="currentTab === 'devices'" />
-    <InputsList v-else-if="currentTab === 'inputs'" />
-    <SwitchesList v-else-if="currentTab === 'switches'" />
+    <DevicesList v-if="currentTab === 'devices'" description="Samsung TVs currently added to this plugin configuration" />
+    <InputsList v-else-if="currentTab === 'inputs'" title="Global Inputs" description="These inputs apply to all configured devices" />
+    <SwitchesList v-else-if="currentTab === 'switches'" title="Global Switches" description="These switches apply to all configured devices" />
   </Tabs>
 </template>

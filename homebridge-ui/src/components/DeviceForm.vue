@@ -302,21 +302,10 @@ watch(
 
   <template v-if="isEdit">
     <div class="mt-4">
-      <div class="d-flex align-items-center justify-content-between mb-2">
-        <h5 class="fw-semibold mb-0">Inputs</h5>
-        <button type="button" class="btn btn-primary" @click="navigateTo('input', { action: 'add', deviceIndex })"><i class="fas fa-plus" /> Add input</button>
-      </div>
-
-      <InputsList :device-index="deviceIndex" />
+      <InputsList :device-index="deviceIndex" :description="`These inputs apply to ${form.name || 'this TV'} and are added on top of the global inputs`" />
     </div>
-
     <div class="mt-4">
-      <div class="d-flex align-items-center justify-content-between mb-2">
-        <h5 class="fw-semibold mb-0">Switches</h5>
-        <button type="button" class="btn btn-primary" @click="navigateTo('switch', { action: 'add', deviceIndex })"><i class="fas fa-plus" /> Add switch</button>
-      </div>
-
-      <SwitchesList :device-index="deviceIndex" />
+      <SwitchesList :device-index="deviceIndex" :description="`These switches apply to ${form.name || 'this TV'} and are added on top of the global switches`" />
     </div>
   </template>
 </template>

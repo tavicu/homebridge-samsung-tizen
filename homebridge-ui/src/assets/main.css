@@ -1,3 +1,7 @@
+#app-tizen {
+  --bs-box-shadow: 0 0.25rem 0.7rem rgba(0, 0, 0, 0.075);
+}
+
 .btn {
   padding: 0.25rem 0.5rem;
   font-size: 0.875rem;
@@ -14,4 +18,41 @@
   text-decoration: underline dotted #6c757d;
   text-underline-offset: 3px;
   cursor: help;
+}
+
+.card-table {
+  --bs-card-border-color: rgba(0, 0, 0, 0.075);
+  --bs-card-cap-bg: var(--bs-card-bg);
+}
+
+.card-table .card-header {
+  border: 0;
+}
+
+.card-table .table {
+  --bs-table-border-color: rgba(0, 0, 0, 0.05);
+}
+
+.card-table th,
+.card-table td,
+.card-table .card-header {
+  padding: 0.75rem 1.25rem;
+}
+
+.card-table tbody td {
+  font-size: 0.8rem;
+}
+
+.card-table thead th {
+  padding-top: 0.35rem;
+  padding-bottom: 0.35rem;
+  font-weight: 600;
+  font-size: 0.85rem;
+  background-color: #f6f9fc;
+  border-top: 1px solid var(--bs-card-border-color);
+  border-bottom: 1px solid var(--bs-card-border-color);
+}
+
+.card-table tr:last-child td {
+  border-bottom: 0;
 }
