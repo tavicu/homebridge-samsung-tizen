@@ -1,4 +1,4 @@
-import { LogLevel, Logging } from 'homebridge';
+import { Logging, LogLevel } from 'homebridge';
 
 const levels = ['info', 'success', 'warn', 'error', 'debug'] as const;
 

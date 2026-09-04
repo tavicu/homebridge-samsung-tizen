@@ -1,10 +1,10 @@
 <script setup>
 import { computed } from 'vue';
 import SwitchesIcon from '../assets/icons/switches.svg';
-import Dropdown from './Dropdown.vue';
-import EmptyState from './EmptyState.vue';
 import { useConfig } from '../composables/useConfig';
 import { useRouter } from '../composables/useRouter';
+import Dropdown from './Dropdown.vue';
+import EmptyState from './EmptyState.vue';
 
 const props = defineProps({
   title: {
@@ -48,7 +48,9 @@ const formatValue = (value) => (Array.isArray(value) ? value.join(', ') : value 
         <h6 class="fw-semibold mb-0">{{ title }}</h6>
         <p v-if="description" class="small text-secondary mb-0 mt-1">{{ description }}</p>
       </div>
-      <button v-if="switches.length" type="button" class="btn btn-primary flex-shrink-0" @click="navigateTo('switch', { action: 'add', deviceIndex })"><i class="fas fa-plus" /> Add switch</button>
+      <button v-if="switches.length" type="button" class="btn btn-primary flex-shrink-0" @click="navigateTo('switch', { action: 'add', deviceIndex })">
+        <i class="fas fa-plus" /> Add switch
+      </button>
     </div>
 
     <table v-if="switches.length" class="table mb-0">
@@ -75,7 +77,9 @@ const formatValue = (value) => (Array.isArray(value) ? value.join(', ') : value 
           <td class="text-end">
             <Dropdown>
               <button class="dropdown-item" type="button" @click="navigateTo('switch', { action: 'edit', switchIndex: index, deviceIndex })"><i class="fas fa-pen" /> Edit</button>
-              <button class="dropdown-item" type="button" @click="navigateTo('switch', { action: 'delete', switchIndex: index, deviceIndex })"><i class="fas fa-trash" /> Delete</button>
+              <button class="dropdown-item" type="button" @click="navigateTo('switch', { action: 'delete', switchIndex: index, deviceIndex })">
+                <i class="fas fa-trash" /> Delete
+              </button>
             </Dropdown>
           </td>
         </tr>

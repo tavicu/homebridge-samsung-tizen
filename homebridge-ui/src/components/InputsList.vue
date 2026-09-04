@@ -1,11 +1,11 @@
 <script setup>
 import { computed } from 'vue';
 import InputsIcon from '../assets/icons/inputs.svg';
+import { useConfig } from '../composables/useConfig';
+import { useRouter } from '../composables/useRouter';
 import Dropdown from './Dropdown.vue';
 import EmptyState from './EmptyState.vue';
 import Tooltip from './Tooltip.vue';
-import { useConfig } from '../composables/useConfig';
-import { useRouter } from '../composables/useRouter';
 
 const props = defineProps({
   title: {
@@ -43,7 +43,9 @@ const formatValue = (value) => (Array.isArray(value) ? value.join(', ') : value 
         <h6 class="fw-semibold mb-0">{{ title }}</h6>
         <p v-if="description" class="small text-secondary mb-0 mt-1">{{ description }}</p>
       </div>
-      <button v-if="inputs.length" type="button" class="btn btn-primary flex-shrink-0" @click="navigateTo('input', { action: 'add', deviceIndex })"><i class="fas fa-plus" /> Add input</button>
+      <button v-if="inputs.length" type="button" class="btn btn-primary flex-shrink-0" @click="navigateTo('input', { action: 'add', deviceIndex })">
+        <i class="fas fa-plus" /> Add input
+      </button>
     </div>
 
     <table v-if="inputs.length" class="table mb-0">
@@ -65,7 +67,9 @@ const formatValue = (value) => (Array.isArray(value) ? value.join(', ') : value 
           <td class="text-end">
             <Dropdown>
               <button class="dropdown-item" type="button" @click="navigateTo('input', { action: 'edit', inputIndex: index, deviceIndex })"><i class="fas fa-pen" /> Edit</button>
-              <button class="dropdown-item" type="button" @click="navigateTo('input', { action: 'delete', inputIndex: index, deviceIndex })"><i class="fas fa-trash" /> Delete</button>
+              <button class="dropdown-item" type="button" @click="navigateTo('input', { action: 'delete', inputIndex: index, deviceIndex })">
+                <i class="fas fa-trash" /> Delete
+              </button>
             </Dropdown>
           </td>
         </tr>

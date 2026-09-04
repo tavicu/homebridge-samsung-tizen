@@ -8,7 +8,7 @@
 
 ## Introduction
 
-Homebridge Samsung Tizen is a plugin created for [Homebridge](https://github.com/homebridge/homebridge) that allows you to control your Samsung TVs *(models starting from 2017)* that are running Tizen Operating System.
+Homebridge Samsung Tizen is a plugin created for [Homebridge](https://github.com/homebridge/homebridge) that allows you to control your Samsung TVs _(models starting from 2017)_ that are running Tizen Operating System.
 
 Please make sure to [read our shiny documentation](https://tavicu.github.io/homebridge-samsung-tizen/) where you find step by step instructions with images on how to install and configure the plugin.
 

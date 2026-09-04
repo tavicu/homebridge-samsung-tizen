@@ -55,9 +55,7 @@ export class AccessoryPoller {
     this.busy = true;
 
     try {
-      await Promise.allSettled(
-        this.device.accessories.flatMap((accessory) => Object.values(accessory.services).map((wrapper) => wrapper.pollValue())),
-      );
+      await Promise.allSettled(this.device.accessories.flatMap((accessory) => Object.values(accessory.services).map((wrapper) => wrapper.pollValue())));
     } finally {
       this.busy = false;
     }
