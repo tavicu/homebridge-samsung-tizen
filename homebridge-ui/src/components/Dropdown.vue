@@ -61,6 +61,11 @@ onUnmounted(() => {
   margin-right: 0.25rem;
 }
 
+.dropdown-menu :deep(button.dropdown-item:focus) {
+  color: var(--bs-dropdown-link-active-color);
+  background-color: var(--bs-dropdown-link-active-bg) !important;
+}
+
 .dark-mode .btn-icon-only {
   --bs-btn-active-border-color: rgba(255, 255, 255, 0.18);
   color: rgba(255, 255, 255, 0.65);
