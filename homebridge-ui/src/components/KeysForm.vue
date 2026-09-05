@@ -1,7 +1,8 @@
 <script setup>
-import { computed, watch } from 'vue';
+import { computed, onUnmounted, watch } from 'vue';
 import { useConfig } from '../composables/useConfig';
 import { useForm } from '../composables/useForm';
+import { useHomebridge } from '../composables/useHomebridge';
 import { useKeys } from '../composables/useKeys';
 import { useToast } from '../composables/useToast';
 import Callout from './Callout.vue';
@@ -13,7 +14,10 @@ const props = defineProps({
   },
 });
 
+const isDeviceScoped = computed(() => props.deviceIndex !== undefined);
+
 const { config, updateConfig, cleanConfig } = useConfig();
+const { enableSaveButton, disableSaveButton } = useHomebridge();
 const toast = useToast();
 const { formEl, validated, checkValidity, createForm, isDirty, markPristine } = useForm();
 const { keyGroups, readKeys, toConfigKeys } = useKeys();
@@ -21,7 +25,7 @@ const { keyGroups, readKeys, toConfigKeys } = useKeys();
 const globalKeys = computed(() => readKeys(config.value.keys));
 
 const storedKeys = computed(() => {
-  if (props.deviceIndex === undefined) {
+  if (!isDeviceScoped.value) {
     return globalKeys.value;
   }
 
@@ -43,7 +47,7 @@ async function handleSubmit() {
   const nextKeys = cleanConfig(toConfigKeys(form));
 
   try {
-    if (props.deviceIndex !== undefined) {
+    if (isDeviceScoped.value) {
       const updatedDevices = (config.value.devices || []).map((item, index) => (index === props.deviceIndex ? { ...item, keys: nextKeys } : item));
 
       await updateConfig({ devices: updatedDevices });
@@ -51,11 +55,30 @@ async function handleSubmit() {
       await updateConfig({ keys: nextKeys });
     }
 
+    markPristine();
     toast.success('Remote keys updated successfully');
   } catch {
     toast.error('Failed to update remote keys');
   }
 }
+
+watch(isDirty, (dirty) => {
+  if (isDeviceScoped.value) {
+    return;
+  }
+
+  if (dirty) {
+    disableSaveButton();
+  } else {
+    enableSaveButton();
+  }
+});
+
+onUnmounted(() => {
+  if (!isDeviceScoped.value) {
+    enableSaveButton();
+  }
+});
 
 watch(
   storedKeys,
