@@ -235,7 +235,7 @@ watch(
   <form ref="formEl" class="card rounded" :class="{ 'was-validated': validated }" novalidate @submit.prevent="handleSubmit">
     <div class="card-body">
       <div class="mb-3">
-        <label for="name" class="form-label">Switch Name <strong class="text-danger">*</strong></label>
+        <label for="name" class="form-label">Switch Name</label>
         <input id="name" v-model="form.name" type="text" class="form-control" placeholder="e.g. Evening Mode" maxlength="64" required />
         <div class="invalid-feedback">Please enter a valid switch name.</div>
       </div>
@@ -268,7 +268,7 @@ watch(
         </div>
 
         <div class="col-md-6">
-          <label for="volume" class="form-label">Volume <span class="text-muted">(optional)</span></label>
+          <label for="volume" class="form-label">Volume <span class="form-optional">Optional</span></label>
           <input id="volume" v-model="form.volume" type="number" class="form-control" min="0" max="100" step="1" placeholder="e.g. 10" />
           <small class="form-text text-muted">Requires SmartThings. Sets the speaker volume.</small>
         </div>
@@ -276,7 +276,7 @@ watch(
 
       <div class="row mb-3">
         <div class="col-md-6">
-          <label for="app" class="form-label">Application ID <span class="text-muted">(optional)</span></label>
+          <label for="app" class="form-label">Application ID <span class="form-optional">Optional</span></label>
           <input id="app" v-model="form.app" type="text" class="form-control" placeholder="e.g. 111299001912" pattern="^[0-9]+$" inputmode="numeric" />
           <small class="form-text text-muted">
             Opens the selected application. See the
@@ -284,14 +284,14 @@ watch(
           </small>
         </div>
         <div class="col-md-6">
-          <label for="channel" class="form-label">Channel <span class="text-muted">(optional)</span></label>
+          <label for="channel" class="form-label">Channel <span class="form-optional">Optional</span></label>
           <input id="channel" v-model="form.channel" type="number" class="form-control" min="1" step="1" placeholder="e.g. 13" />
         </div>
       </div>
 
       <div class="row mb-3">
         <div class="col-md-6">
-          <label for="input" class="form-label">Input Source <span class="text-muted">(optional)</span></label>
+          <label for="input" class="form-label">Input Source <span class="form-optional">Optional</span></label>
           <select id="input" v-model="form.input" class="form-select">
             <option value="">None</option>
             <option value="digitalTv">Digital TV</option>
@@ -309,14 +309,14 @@ watch(
         </div>
 
         <div class="col-md-6">
-          <label for="picture_mode" class="form-label">Picture Mode <span class="text-muted">(optional)</span></label>
+          <label for="picture_mode" class="form-label">Picture Mode <span class="form-optional">Optional</span></label>
           <input id="picture_mode" v-model="form.picture_mode" type="text" class="form-control" placeholder="e.g. movie" />
           <small class="form-text text-muted">Requires SmartThings. Enter the exact name shown on the TV (for example movie, standard, or dynamic). Names vary by model.</small>
         </div>
       </div>
 
       <div>
-        <label class="form-label">Key(s) to execute <span class="text-muted">(optional)</span></label>
+        <label class="form-label">Key(s) to execute <span class="form-optional">Optional</span></label>
         <div class="d-flex flex-column gap-2">
           <div v-for="command in form.commands" :key="command.id" class="input-group">
             <input v-model="command.value" type="text" class="form-control font-monospace text-uppercase" placeholder="e.g. KEY_VOLUP" />

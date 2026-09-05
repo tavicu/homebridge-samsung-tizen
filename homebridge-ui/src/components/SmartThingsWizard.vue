@@ -109,7 +109,7 @@ function handleRetry() {
     </div>
     <div class="card-body">
       <div class="mb-3">
-        <label for="clientId" class="form-label">Client ID <strong class="text-danger">*</strong></label>
+        <label for="clientId" class="form-label">Client ID</label>
         <input
           id="clientId"
           v-model="state.clientId"
@@ -123,7 +123,7 @@ function handleRetry() {
       </div>
 
       <div class="mb-2">
-        <label for="clientSecret" class="form-label">Client Secret <strong class="text-danger">*</strong></label>
+        <label for="clientSecret" class="form-label">Client Secret</label>
         <input
           id="clientSecret"
           v-model="state.clientSecret"
@@ -160,7 +160,7 @@ function handleRetry() {
       </div>
 
       <div class="mb-2">
-        <label for="authorizationCode" class="form-label">Authorization Code <strong class="text-danger">*</strong></label>
+        <label for="authorizationCode" class="form-label">Authorization Code</label>
         <input id="authorizationCode" v-model="state.authorizationCode" type="text" class="form-control" placeholder="e.g. 4euLqN" pattern="[a-zA-Z0-9]+" required />
         <div class="invalid-feedback">Please enter a valid authorization code</div>
       </div>

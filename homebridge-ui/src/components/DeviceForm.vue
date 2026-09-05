@@ -6,6 +6,7 @@ import { useForm } from '../composables/useForm';
 import { useRouter } from '../composables/useRouter';
 import { useSmartThings } from '../composables/useSmartThings';
 import { useToast } from '../composables/useToast';
+import Callout from './Callout.vue';
 import InputsList from './InputsList.vue';
 import SwitchesList from './SwitchesList.vue';
 
@@ -194,24 +195,27 @@ watch(
     </div>
   </div>
 
-  <div v-if="!isEdit" class="mb-3">
-    <div class="fw-semibold mb-1">Just fill in the essential details to add your TV</div>
-    This initial step covers basic setup. Additional features (inputs, custom switches, power options) can be fully customized from the Edit Device menu after adding.
-  </div>
+  <Callout
+    v-if="!isEdit"
+    class="mb-3"
+    state="info"
+    title="Just fill in the essential details to add your TV"
+    text="This initial step covers basic setup. Additional features (inputs, custom switches, power options) can be fully customized from the Edit Device menu after adding."
+  />
 
   <form ref="formEl" class="card rounded" :class="{ 'was-validated': validated }" novalidate @submit.prevent="handleSubmit">
     <div v-if="isEdit" class="card-header">Main Configuration</div>
 
     <div class="card-body">
       <div class="mb-3">
-        <label for="name" class="form-label">Device Name <strong class="text-danger">*</strong></label>
+        <label for="name" class="form-label">Device Name</label>
         <input id="name" v-model="form.name" type="text" class="form-control" placeholder="e.g. Living Room TV" maxlength="64" required />
         <div class="invalid-feedback">Please enter a valid device name.</div>
       </div>
 
       <div class="row mb-3">
         <div class="col-md-6">
-          <label for="ipAddress" class="form-label">IP Address <strong class="text-danger">*</strong></label>
+          <label for="ipAddress" class="form-label">IP Address</label>
           <input
             id="ipAddress"
             v-model="form.ip"
@@ -227,7 +231,7 @@ watch(
         </div>
 
         <div class="col-md-6">
-          <label for="macAddress" class="form-label">MAC Address <strong class="text-danger">*</strong></label>
+          <label for="macAddress" class="form-label">MAC Address</label>
           <input
             id="macAddress"
             v-model="form.mac"
@@ -254,7 +258,7 @@ watch(
       <hr class="my-4 text-muted" />
 
       <div class="mb-3">
-        <label for="deviceId" class="form-label">SmartThings Device ID <span class="text-muted">(optional)</span></label>
+        <label for="deviceId" class="form-label">SmartThings Device ID <span class="form-optional">Optional</span></label>
 
         <select v-if="stDevices.length" id="deviceId" v-model="deviceIdSelect" class="form-select mb-2">
           <option v-for="device in stDevices" :key="device.deviceId" :value="device.deviceId">{{ device.name }} ({{ device.deviceId }})</option>
@@ -274,7 +278,7 @@ watch(
 
       <template v-if="isEdit">
         <div class="mb-3">
-          <label for="uuid" class="form-label">UUID <span class="text-muted">(optional)</span></label>
+          <label for="uuid" class="form-label">UUID <span class="form-optional">Optional</span></label>
           <input id="uuid" v-model="form.uuid" type="text" class="form-control" placeholder="e.g. AX1D" />
           <small class="form-text text-muted">If you have problems adding the TV to Home app, set this field to a unique value</small>
         </div>

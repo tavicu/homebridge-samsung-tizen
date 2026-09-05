@@ -196,13 +196,13 @@ watch(
   <form ref="formEl" class="card rounded" :class="{ 'was-validated': validated }" novalidate @submit.prevent="handleSubmit">
     <div class="card-body">
       <div class="mb-3">
-        <label for="name" class="form-label">Input Name <strong class="text-danger">*</strong></label>
+        <label for="name" class="form-label">Input Name</label>
         <input id="name" v-model="form.name" type="text" class="form-control" placeholder="e.g. YouTube" maxlength="64" required />
         <div class="invalid-feedback">Please enter a valid input name.</div>
       </div>
 
       <div class="mb-3">
-        <label for="type" class="form-label">Input Type <strong class="text-danger">*</strong></label>
+        <label for="type" class="form-label">Input Type</label>
         <select id="type" v-model="form.type" class="form-select" required>
           <option disabled value="">Choose input type ...</option>
           <option value="input">Input</option>
@@ -213,7 +213,7 @@ watch(
       </div>
 
       <div v-if="form.type === 'input'">
-        <label for="value-input" class="form-label">Input Source <strong class="text-danger">*</strong></label>
+        <label for="value-input" class="form-label">Input Source</label>
         <select id="value-input" v-model="form.valueInput" class="form-select" required>
           <option disabled value="">Choose input source ...</option>
           <option value="digitalTv">Digital TV</option>
@@ -232,7 +232,7 @@ watch(
       </div>
 
       <div v-if="form.type === 'app'">
-        <label for="value-app" class="form-label">Application ID <strong class="text-danger">*</strong></label>
+        <label for="value-app" class="form-label">Application ID</label>
         <input id="value-app" v-model="form.valueApp" type="text" class="form-control" placeholder="e.g. 111299001912" pattern="^[0-9]+$" inputmode="numeric" required />
         <div class="invalid-feedback">Please enter a valid application ID.</div>
         <small class="form-text text-muted">
@@ -242,7 +242,7 @@ watch(
       </div>
 
       <div v-if="form.type === 'command'">
-        <label class="form-label">Key(s) to execute <strong class="text-danger">*</strong></label>
+        <label class="form-label">Key(s) to execute</label>
         <div class="d-flex flex-column gap-2">
           <div v-for="command in form.commands" :key="command.id" class="input-group">
             <input v-model="command.value" type="text" class="form-control font-monospace text-uppercase" placeholder="e.g. KEY_VOLUP" required />
