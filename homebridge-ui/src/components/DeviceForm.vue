@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, reactive, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { useConfig } from '../composables/useConfig';
 import { useDevice } from '../composables/useDevice';
 import { useForm } from '../composables/useForm';
@@ -52,8 +52,8 @@ const currentTab = computed(() => {
   return 'settings';
 });
 
-const { formEl, validated, checkValidity } = useForm();
-const form = reactive({
+const { formEl, validated, checkValidity, createForm, isDirty, markPristine } = useForm();
+const form = createForm({
   name: '',
   ip: '',
   mac: '',
@@ -74,22 +74,14 @@ const deviceIdSelect = computed({
   },
 });
 
-function resetForm() {
-  form.name = '';
-  form.ip = '';
-  form.mac = '';
-  form.deviceId = '';
-  form.uuid = '';
-  form.options = [];
-}
-
-function fillForm(device) {
+function fillForm(device = {}) {
   form.name = device.name || '';
   form.ip = device.ip || '';
   form.mac = device.mac || '';
   form.deviceId = device.deviceId || device.device_id || '';
   form.uuid = device.uuid || '';
   form.options = Array.isArray(device.options) ? device.options : [];
+  markPristine();
 }
 
 function init() {
@@ -107,7 +99,7 @@ function init() {
 
     fillForm(device);
   } else {
-    resetForm();
+    fillForm();
   }
 }
 
@@ -152,6 +144,18 @@ function buildDeviceData(existingDevice = {}) {
   });
 }
 
+function handleReset() {
+  const device = config.value?.devices?.[props.deviceIndex];
+
+  if (!device) {
+    return;
+  }
+
+  validated.value = false;
+  testResult.value = null;
+  fillForm(device);
+}
+
 async function handleSubmit() {
   if (!checkValidity()) {
     return;
@@ -171,6 +175,7 @@ async function handleSubmit() {
       const updatedDevices = currentDevices.map((device, index) => (index === props.deviceIndex ? buildDeviceData(device) : device));
       await updateConfig({ devices: updatedDevices });
 
+      markPristine();
       toast.success('Device updated successfully');
     } else {
       const newDevice = buildDeviceData();
@@ -334,9 +339,14 @@ watch(
       </template>
     </div>
 
-    <div class="card-footer text-end">
-      <button type="button" class="btn btn-outline-secondary" @click="navigateTo('dashboard', { tab: 'devices' })">Cancel</button>
-      <button type="submit" class="btn btn-primary">{{ isEdit ? 'Update Device' : 'Add Device' }} <i v-if="!isEdit" class="fas fa-arrow-right" /></button>
+    <div class="card-footer">
+      <button v-if="!isEdit" type="button" class="btn btn-outline-secondary" @click="navigateTo('dashboard', { tab: 'devices' })">Cancel</button>
+      <small v-else class="small text-muted">Changes are saved to your config file instantly.</small>
+
+      <div class="card-actions">
+        <button v-if="isEdit" type="button" class="btn btn-outline-secondary" :disabled="!isDirty" @click="handleReset">Reset</button>
+        <button type="submit" class="btn btn-primary" :disabled="isEdit && !isDirty">{{ isEdit ? 'Update Device' : 'Add Device' }}</button>
+      </div>
     </div>
   </form>
 

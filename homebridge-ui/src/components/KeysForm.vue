@@ -1,5 +1,5 @@
 <script setup>
-import { computed, reactive, watch } from 'vue';
+import { computed, watch } from 'vue';
 import { useConfig } from '../composables/useConfig';
 import { useForm } from '../composables/useForm';
 import { useKeys } from '../composables/useKeys';
@@ -15,7 +15,7 @@ const props = defineProps({
 
 const { config, updateConfig, cleanConfig } = useConfig();
 const toast = useToast();
-const { formEl, validated, checkValidity } = useForm();
+const { formEl, validated, checkValidity, createForm, isDirty, markPristine } = useForm();
 const { keyGroups, readKeys, toConfigKeys } = useKeys();
 
 const globalKeys = computed(() => readKeys(config.value.keys));
@@ -28,11 +28,11 @@ const storedKeys = computed(() => {
   return readKeys(config.value.devices?.[props.deviceIndex]?.keys);
 });
 
-const form = reactive(readKeys());
-const isDirty = computed(() => Object.keys(form).some((id) => form[id] !== storedKeys.value[id]));
+const form = createForm(readKeys());
 
 function fillForm() {
   Object.assign(form, storedKeys.value);
+  markPristine();
 }
 
 async function handleSubmit() {
@@ -81,12 +81,20 @@ watch(
       <div class="card-body keys-grid">
         <div v-for="key in group.keys" :key="key.id">
           <label :for="`remote-key-${key.id}`" class="form-label">{{ key.label }}</label>
-          <input :id="`remote-key-${key.id}`" v-model="form[key.id]" type="text" class="form-control font-monospace text-uppercase" :placeholder="globalKeys[key.id] || key.default" />
+          <input
+            :id="`remote-key-${key.id}`"
+            v-model="form[key.id]"
+            type="text"
+            class="form-control font-monospace text-uppercase"
+            :placeholder="globalKeys[key.id] || key.default"
+          />
         </div>
       </div>
     </template>
 
-    <div class="card-footer justify-content-end">
+    <div class="card-footer">
+      <small class="small text-muted">Changes are saved to your config file instantly.</small>
+
       <div class="card-actions">
         <button type="button" class="btn btn-outline-secondary" :disabled="!isDirty" @click="fillForm">Reset</button>
         <button type="submit" class="btn btn-primary" :disabled="!isDirty">Save Keys</button>

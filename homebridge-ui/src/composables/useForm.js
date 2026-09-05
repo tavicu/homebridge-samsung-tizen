@@ -1,4 +1,4 @@
-import { ref } from 'vue';
+import { computed, reactive, ref } from 'vue';
 
 const SKIP_INPUT_TYPES = new Set(['checkbox', 'radio', 'file', 'button', 'submit', 'reset', 'hidden', 'image']);
 
@@ -32,6 +32,9 @@ export function useForm() {
   const formEl = ref(null);
   const validated = ref(false);
 
+  let trackedForm = null;
+  const snapshot = ref(null);
+
   function checkValidity() {
     trimFormValues(formEl.value);
 
@@ -43,5 +46,28 @@ export function useForm() {
     return false;
   }
 
-  return { formEl, validated, checkValidity };
+  // Marks the current form state as the "clean" baseline (e.g. after filling/resetting the form).
+  function markPristine() {
+    snapshot.value = trackedForm ? JSON.stringify(trackedForm) : null;
+  }
+
+  // Creates the reactive form state and starts tracking it for changes.
+  function createForm(initialValues) {
+    trackedForm = reactive(initialValues);
+    markPristine();
+
+    return trackedForm;
+  }
+
+  // Checks if the current form state has changed since the last "clean" snapshot.
+  const isDirty = computed(() => trackedForm !== null && JSON.stringify(trackedForm) !== snapshot.value);
+
+  return {
+    formEl,
+    validated,
+    isDirty,
+    createForm,
+    markPristine,
+    checkValidity,
+  };
 }

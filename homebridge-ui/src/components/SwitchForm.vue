@@ -1,5 +1,5 @@
 <script setup>
-import { computed, reactive, watch } from 'vue';
+import { computed, watch } from 'vue';
 import { useConfig } from '../composables/useConfig';
 import { useForm } from '../composables/useForm';
 import { useRouter } from '../composables/useRouter';
@@ -43,8 +43,8 @@ const toast = useToast();
 const isEdit = computed(() => props.action === 'edit');
 const isDeviceScoped = computed(() => props.deviceIndex !== undefined);
 
-const { formEl, validated, checkValidity } = useForm();
-const form = reactive({
+const { formEl, validated, checkValidity, createForm, isDirty, markPristine } = useForm();
+const form = createForm({
   name: '',
   power: false,
   sleep: '',
@@ -71,20 +71,7 @@ function hasAnyAction() {
   );
 }
 
-function resetForm() {
-  form.name = '';
-  form.power = false;
-  form.sleep = '';
-  form.mute = false;
-  form.volume = '';
-  form.app = '';
-  form.input = '';
-  form.channel = '';
-  form.picture_mode = '';
-  form.commands = [createCommand()];
-}
-
-function fillForm(switchItem) {
+function fillForm(switchItem = {}) {
   form.name = switchItem.name || '';
   form.power = !!switchItem.power;
   form.sleep = switchItem.sleep !== undefined && switchItem.sleep !== null ? String(switchItem.sleep) : '';
@@ -95,6 +82,7 @@ function fillForm(switchItem) {
   form.channel = switchItem.channel !== undefined && switchItem.channel !== null ? String(switchItem.channel) : '';
   form.picture_mode = switchItem.picture_mode || '';
   form.commands = switchItem.command !== undefined ? toCommands(switchItem.command) : [createCommand()];
+  markPristine();
 }
 
 function getCurrentSwitches() {
@@ -119,7 +107,7 @@ function init() {
 
     fillForm(switchItem);
   } else {
-    resetForm();
+    fillForm();
   }
 }
 
@@ -157,6 +145,17 @@ async function persistSwitches(nextSwitches) {
   } else {
     await updateConfig({ switches: nextSwitches });
   }
+}
+
+function handleReset() {
+  const switchItem = getCurrentSwitches()[props.switchIndex];
+
+  if (!switchItem) {
+    return;
+  }
+
+  validated.value = false;
+  fillForm(switchItem);
 }
 
 async function handleSubmit() {
@@ -325,14 +324,19 @@ watch(
             </button>
           </div>
         </div>
-        <button type="button" class="btn btn-outline-primary mt-2" @click="addCommand"><i class="fas fa-plus" /> Add Command</button>
+        <button type="button" class="btn btn-sm btn-outline-primary mt-2" @click="addCommand"><i class="fas fa-plus" /> Add Command</button>
         <small class="form-text text-muted d-block mt-2"> Repeat a key with <code>KEY_VOLUP*3</code>. Hold it with <code>KEY_POWER*2.5s</code> (time in seconds). </small>
       </div>
     </div>
 
-    <div class="card-footer text-end">
-      <button type="button" class="btn btn-outline-secondary" @click="navigateBack('dashboard', { tab: 'switches' })">Cancel</button>
-      <button type="submit" class="btn btn-primary">{{ isEdit ? 'Save Switch' : 'Add Switch' }} <i class="fas fa-arrow-right" /></button>
+    <div class="card-footer">
+      <button v-if="!isEdit" type="button" class="btn btn-outline-secondary" @click="navigateBack('dashboard', { tab: 'switches' })">Cancel</button>
+      <small v-else class="small text-muted">Changes are saved to your config file instantly.</small>
+
+      <div class="card-actions">
+        <button v-if="isEdit" type="button" class="btn btn-outline-secondary" :disabled="!isDirty" @click="handleReset">Reset</button>
+        <button type="submit" class="btn btn-primary" :disabled="isEdit && !isDirty">{{ isEdit ? 'Save Switch' : 'Add Switch' }}</button>
+      </div>
     </div>
   </form>
 </template>

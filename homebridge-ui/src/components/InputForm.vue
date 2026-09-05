@@ -1,5 +1,5 @@
 <script setup>
-import { computed, reactive, watch } from 'vue';
+import { computed, watch } from 'vue';
 import { useConfig } from '../composables/useConfig';
 import { useForm } from '../composables/useForm';
 import { useRouter } from '../composables/useRouter';
@@ -43,8 +43,8 @@ const toast = useToast();
 const isEdit = computed(() => props.action === 'edit');
 const isDeviceScoped = computed(() => props.deviceIndex !== undefined);
 
-const { formEl, validated, checkValidity } = useForm();
-const form = reactive({
+const { formEl, validated, checkValidity, createForm, isDirty, markPristine } = useForm();
+const form = createForm({
   name: '',
   type: '',
   valueInput: '',
@@ -52,20 +52,13 @@ const form = reactive({
   commands: [createCommand()],
 });
 
-function resetForm() {
-  form.name = '';
-  form.type = '';
-  form.valueInput = '';
-  form.valueApp = '';
-  form.commands = [createCommand()];
-}
-
-function fillForm(input) {
+function fillForm(input = {}) {
   form.name = input.name || '';
   form.type = input.type || '';
   form.valueInput = input.type === 'input' ? String(input.value || '') : '';
   form.valueApp = input.type === 'app' ? String(input.value || '') : '';
   form.commands = input.type === 'command' ? toCommands(input.value) : [createCommand()];
+  markPristine();
 }
 
 function getCurrentInputs() {
@@ -90,7 +83,7 @@ function init() {
 
     fillForm(input);
   } else {
-    resetForm();
+    fillForm();
   }
 }
 
@@ -129,6 +122,17 @@ async function persistInputs(nextInputs) {
   } else {
     await updateConfig({ inputs: nextInputs });
   }
+}
+
+function handleReset() {
+  const input = getCurrentInputs()[props.inputIndex];
+
+  if (!input) {
+    return;
+  }
+
+  validated.value = false;
+  fillForm(input);
 }
 
 async function handleSubmit() {
@@ -251,14 +255,19 @@ watch(
             </button>
           </div>
         </div>
-        <button type="button" class="btn btn-outline-primary mt-2" @click="addCommand"><i class="fas fa-plus" /> Add Command</button>
+        <button type="button" class="btn btn-sm btn-outline-primary mt-2" @click="addCommand"><i class="fas fa-plus" /> Add Command</button>
         <small class="form-text text-muted d-block mt-2"> Repeat a key with <code>KEY_VOLUP*3</code>. Hold it with <code>KEY_POWER*2.5s</code> (time in seconds). </small>
       </div>
     </div>
 
-    <div class="card-footer text-end">
-      <button type="button" class="btn btn-outline-secondary" @click="navigateBack('dashboard', { tab: 'inputs' })">Cancel</button>
-      <button type="submit" class="btn btn-primary">{{ isEdit ? 'Save Input' : 'Add Input' }} <i class="fas fa-arrow-right" /></button>
+    <div class="card-footer">
+      <button v-if="!isEdit" type="button" class="btn btn-outline-secondary" @click="navigateBack('dashboard', { tab: 'inputs' })">Cancel</button>
+      <small v-else class="small text-muted">Changes are saved to your config file instantly.</small>
+
+      <div class="card-actions">
+        <button v-if="isEdit" type="button" class="btn btn-outline-secondary" :disabled="!isDirty" @click="handleReset">Reset</button>
+        <button type="submit" class="btn btn-primary" :disabled="isEdit && !isDirty">{{ isEdit ? 'Save Input' : 'Add Input' }}</button>
+      </div>
     </div>
   </form>
 </template>
