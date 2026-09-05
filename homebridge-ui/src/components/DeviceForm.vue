@@ -8,6 +8,7 @@ import { useSmartThings } from '../composables/useSmartThings';
 import { useToast } from '../composables/useToast';
 import Callout from './Callout.vue';
 import InputsList from './InputsList.vue';
+import KeysForm from './KeysForm.vue';
 import SwitchesList from './SwitchesList.vue';
 import Tabs from './Tabs.vue';
 
@@ -38,6 +39,7 @@ const tabs = [
   { id: 'settings', label: 'Settings' },
   { id: 'inputs', label: 'Inputs' },
   { id: 'switches', label: 'Switches' },
+  { id: 'keys', label: 'Remote Keys' },
 ];
 
 const currentTab = computed(() => {
@@ -349,5 +351,6 @@ watch(
       :device-index="deviceIndex"
       :description="`These switches apply to ${form.name || 'this TV'} and are added on top of the global switches`"
     />
+    <KeysForm v-if="currentTab === 'keys'" :device-index="deviceIndex" />
   </template>
 </template>

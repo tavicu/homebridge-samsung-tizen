@@ -64,8 +64,6 @@
         "properties": {
           "REWIND": { "type": "string" },
           "FAST_FORWARD": { "type": "string" },
-          "NEXT_TRACK": { "type": "string" },
-          "PREVIOUS_TRACK": { "type": "string" },
           "ARROW_UP": { "type": "string" },
           "ARROW_DOWN": { "type": "string" },
           "ARROW_LEFT": { "type": "string" },
@@ -392,6 +390,73 @@
               ]
             }
           ]
+        }
+      ]
+    },
+    {
+      "type": "fieldset",
+      "title": "Remote Keys",
+      "expandable": true,
+      "expanded": false,
+      "items": [
+        {
+          "type": "help",
+          "helpvalue": "<p class='help-block'>These mappings are used by every TV, unless a device has its own keys. Leave a field empty to keep the plugin default.</p>"
+        },
+        {
+          "key": "keys.PLAY_PAUSE",
+          "title": "Play / Pause",
+          "placeholder": "KEY_PLAY_BACK"
+        },
+        {
+          "key": "keys.REWIND",
+          "title": "Rewind",
+          "placeholder": "KEY_REWIND"
+        },
+        {
+          "key": "keys.FAST_FORWARD",
+          "title": "Fast Forward",
+          "placeholder": "KEY_FF"
+        },
+        {
+          "key": "keys.ARROW_UP",
+          "title": "Arrow Up",
+          "placeholder": "KEY_UP"
+        },
+        {
+          "key": "keys.ARROW_DOWN",
+          "title": "Arrow Down",
+          "placeholder": "KEY_DOWN"
+        },
+        {
+          "key": "keys.ARROW_LEFT",
+          "title": "Arrow Left",
+          "placeholder": "KEY_LEFT"
+        },
+        {
+          "key": "keys.ARROW_RIGHT",
+          "title": "Arrow Right",
+          "placeholder": "KEY_RIGHT"
+        },
+        {
+          "key": "keys.SELECT",
+          "title": "Select",
+          "placeholder": "KEY_ENTER"
+        },
+        {
+          "key": "keys.BACK",
+          "title": "Back",
+          "placeholder": "KEY_RETURN"
+        },
+        {
+          "key": "keys.EXIT",
+          "title": "Exit",
+          "placeholder": "KEY_RETURN"
+        },
+        {
+          "key": "keys.INFORMATION",
+          "title": "Information",
+          "placeholder": "KEY_INFO"
         }
       ]
     }

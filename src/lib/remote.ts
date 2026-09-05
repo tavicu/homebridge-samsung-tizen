@@ -1,13 +1,9 @@
 import { Characteristic } from 'homebridge';
 import { Device } from '../device/device.js';
 
-// Samsung has no documented equivalent for NEXT_TRACK and PREVIOUS_TRACK,
-// so they stay unmapped until the user configures a command for them.
-const DEFAULTS: Record<string, string | null> = {
+const DEFAULTS: Record<string, string> = {
   REWIND: 'KEY_REWIND',
   FAST_FORWARD: 'KEY_FF',
-  NEXT_TRACK: null,
-  PREVIOUS_TRACK: null,
   ARROW_UP: 'KEY_UP',
   ARROW_DOWN: 'KEY_DOWN',
   ARROW_LEFT: 'KEY_LEFT',

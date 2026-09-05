@@ -22,7 +22,7 @@ This is a full rewrite of the plugin in TypeScript. Your existing devices are ke
 - The speaker now reports the same on/off state as the TV, so the volume buttons in the iOS Remote widget stay enabled when the TV is on.
 - New `Device.Disable` option, so a device can be turned off from the plugin without deleting its configuration.
 - `keys`, `inputs`, `switches` and `wol` can now be configured once at plugin level and are inherited by every device. Anything set on a device still wins.
-- Rewind, Fast Forward and Exit now work in the iOS remote. Next Track and Previous Track can be mapped through the `keys` setting, they have no default because Samsung has no matching command.
+- Remote `keys` now map every iOS Remote button Home shows for a TV, and can be edited in the configuration interface.
 - All dependencies were updated to their latest versions.
 
 **SmartThings uses a new authorization flow**
