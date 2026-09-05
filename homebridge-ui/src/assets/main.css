@@ -42,6 +42,8 @@ hr {
 }
 
 .btn {
+  --bs-btn-disabled-opacity: 0.25;
+
   font-size: 0.875rem;
   border-radius: 0.4rem;
   text-transform: none;
@@ -145,6 +147,7 @@ hr {
 }
 
 .card .card-header:not(:first-child) {
+  margin-top: 1rem;
   border-top: 1px solid var(--bs-card-border-color);
 }
 

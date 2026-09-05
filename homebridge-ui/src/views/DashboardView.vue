@@ -1,5 +1,6 @@
 <script setup>
 import { onMounted } from 'vue';
+import Callout from '../components/Callout.vue';
 import DevicesList from '../components/DevicesList.vue';
 import InputsList from '../components/InputsList.vue';
 import SmartThingsCard from '../components/SmartThingsCard.vue';
@@ -22,7 +23,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <p class="small" v-html="$t('dashboard.alert', { url: 'https://tavicu.github.io/homebridge-samsung-tizen/' })" />
+  <Callout class="mb-3" :text="$t('dashboard.alert', { url: 'https://tavicu.github.io/homebridge-samsung-tizen/' })" />
 
   <SmartThingsCard class="mb-4" />
 

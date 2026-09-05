@@ -28,7 +28,7 @@ const devices = computed(() => config.value?.devices || []);
     <div class="card-header d-flex align-items-center justify-content-between gap-3 bg-transparent">
       <div>
         <h6 class="fw-semibold mb-0">{{ title }}</h6>
-        <p v-if="description" class="small text-secondary mb-0 mt-1">{{ description }}</p>
+        <p v-if="description" class="small text-secondary mt-1">{{ description }}</p>
       </div>
       <button v-if="devices.length" type="button" class="btn btn-primary flex-shrink-0" @click="navigateTo('device', { action: 'add' })">
         <i class="fas fa-plus" /> Add device

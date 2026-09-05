@@ -9,6 +9,7 @@ import { useToast } from '../composables/useToast';
 import Callout from './Callout.vue';
 import InputsList from './InputsList.vue';
 import SwitchesList from './SwitchesList.vue';
+import Tabs from './Tabs.vue';
 
 const props = defineProps({
   action: {
@@ -23,7 +24,7 @@ const props = defineProps({
 
 const { config, updateConfig, cleanConfig } = useConfig();
 const { isTesting, canTest, testConnection } = useDevice();
-const { navigateTo, navigateBack } = useRouter();
+const { currentParams, navigateTo } = useRouter();
 const { getDevices } = useSmartThings();
 const toast = useToast();
 
@@ -32,6 +33,22 @@ function normalizeMac(mac) {
 }
 
 const isEdit = computed(() => props.action === 'edit');
+
+const tabs = [
+  { id: 'settings', label: 'Settings' },
+  { id: 'inputs', label: 'Inputs' },
+  { id: 'switches', label: 'Switches' },
+];
+
+const currentTab = computed(() => {
+  const tab = currentParams.value?.tab;
+
+  if (tabs.some((item) => item.id === tab)) {
+    return tab;
+  }
+
+  return 'settings';
+});
 
 const { formEl, validated, checkValidity } = useForm();
 const form = reactive({
@@ -158,9 +175,8 @@ async function handleSubmit() {
       await updateConfig({ devices: [...currentDevices, newDevice] });
 
       toast.success('Device added successfully');
+      navigateTo('device', { action: 'edit', deviceIndex: currentDevices.length });
     }
-
-    navigateTo('dashboard', { tab: 'devices' });
   } catch {
     toast.error(isEdit.value ? 'Failed to update device' : 'Failed to add device');
   }
@@ -183,9 +199,9 @@ watch(
 <template>
   <div class="d-flex align-items-center justify-content-between mb-3">
     <div>
-      <h6 class="fw-bold mb-0">{{ isEdit ? 'Edit Device' : 'Add Device' }}</h6>
+      <h6 class="fw-bold mb-0">{{ isEdit ? `Edit Device - ${form.name}` : 'Add Device' }}</h6>
       <div class="text-muted">
-        {{ isEdit ? `Edit the configuration of the device ${form.name}` : 'Configure a new Samsung TV for Homebridge control' }}
+        {{ isEdit ? 'Adjust the connection and control settings for this TV' : 'Configure a new Samsung TV for Homebridge control' }}
       </div>
     </div>
 
@@ -199,12 +215,17 @@ watch(
     v-if="!isEdit"
     class="mb-3"
     state="info"
-    title="Just fill in the essential details to add your TV"
-    text="This initial step covers basic setup. Additional features (inputs, custom switches, power options) can be fully customized from the Edit Device menu after adding."
+    title="A few details are enough to add your TV"
+    text="We’ll keep this first step simple. After the TV is added, you’ll be able to set up inputs, custom switches, and other settings at your own pace."
   />
 
-  <form ref="formEl" class="card rounded" :class="{ 'was-validated': validated }" novalidate @submit.prevent="handleSubmit">
-    <div v-if="isEdit" class="card-header">Main Configuration</div>
+  <Tabs v-if="isEdit" :tabs="tabs" />
+
+  <form v-show="!isEdit || currentTab === 'settings'" ref="formEl" class="card rounded" :class="{ 'was-validated': validated }" novalidate @submit.prevent="handleSubmit">
+    <div class="card-header">
+      <h6 class="fw-semibold mb-0">Main Configuration</h6>
+      <p class="small text-secondary mt-1">The name and network details used to control this TV</p>
+    </div>
 
     <div class="card-body">
       <div class="mb-3">
@@ -246,18 +267,28 @@ watch(
         </div>
       </div>
 
-      <div class="mb-3">
-        <button type="button" class="btn btn-outline-secondary" :disabled="!canTest(formEl?.ip)" @click="handleTestConnection">
-          <i v-if="isTesting" class="fas fa-spinner fa-spin me-1" />
-          {{ isTesting ? 'Testing...' : 'Test connection' }}
-        </button>
-      </div>
+      <button type="button" class="btn btn-outline-secondary" :disabled="!canTest(formEl?.ip)" @click="handleTestConnection">
+        <i v-if="isTesting" class="fas fa-spinner fa-spin me-1" />
+        {{ isTesting ? 'Testing...' : 'Test connection' }}
+      </button>
 
-      <div v-if="testResult" class="mb-3" :class="testResult.reachable ? 'text-success' : 'text-danger'">{{ testResult.message }}</div>
+      <Callout
+        v-if="testResult"
+        class="mt-3"
+        :state="testResult.reachable ? 'success' : 'danger'"
+        :title="testResult.title"
+        :text="testResult.message"
+        :icon="testResult.reachable ? 'fa-check' : 'fa-exclamation-triangle'"
+      />
+    </div>
 
-      <hr class="my-4" />
+    <div class="card-header">
+      <h6 class="fw-semibold mb-0">Optional settings</h6>
+      <p class="small text-secondary mt-1">Additional options that are not required to control this TV</p>
+    </div>
 
-      <div class="mb-3">
+    <div class="card-body">
+      <div :class="{ 'mb-3': isEdit }">
         <label for="deviceId" class="form-label">SmartThings Device ID <span class="form-optional">Optional</span></label>
 
         <select v-if="stDevices.length" id="deviceId" v-model="deviceIdSelect" class="form-select mb-2">
@@ -302,17 +333,21 @@ watch(
     </div>
 
     <div class="card-footer text-end">
-      <button type="button" class="btn btn-outline-secondary" @click="navigateBack('dashboard', { tab: 'devices' })">Cancel</button>
-      <button type="submit" class="btn btn-primary">{{ isEdit ? 'Save Device' : 'Add Device' }} <i class="fas fa-arrow-right" /></button>
+      <button type="button" class="btn btn-outline-secondary" @click="navigateTo('dashboard', { tab: 'devices' })">Cancel</button>
+      <button type="submit" class="btn btn-primary">{{ isEdit ? 'Update Device' : 'Add Device' }} <i v-if="!isEdit" class="fas fa-arrow-right" /></button>
     </div>
   </form>
 
   <template v-if="isEdit">
-    <div class="mt-4">
-      <InputsList :device-index="deviceIndex" :description="`These inputs apply to ${form.name || 'this TV'} and are added on top of the global inputs`" />
-    </div>
-    <div class="mt-4">
-      <SwitchesList :device-index="deviceIndex" :description="`These switches apply to ${form.name || 'this TV'} and are added on top of the global switches`" />
-    </div>
+    <InputsList
+      v-if="currentTab === 'inputs'"
+      :device-index="deviceIndex"
+      :description="`These inputs apply to ${form.name || 'this TV'} and are added on top of the global inputs`"
+    />
+    <SwitchesList
+      v-if="currentTab === 'switches'"
+      :device-index="deviceIndex"
+      :description="`These switches apply to ${form.name || 'this TV'} and are added on top of the global switches`"
+    />
   </template>
 </template>

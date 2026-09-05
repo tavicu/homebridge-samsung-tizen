@@ -179,16 +179,16 @@ watch(
 <template>
   <div class="d-flex align-items-center justify-content-between mb-3">
     <div>
-      <h6 class="fw-bold mb-0">{{ isEdit ? 'Edit Input' : 'Add Input' }}</h6>
+      <h6 class="fw-bold mb-0">{{ isEdit ? `Edit Input - ${form.name}` : 'Add Input' }}</h6>
       <div class="text-muted">
-        <template v-if="isEdit">Edit the configuration of the input {{ form.name }}</template>
+        <template v-if="isEdit">Adjust the configuration for this input</template>
         <template v-else-if="isDeviceScoped">Configure a new input for this device</template>
         <template v-else>Configure a new global input that applies to all devices</template>
       </div>
     </div>
 
     <div v-if="isEdit" class="d-flex gap-2 flex-shrink-0">
-      <button type="button" class="btn btn-outline-secondary" @click="navigateTo('dashboard', { tab: 'inputs' })">Back</button>
+      <button type="button" class="btn btn-outline-secondary" @click="navigateBack('dashboard', { tab: 'inputs' })">Back</button>
       <button type="button" class="btn btn-outline-danger" @click="navigateTo('input', { action: 'delete', inputIndex, deviceIndex })">Delete Input</button>
     </div>
   </div>

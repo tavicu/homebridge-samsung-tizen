@@ -19,7 +19,8 @@ export function useDevice() {
         return {
           reachable: true,
           mac: result.mac || null,
-          message: 'The TV responded. The IP looks correct and the TV is reachable.',
+          title: 'Connection established',
+          message: 'We have successfully connected to the TV, and the IP looks correct and the device is reachable!',
         };
       }
     } catch {
@@ -29,7 +30,8 @@ export function useDevice() {
 
     return {
       reachable: false,
-      message: 'Could not reach the TV. Check the IP, that the TV is on, and that it is on the same network.',
+      title: 'Unable to connect',
+      message: 'We could not reach the TV, confirm that the IP is correct and that the TV is turned on!',
     };
   }
 

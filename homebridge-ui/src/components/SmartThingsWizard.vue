@@ -105,7 +105,7 @@ function handleRetry() {
   <form v-if="currentStep === 1" ref="formEl" class="card shadow" :class="{ 'was-validated': validated }" novalidate @submit.prevent="handleSubmit">
     <div class="card-header">
       <h6 class="fw-semibold mb-0">API Credentials</h6>
-      <p class="small text-secondary mb-0 mt-1">Enter your SmartThings OAuth client ID and secret.</p>
+      <p class="small text-secondary mt-1">Enter your SmartThings OAuth client ID and secret</p>
     </div>
     <div class="card-body">
       <div class="mb-3">
@@ -145,7 +145,7 @@ function handleRetry() {
   <form v-if="currentStep === 2" ref="formEl" class="card shadow" :class="{ 'was-validated': validated }" novalidate @submit.prevent="handleSubmit">
     <div class="card-header">
       <h6 class="fw-semibold mb-0">Authorization Code</h6>
-      <p class="small text-secondary mb-0 mt-1">Open the authorization URL, then paste the code you receive.</p>
+      <p class="small text-secondary mt-1">Open the authorization URL, then paste the code you receive</p>
     </div>
     <div class="card-body">
       <div class="mb-3">

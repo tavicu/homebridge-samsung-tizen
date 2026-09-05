@@ -17,7 +17,7 @@ const props = defineProps({
 });
 
 const { config, updateConfig } = useConfig();
-const { navigateTo, navigateBack } = useRouter();
+const { navigateBack } = useRouter();
 const toast = useToast();
 
 const switchItem = computed(() => {
@@ -30,11 +30,11 @@ const switchItem = computed(() => {
 
 function goBack() {
   if (props.deviceIndex !== undefined) {
-    navigateTo('device', { action: 'edit', deviceIndex: props.deviceIndex });
+    navigateBack('device', { action: 'edit', deviceIndex: props.deviceIndex, tab: 'switches' });
     return;
   }
 
-  navigateTo('dashboard', { tab: 'switches' });
+  navigateBack('dashboard', { tab: 'switches' });
 }
 
 async function confirmDelete() {
@@ -77,13 +77,10 @@ watch(
 </script>
 
 <template>
-  <Confirm
-    title="Delete switch"
-    confirm-label="Delete Switch"
-    @cancel="navigateBack('switch', { action: 'edit', switchIndex, deviceIndex })"
-    @confirm="confirmDelete"
-  >
-    <p>Are you sure you want to delete the switch <span class="fw-semibold">{{ switchItem?.name }}</span> from configuration?</p>
+  <Confirm title="Delete switch" confirm-label="Delete Switch" @cancel="navigateBack('switch', { action: 'edit', switchIndex, deviceIndex })" @confirm="confirmDelete">
+    <p>
+      Are you sure you want to delete the switch <span class="fw-semibold">{{ switchItem?.name }}</span> from configuration?
+    </p>
     <p>This action is irreversible. Confirming saves the plugin configuration immediately.</p>
   </Confirm>
 </template>

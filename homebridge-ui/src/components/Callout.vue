@@ -13,18 +13,26 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  icon: {
+    type: String,
+    default: '',
+  },
 });
 </script>
 
 <template>
-  <div class="callout" :class="`callout-${props.state}`">
-    <div v-if="title" class="callout-title fw-semibold" :class="{ 'mb-1': text || $slots.default }">{{ title }}</div>
+  <div class="callout d-flex align-items-center gap-3" :class="`callout-${props.state}`">
+    <div class="flex-grow-1">
+      <div v-if="title" class="callout-title fw-semibold" :class="{ 'mb-1': text || $slots.default }">{{ title }}</div>
 
-    <div v-if="text || $slots.default" class="callout-text">
-      <slot>
-        <div v-html="text" />
-      </slot>
+      <div v-if="text || $slots.default" class="callout-text">
+        <slot>
+          <div v-html="text" />
+        </slot>
+      </div>
     </div>
+
+    <i v-if="icon" class="fas flex-shrink-0 callout-icon" :class="[icon, `text-${state}`]" />
   </div>
 </template>
 
@@ -42,6 +50,11 @@ const props = defineProps({
 
 .callout-text {
   font-size: 0.825rem;
+}
+
+.callout-icon {
+  font-size: 2rem;
+  line-height: 1;
 }
 
 .callout-primary {
