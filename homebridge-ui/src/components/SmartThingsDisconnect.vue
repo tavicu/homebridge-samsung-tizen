@@ -3,7 +3,7 @@ import { useHomebridge } from '../composables/useHomebridge';
 import { useRouter } from '../composables/useRouter';
 import { useSmartThings } from '../composables/useSmartThings';
 import { useToast } from '../composables/useToast';
-import ConfirmDelete from './ConfirmDelete.vue';
+import Confirm from './Confirm.vue';
 
 const { showSpinner, hideSpinner } = useHomebridge();
 const { navigateTo } = useRouter();
@@ -27,14 +27,12 @@ async function confirmDisconnect() {
 </script>
 
 <template>
-  <div class="mb-3">
-    <h6 class="fw-bold mb-0">Disconnect SmartThings</h6>
-    <div class="text-muted">Remove the stored SmartThings tokens</div>
-  </div>
-
-  <ConfirmDelete
+  <Confirm
     title="Disconnect SmartThings?"
-    text="This removes the stored access and refresh tokens. Client ID and Secret in the plugin config are kept. Restart Homebridge afterwards so the plugin stops using the token still in memory."
+    :text="[
+      'This removes the stored access and refresh tokens. Client ID and Secret in the plugin config are kept.',
+      'Restart Homebridge afterwards so the plugin stops using the token still in memory.',
+    ]"
     confirm-label="Disconnect"
     @cancel="navigateTo('dashboard')"
     @confirm="confirmDisconnect"

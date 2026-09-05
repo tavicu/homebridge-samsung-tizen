@@ -3,7 +3,7 @@ import { computed, watch } from 'vue';
 import { useConfig } from '../composables/useConfig';
 import { useRouter } from '../composables/useRouter';
 import { useToast } from '../composables/useToast';
-import ConfirmDelete from './ConfirmDelete.vue';
+import Confirm from './Confirm.vue';
 
 const props = defineProps({
   switchIndex: {
@@ -77,16 +77,13 @@ watch(
 </script>
 
 <template>
-  <div class="mb-3">
-    <h6 class="fw-bold mb-0">Delete Switch</h6>
-    <div class="text-muted">Delete the switch {{ switchItem?.name }}</div>
-  </div>
-
-  <ConfirmDelete
-    :title="`Delete switch ${switchItem?.name}`"
-    :text="`Are you sure you want to delete the switch ${switchItem?.name} from configuration?`"
+  <Confirm
+    title="Delete switch"
     confirm-label="Delete Switch"
     @cancel="navigateTo('switch', { action: 'edit', switchIndex, deviceIndex })"
     @confirm="confirmDelete"
-  />
+  >
+    <p>Are you sure you want to delete the switch <span class="fw-semibold">{{ switchItem?.name }}</span> from configuration?</p>
+    <p>This action is irreversible. Confirming saves the plugin configuration immediately.</p>
+  </Confirm>
 </template>

@@ -3,7 +3,7 @@ import { computed, watch } from 'vue';
 import { useConfig } from '../composables/useConfig';
 import { useRouter } from '../composables/useRouter';
 import { useToast } from '../composables/useToast';
-import ConfirmDelete from './ConfirmDelete.vue';
+import Confirm from './Confirm.vue';
 
 const props = defineProps({
   inputIndex: {
@@ -77,16 +77,13 @@ watch(
 </script>
 
 <template>
-  <div class="mb-3">
-    <h6 class="fw-bold mb-0">Delete Input</h6>
-    <div class="text-muted">Delete the input {{ inputItem?.name }}</div>
-  </div>
-
-  <ConfirmDelete
-    :title="`Delete input ${inputItem?.name}`"
-    :text="`Are you sure you want to delete the input ${inputItem?.name} from configuration?`"
+  <Confirm
+    title="Delete input"
     confirm-label="Delete Input"
     @cancel="navigateTo('input', { action: 'edit', inputIndex, deviceIndex })"
     @confirm="confirmDelete"
-  />
+  >
+    <p>Are you sure you want to delete the input <span class="fw-semibold">{{ inputItem?.name }}</span> from configuration?</p>
+    <p>This action is irreversible. Confirming saves the plugin configuration immediately.</p>
+  </Confirm>
 </template>
