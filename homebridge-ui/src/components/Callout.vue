@@ -48,12 +48,20 @@ const props = defineProps({
   background-color: color-mix(in srgb, var(--callout-color) 5%, transparent);
 }
 
+.callout-sm {
+  padding: 0.4rem 0.7rem;
+}
+
+.callout-sm .callout-text {
+  line-height: 1.5;
+}
+
 .callout-text {
   font-size: 0.825rem;
 }
 
 .callout-icon {
-  font-size: 2rem;
+  font-size: 1.8rem;
   line-height: 1;
 }
 

@@ -4,6 +4,7 @@ import { useConfig } from '../composables/useConfig';
 import { useForm } from '../composables/useForm';
 import { useRouter } from '../composables/useRouter';
 import { useToast } from '../composables/useToast';
+import Callout from './Callout.vue';
 
 const props = defineProps({
   action: {
@@ -226,12 +227,12 @@ watch(
     </div>
   </div>
 
-  <div v-if="!isEdit" class="mb-3">
-    <div class="fw-semibold mb-1">Combine one or more actions</div>
-    A switch can run multiple actions at once — for example power on the TV, set volume, then send a remote command.
-  </div>
-
   <form ref="formEl" class="card rounded" :class="{ 'was-validated': validated }" novalidate @submit.prevent="handleSubmit">
+    <div class="card-header">
+      <h6 class="fw-semibold mb-0">Switch Configuration</h6>
+      <p class="small text-secondary mt-1">The name shown in HomeKit, and whether the TV should be turned on first</p>
+    </div>
+
     <div class="card-body">
       <div class="mb-3">
         <label for="name" class="form-label">Switch Name</label>
@@ -239,9 +240,7 @@ watch(
         <div class="invalid-feedback">Please enter a valid switch name.</div>
       </div>
 
-      <hr class="my-4" />
-
-      <div class="mb-3">
+      <div>
         <label class="hb-uix-switch mb-0" for="power">
           <input id="power" v-model="form.power" type="checkbox" />
           <span>Power on TV before running actions</span>
@@ -249,7 +248,14 @@ watch(
         </label>
         <small class="form-text text-muted d-block">If enabled, the TV is turned on first when this switch is activated.</small>
       </div>
+    </div>
 
+    <div class="card-header">
+      <h6 class="fw-semibold mb-0">Actions</h6>
+      <p class="small text-secondary mt-1">A switch can run multiple actions at once — for example set volume, then open an app</p>
+    </div>
+
+    <div class="card-body">
       <div class="mb-3">
         <label class="hb-uix-switch mb-0" for="mute">
           <input id="mute" v-model="form.mute" type="checkbox" />
@@ -288,7 +294,11 @@ watch(
         </div>
       </div>
 
-      <div class="row mb-3">
+      <hr class="mx-2 my-3" />
+
+      <Callout class="callout-sm mb-2" state="warning">These actions require a SmartThings integration.</Callout>
+
+      <div class="row">
         <div class="col-md-6">
           <label for="input" class="form-label">Input Source <span class="form-optional">Optional</span></label>
           <select id="input" v-model="form.input" class="form-select">
@@ -304,29 +314,33 @@ watch(
             <option value="USB-C">USB-C</option>
             <option value="Display Port">Display Port</option>
           </select>
-          <small class="form-text text-muted">Requires SmartThings.</small>
         </div>
 
         <div class="col-md-6">
           <label for="picture_mode" class="form-label">Picture Mode <span class="form-optional">Optional</span></label>
           <input id="picture_mode" v-model="form.picture_mode" type="text" class="form-control" placeholder="e.g. movie" />
-          <small class="form-text text-muted">Requires SmartThings. Enter the exact name shown on the TV (for example movie, standard, or dynamic). Names vary by model.</small>
         </div>
       </div>
+    </div>
 
-      <div>
-        <label class="form-label">Key(s) to execute <span class="form-optional">Optional</span></label>
-        <div class="d-flex flex-column gap-2">
-          <div v-for="command in form.commands" :key="command.id" class="input-group">
-            <input v-model="command.value" type="text" class="form-control font-monospace text-uppercase" placeholder="e.g. KEY_VOLUP" />
-            <button type="button" class="btn btn-outline-danger" @click="removeCommand(command.id)">
-              <i class="fas fa-xmark" />
-            </button>
-          </div>
+    <div class="card-header">
+      <h6 class="fw-semibold mb-0">Remote Commands</h6>
+      <p class="small text-secondary mt-1">Send one or more remote keys after the other actions</p>
+    </div>
+
+    <div class="card-body">
+      <Callout class="callout-sm mb-2">You can repeat a command with <code class="fw-semibold">KEY_VOLUP*3</code> and hold a key by using <code class="fw-semibold">KEY_POWER*2.5s</code>.</Callout>
+
+      <label class="form-label">Key(s) to execute <span class="form-optional">Optional</span></label>
+      <div class="d-flex flex-column gap-2">
+        <div v-for="command in form.commands" :key="command.id" class="input-group input-group-sm">
+          <input v-model="command.value" type="text" class="form-control font-monospace text-uppercase" placeholder="e.g. KEY_VOLUP" />
+          <button type="button" class="btn btn-outline-danger" @click="removeCommand(command.id)">
+            <i class="fas fa-xmark" />
+          </button>
         </div>
-        <button type="button" class="btn btn-sm btn-outline-primary mt-2" @click="addCommand"><i class="fas fa-plus" /> Add Command</button>
-        <small class="form-text text-muted d-block mt-2"> Repeat a key with <code>KEY_VOLUP*3</code>. Hold it with <code>KEY_POWER*2.5s</code> (time in seconds). </small>
       </div>
+      <button type="button" class="btn btn-sm btn-outline-primary mt-2" @click="addCommand"><i class="fas fa-plus" /> Add Command</button>
     </div>
 
     <div class="card-footer">

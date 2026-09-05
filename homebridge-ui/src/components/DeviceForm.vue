@@ -274,14 +274,14 @@ watch(
         </div>
       </div>
 
-      <button type="button" class="btn btn-outline-secondary" :disabled="!canTest(formEl?.ip)" @click="handleTestConnection">
+      <button type="button" class="btn btn-sm btn-outline-secondary" :disabled="!canTest(formEl?.ip)" @click="handleTestConnection">
         <i v-if="isTesting" class="fas fa-spinner fa-spin me-1" />
         {{ isTesting ? 'Testing...' : 'Test connection' }}
       </button>
 
       <Callout
         v-if="testResult"
-        class="mt-3"
+        class="callout-sm mt-3"
         :state="testResult.reachable ? 'success' : 'danger'"
         :title="testResult.title"
         :text="testResult.message"

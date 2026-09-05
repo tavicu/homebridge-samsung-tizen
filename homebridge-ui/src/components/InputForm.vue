@@ -198,6 +198,11 @@ watch(
   </div>
 
   <form ref="formEl" class="card rounded" :class="{ 'was-validated': validated }" novalidate @submit.prevent="handleSubmit">
+    <div class="card-header">
+      <h6 class="fw-semibold mb-0">Input Configuration</h6>
+      <p class="small text-secondary mt-1">Name this input and choose what it should do when selected</p>
+    </div>
+
     <div class="card-body">
       <div class="mb-3">
         <label for="name" class="form-label">Input Name</label>
@@ -232,7 +237,7 @@ watch(
           <option value="Display Port">Display Port</option>
         </select>
         <div class="invalid-feedback">Please choose an input source.</div>
-        <small class="form-text text-muted">Requires a SmartThings connection.</small>
+        <small class="form-text text-muted">This input type requires a SmartThings integration.</small>
       </div>
 
       <div v-if="form.type === 'app'">
@@ -248,7 +253,7 @@ watch(
       <div v-if="form.type === 'command'">
         <label class="form-label">Key(s) to execute</label>
         <div class="d-flex flex-column gap-2">
-          <div v-for="command in form.commands" :key="command.id" class="input-group">
+          <div v-for="command in form.commands" :key="command.id" class="input-group input-group-sm">
             <input v-model="command.value" type="text" class="form-control font-monospace text-uppercase" placeholder="e.g. KEY_VOLUP" required />
             <button type="button" class="btn btn-outline-danger" @click="removeCommand(command.id)">
               <i class="fas fa-xmark" />
@@ -256,7 +261,9 @@ watch(
           </div>
         </div>
         <button type="button" class="btn btn-sm btn-outline-primary mt-2" @click="addCommand"><i class="fas fa-plus" /> Add Command</button>
-        <small class="form-text text-muted d-block mt-2"> Repeat a key with <code>KEY_VOLUP*3</code>. Hold it with <code>KEY_POWER*2.5s</code> (time in seconds). </small>
+        <small class="form-text d-block text-muted mt-2">
+          You can repeat a command with <code class="fw-semibold">KEY_VOLUP*3</code> and hold a key by using <code class="fw-semibold">KEY_POWER*2.5s</code>.
+        </small>
       </div>
     </div>
 

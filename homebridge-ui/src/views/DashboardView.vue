@@ -25,7 +25,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <Callout class="mb-3" :text="$t('dashboard.alert', { url: 'https://tavicu.github.io/homebridge-samsung-tizen/' })" />
+  <Callout class="callout-sm mb-3" :text="$t('dashboard.alert', { url: 'https://tavicu.github.io/homebridge-samsung-tizen/' })" />
 
   <SmartThingsCard class="mb-4" />
 
