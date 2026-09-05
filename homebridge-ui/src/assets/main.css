@@ -1,5 +1,6 @@
 #app-tizen {
   --bs-box-shadow: 0 0.25rem 0.7rem rgba(0, 0, 0, 0.075);
+  --bs-hr-bg: rgba(0, 0, 0, 0.08);
   --form-control-bg: #fcfcfc;
   --form-control-border: #e4e7ec;
   --form-control-hover-bg: #fff;
@@ -12,6 +13,7 @@
   --bs-body-color: #a5a5a5;
   --bs-box-shadow: 0 0.25rem 0.8rem rgba(0, 0, 0, 0.4);
   --bs-secondary-color: rgba(130, 130, 130, 0.75);
+  --bs-hr-bg: rgba(255, 255, 255, 0.1);
   --form-control-bg: rgba(255, 255, 255, 0.06);
   --form-control-border: rgba(255, 255, 255, 0.14);
   --form-control-hover-bg: rgba(255, 255, 255, 0.1);
@@ -32,6 +34,11 @@
 
 p:last-child {
   margin-bottom: 0;
+}
+
+hr {
+  opacity: 1;
+  border-color: var(--bs-hr-bg);
 }
 
 .btn {

@@ -240,7 +240,7 @@ watch(
         <div class="invalid-feedback">Please enter a valid switch name.</div>
       </div>
 
-      <hr class="my-4 text-muted" />
+      <hr class="my-4" />
 
       <div class="mb-3">
         <label class="hb-uix-switch mb-0" for="power">

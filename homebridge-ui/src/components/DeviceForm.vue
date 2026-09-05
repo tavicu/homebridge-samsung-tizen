@@ -255,7 +255,7 @@ watch(
 
       <div v-if="testResult" class="mb-3" :class="testResult.reachable ? 'text-success' : 'text-danger'">{{ testResult.message }}</div>
 
-      <hr class="my-4 text-muted" />
+      <hr class="my-4" />
 
       <div class="mb-3">
         <label for="deviceId" class="form-label">SmartThings Device ID <span class="form-optional">Optional</span></label>
@@ -283,7 +283,7 @@ watch(
           <small class="form-text text-muted">If you have problems adding the TV to Home app, set this field to a unique value</small>
         </div>
 
-        <hr class="my-4 text-muted" />
+        <hr class="my-4" />
 
         <div>
           <label class="hb-uix-switch" for="option.Device.Disable">
