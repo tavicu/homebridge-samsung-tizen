@@ -69,7 +69,7 @@ watch(
 </script>
 
 <template>
-  <Callout class="mb-3" text="Leave a field empty to use the default mapping shown in the placeholder." />
+  <Callout class="callout-sm mb-3" text="Leave a field empty to use the default mapping shown in the placeholder." />
 
   <form ref="formEl" class="card rounded shadow" :class="{ 'was-validated': validated }" novalidate @submit.prevent="handleSubmit">
     <template v-for="group in keyGroups" :key="group.id">
