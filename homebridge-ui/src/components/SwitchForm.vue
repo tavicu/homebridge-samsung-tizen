@@ -37,7 +37,7 @@ function toCommands(value) {
 }
 
 const { config, updateConfig, cleanConfig } = useConfig();
-const { navigateTo } = useRouter();
+const { navigateTo, navigateBack } = useRouter();
 const toast = useToast();
 
 const isEdit = computed(() => props.action === 'edit');
@@ -97,15 +97,6 @@ function fillForm(switchItem) {
   form.commands = switchItem.command !== undefined ? toCommands(switchItem.command) : [createCommand()];
 }
 
-function goBack() {
-  if (props.deviceIndex !== undefined) {
-    navigateTo('device', { action: 'edit', deviceIndex: props.deviceIndex });
-    return;
-  }
-
-  navigateTo('dashboard', { tab: 'switches' });
-}
-
 function getCurrentSwitches() {
   if (props.deviceIndex !== undefined) {
     return config.value.devices?.[props.deviceIndex]?.switches || [];
@@ -122,7 +113,7 @@ function init() {
 
     if (!switchItem) {
       toast.error('Switch not found');
-      goBack();
+      navigateBack('dashboard', { tab: 'switches' });
       return;
     }
 
@@ -193,7 +184,7 @@ async function handleSubmit() {
       toast.success('Switch added successfully');
     }
 
-    goBack();
+    navigateBack('dashboard', { tab: 'switches' });
   } catch {
     toast.error(isEdit.value ? 'Failed to edit switch' : 'Failed to add switch');
   }
@@ -230,7 +221,10 @@ watch(
       </div>
     </div>
 
-    <button v-if="isEdit" type="button" class="btn btn-outline-danger" @click="navigateTo('switch', { action: 'delete', switchIndex, deviceIndex })">Delete Switch</button>
+    <div v-if="isEdit" class="d-flex gap-2 flex-shrink-0">
+      <button type="button" class="btn btn-outline-secondary" @click="navigateTo('dashboard', { tab: 'switches' })">Back</button>
+      <button type="button" class="btn btn-outline-danger" @click="navigateTo('switch', { action: 'delete', switchIndex, deviceIndex })">Delete Switch</button>
+    </div>
   </div>
 
   <div v-if="!isEdit" class="mb-3">
@@ -337,7 +331,7 @@ watch(
     </div>
 
     <div class="card-footer text-end">
-      <button type="button" class="btn btn-outline-secondary" @click="goBack">Cancel</button>
+      <button type="button" class="btn btn-outline-secondary" @click="navigateBack('dashboard', { tab: 'switches' })">Cancel</button>
       <button type="submit" class="btn btn-primary">{{ isEdit ? 'Save Switch' : 'Add Switch' }} <i class="fas fa-arrow-right" /></button>
     </div>
   </form>

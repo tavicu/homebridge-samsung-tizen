@@ -17,7 +17,7 @@ const props = defineProps({
 });
 
 const { config, updateConfig } = useConfig();
-const { navigateTo } = useRouter();
+const { navigateTo, navigateBack } = useRouter();
 const toast = useToast();
 
 const switchItem = computed(() => {
@@ -80,7 +80,7 @@ watch(
   <Confirm
     title="Delete switch"
     confirm-label="Delete Switch"
-    @cancel="navigateTo('switch', { action: 'edit', switchIndex, deviceIndex })"
+    @cancel="navigateBack('switch', { action: 'edit', switchIndex, deviceIndex })"
     @confirm="confirmDelete"
   >
     <p>Are you sure you want to delete the switch <span class="fw-semibold">{{ switchItem?.name }}</span> from configuration?</p>

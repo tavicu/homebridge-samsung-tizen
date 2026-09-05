@@ -13,7 +13,7 @@ const props = defineProps({
 });
 
 const { config, updateConfig } = useConfig();
-const { navigateTo } = useRouter();
+const { navigateTo, navigateBack } = useRouter();
 const toast = useToast();
 
 const device = computed(() => config.value?.devices?.[props.deviceIndex]);
@@ -46,7 +46,7 @@ watch(
   <Confirm
     title="Delete device"
     confirm-label="Delete Device"
-    @cancel="navigateTo('device', { action: 'edit', deviceIndex })"
+    @cancel="navigateBack('device', { action: 'edit', deviceIndex })"
     @confirm="confirmDelete"
   >
     <p>Are you sure you want to delete the device <span class="fw-semibold">{{ device?.name }}</span> from configuration?</p>

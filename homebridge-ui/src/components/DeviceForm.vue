@@ -22,7 +22,7 @@ const props = defineProps({
 
 const { config, updateConfig, cleanConfig } = useConfig();
 const { isTesting, canTest, testConnection } = useDevice();
-const { navigateTo } = useRouter();
+const { navigateTo, navigateBack } = useRouter();
 const { getDevices } = useSmartThings();
 const toast = useToast();
 
@@ -188,7 +188,10 @@ watch(
       </div>
     </div>
 
-    <button v-if="isEdit" type="button" class="btn btn-outline-danger" @click="navigateTo('device', { action: 'delete', deviceIndex })">Delete Device</button>
+    <div v-if="isEdit" class="d-flex gap-2 flex-shrink-0">
+      <button type="button" class="btn btn-outline-secondary" @click="navigateTo('dashboard', { tab: 'devices' })">Back</button>
+      <button type="button" class="btn btn-outline-danger" @click="navigateTo('device', { action: 'delete', deviceIndex })">Delete Device</button>
+    </div>
   </div>
 
   <div v-if="!isEdit" class="mb-3">
@@ -295,7 +298,7 @@ watch(
     </div>
 
     <div class="card-footer text-end">
-      <button type="button" class="btn btn-outline-secondary" @click="navigateTo('dashboard', { tab: 'devices' })">Cancel</button>
+      <button type="button" class="btn btn-outline-secondary" @click="navigateBack('dashboard', { tab: 'devices' })">Cancel</button>
       <button type="submit" class="btn btn-primary">{{ isEdit ? 'Save Device' : 'Add Device' }} <i class="fas fa-arrow-right" /></button>
     </div>
   </form>

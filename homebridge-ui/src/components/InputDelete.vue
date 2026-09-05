@@ -17,7 +17,7 @@ const props = defineProps({
 });
 
 const { config, updateConfig } = useConfig();
-const { navigateTo } = useRouter();
+const { navigateTo, navigateBack } = useRouter();
 const toast = useToast();
 
 const inputItem = computed(() => {
@@ -80,7 +80,7 @@ watch(
   <Confirm
     title="Delete input"
     confirm-label="Delete Input"
-    @cancel="navigateTo('input', { action: 'edit', inputIndex, deviceIndex })"
+    @cancel="navigateBack('input', { action: 'edit', inputIndex, deviceIndex })"
     @confirm="confirmDelete"
   >
     <p>Are you sure you want to delete the input <span class="fw-semibold">{{ inputItem?.name }}</span> from configuration?</p>

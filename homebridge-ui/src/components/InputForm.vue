@@ -37,7 +37,7 @@ function toCommands(value) {
 }
 
 const { config, updateConfig, cleanConfig } = useConfig();
-const { navigateTo } = useRouter();
+const { navigateTo, navigateBack } = useRouter();
 const toast = useToast();
 
 const isEdit = computed(() => props.action === 'edit');
@@ -68,15 +68,6 @@ function fillForm(input) {
   form.commands = input.type === 'command' ? toCommands(input.value) : [createCommand()];
 }
 
-function goBack() {
-  if (props.deviceIndex !== undefined) {
-    navigateTo('device', { action: 'edit', deviceIndex: props.deviceIndex });
-    return;
-  }
-
-  navigateTo('dashboard', { tab: 'inputs' });
-}
-
 function getCurrentInputs() {
   if (props.deviceIndex !== undefined) {
     return config.value.devices?.[props.deviceIndex]?.inputs || [];
@@ -93,7 +84,7 @@ function init() {
 
     if (!input) {
       toast.error('Input not found');
-      goBack();
+      navigateBack('dashboard', { tab: 'inputs' });
       return;
     }
 
@@ -159,7 +150,7 @@ async function handleSubmit() {
       toast.success('Input added successfully');
     }
 
-    goBack();
+    navigateBack('dashboard', { tab: 'inputs' });
   } catch {
     toast.error(isEdit.value ? 'Failed to edit input' : 'Failed to add input');
   }
@@ -196,7 +187,10 @@ watch(
       </div>
     </div>
 
-    <button v-if="isEdit" type="button" class="btn btn-outline-danger" @click="navigateTo('input', { action: 'delete', inputIndex, deviceIndex })">Delete Input</button>
+    <div v-if="isEdit" class="d-flex gap-2 flex-shrink-0">
+      <button type="button" class="btn btn-outline-secondary" @click="navigateTo('dashboard', { tab: 'inputs' })">Back</button>
+      <button type="button" class="btn btn-outline-danger" @click="navigateTo('input', { action: 'delete', inputIndex, deviceIndex })">Delete Input</button>
+    </div>
   </div>
 
   <form ref="formEl" class="card rounded" :class="{ 'was-validated': validated }" novalidate @submit.prevent="handleSubmit">
@@ -263,7 +257,7 @@ watch(
     </div>
 
     <div class="card-footer text-end">
-      <button type="button" class="btn btn-outline-secondary" @click="goBack">Cancel</button>
+      <button type="button" class="btn btn-outline-secondary" @click="navigateBack('dashboard', { tab: 'inputs' })">Cancel</button>
       <button type="submit" class="btn btn-primary">{{ isEdit ? 'Save Input' : 'Add Input' }} <i class="fas fa-arrow-right" /></button>
     </div>
   </form>
