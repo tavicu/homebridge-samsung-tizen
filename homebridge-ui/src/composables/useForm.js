@@ -59,6 +59,10 @@ export function useForm() {
     return trackedForm;
   }
 
+  function createId() {
+    return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 11)}`;
+  }
+
   // Checks if the current form state has changed since the last "clean" snapshot.
   const isDirty = computed(() => trackedForm !== null && JSON.stringify(trackedForm) !== snapshot.value);
 
@@ -66,6 +70,7 @@ export function useForm() {
     formEl,
     validated,
     isDirty,
+    createId,
     createForm,
     markPristine,
     checkValidity,

@@ -21,8 +21,13 @@ const props = defineProps({
   },
 });
 
+const { config, updateConfig, cleanConfig } = useConfig();
+const { navigateTo, navigateBack } = useRouter();
+const toast = useToast();
+const { formEl, validated, checkValidity, createForm, createId, isDirty, markPristine } = useForm();
+
 function createCommand(value = '') {
-  return { id: crypto.randomUUID(), value };
+  return { id: createId(), value };
 }
 
 function toCommands(value) {
@@ -37,14 +42,9 @@ function toCommands(value) {
   return [createCommand()];
 }
 
-const { config, updateConfig, cleanConfig } = useConfig();
-const { navigateTo, navigateBack } = useRouter();
-const toast = useToast();
-
 const isEdit = computed(() => props.action === 'edit');
 const isDeviceScoped = computed(() => props.deviceIndex !== undefined);
 
-const { formEl, validated, checkValidity, createForm, isDirty, markPristine } = useForm();
 const form = createForm({
   name: '',
   type: '',
