@@ -98,6 +98,21 @@ hr {
   border-radius: 999px;
 }
 
+.form-check + .form-check {
+  margin-top: 0.8rem;
+}
+
+.form-switch {
+  padding-left: 3.2em;
+}
+
+.form-switch .form-check-input {
+  width: 2.6em;
+  height: 1.4em;
+  margin-top: 0.05em;
+  margin-left: -3.2em;
+}
+
 .dark-mode .form-optional {
   color: rgba(255, 255, 255, 0.55);
   background-color: rgba(255, 255, 255, 0.08);

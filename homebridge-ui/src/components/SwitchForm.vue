@@ -249,12 +249,11 @@ watch(
       </div>
 
       <div>
-        <label class="hb-uix-switch mb-0" for="power">
-          <input id="power" v-model="form.power" type="checkbox" />
-          <span>Power on TV before running actions</span>
-          <span class="hb-uix-slider hb-uix-round" />
-        </label>
-        <small class="form-text text-muted d-block">If enabled, the TV is turned on first when this switch is activated.</small>
+        <div class="form-check form-switch">
+          <input id="power" v-model="form.power" class="form-check-input" type="checkbox" role="switch" />
+          <label class="form-check-label" for="power">Power on TV before running actions</label>
+        </div>
+        <small class="form-text text-muted">If enabled, the TV is turned on first when this switch is activated.</small>
       </div>
     </div>
 
@@ -265,12 +264,11 @@ watch(
 
     <div class="card-body">
       <div class="mb-3">
-        <label class="hb-uix-switch mb-0" for="mute">
-          <input id="mute" v-model="form.mute" type="checkbox" />
-          <span>Mute</span>
-          <span class="hb-uix-slider hb-uix-round" />
-        </label>
-        <small class="form-text text-muted d-block">Sends the mute toggle command to the TV.</small>
+        <div class="form-check form-switch">
+          <input id="mute" v-model="form.mute" class="form-check-input" type="checkbox" role="switch" />
+          <label class="form-check-label" for="mute">Mute</label>
+        </div>
+        <small class="form-text text-muted">Sends the mute toggle command to the TV.</small>
       </div>
 
       <div class="row mb-3">

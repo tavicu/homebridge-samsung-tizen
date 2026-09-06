@@ -333,17 +333,15 @@ watch(
         <hr class="my-4" />
 
         <div>
-          <label class="hb-uix-switch" for="option.Device.Disable">
-            <input id="option.Device.Disable" v-model="form.options" type="checkbox" value="Device.Disable" />
-            <span>Disable device from processing</span>
-            <span class="hb-uix-slider hb-uix-round" />
-          </label>
+          <div class="form-check form-switch">
+            <input id="option.Device.Disable" v-model="form.options" class="form-check-input" type="checkbox" role="switch" value="Device.Disable" />
+            <label class="form-check-label" for="option.Device.Disable">Disable device from processing</label>
+          </div>
 
-          <label class="hb-uix-switch" for="option.Switch.DeviceName.Disable">
-            <input id="option.Switch.DeviceName.Disable" v-model="form.options" type="checkbox" value="Switch.DeviceName.Disable" />
-            <span>Disable prepending device name on custom switches</span>
-            <span class="hb-uix-slider hb-uix-round" />
-          </label>
+          <div class="form-check form-switch">
+            <input id="option.Switch.DeviceName.Disable" v-model="form.options" class="form-check-input" type="checkbox" role="switch" value="Switch.DeviceName.Disable" />
+            <label class="form-check-label" for="option.Switch.DeviceName.Disable">Disable prepending device name on custom switches</label>
+          </div>
         </div>
       </template>
     </div>
