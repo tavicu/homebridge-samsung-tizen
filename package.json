@@ -33,7 +33,8 @@
     "dist",
     "homebridge-ui/public",
     "homebridge-ui/server.js",
-    "config.schema.json"
+    "config.schema.json",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "build": "rimraf dist homebridge-ui/public && tsc && vite build --config homebridge-ui/vite.config.js",
