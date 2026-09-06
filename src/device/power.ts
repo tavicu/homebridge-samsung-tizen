@@ -14,8 +14,12 @@ const POLL_INTERVAL = 1000 * 45;
 const SSDP_FRESH_LIMIT = 1000 * 60;
 const POWERING_TIMEOUT = 1000 * 3;
 
+// A TV that went off keeps answering on port 8001 while in standby, around 17 seconds.
+// Without PowerState there is nothing to tell standby apart from on, so we wait it out.
+const STANDBY_TIMEOUT = 1000 * 18;
+
 export class PowerMonitor {
-  private ssdpFreshUntil = 0;
+  private skipPingUntil = 0;
   private latch: { value: boolean; expiresAt: number; timer: NodeJS.Timeout } | null = null;
 
   constructor(
@@ -58,17 +62,17 @@ export class PowerMonitor {
   private async handleSsdpAlive(maxAgeSeconds?: number): Promise<void> {
     const maxAge = maxAgeSeconds && Number.isFinite(maxAgeSeconds) ? maxAgeSeconds * 1000 : SSDP_FRESH_LIMIT;
 
-    this.ssdpFreshUntil = Date.now() + Math.min(maxAge, SSDP_FRESH_LIMIT);
+    this.skipPingUntil = Date.now() + Math.min(maxAge, SSDP_FRESH_LIMIT);
     this.reconcile(await this.isOn(), 'ssdp');
   }
 
   private handleSsdpByebye(): void {
-    this.ssdpFreshUntil = 0;
+    this.skipPingUntil = this.device.storage.powerStateSupport ? 0 : Date.now() + STANDBY_TIMEOUT;
     this.reconcile(false, 'ssdp');
   }
 
   private async confirmViaPing(trigger: Trigger): Promise<void> {
-    if (Date.now() < this.ssdpFreshUntil) {
+    if (Date.now() < this.skipPingUntil) {
       return;
     }
 
@@ -111,13 +115,15 @@ export class PowerMonitor {
   private latchOptimistic(value: boolean): void {
     this.clearLatch();
 
+    const timeout = !value && !this.device.storage.powerStateSupport ? STANDBY_TIMEOUT : POWERING_TIMEOUT;
+
     this.latch = {
       value,
-      expiresAt: Date.now() + POWERING_TIMEOUT,
+      expiresAt: Date.now() + timeout,
       timer: setTimeout(() => {
         this.latch = null;
         void this.confirmViaPing('powering');
-      }, POWERING_TIMEOUT),
+      }, timeout),
     };
 
     this.applyPower(value, 'command');

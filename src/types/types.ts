@@ -1,5 +1,6 @@
 import { PlatformIdentifier, PlatformName, Service } from 'homebridge';
 import { DeviceConfig } from './device.js';
+import { UPnPConfig } from './upnp.js';
 import { WolOptions } from './wol.js';
 
 export type LinkedService = Service & {
@@ -13,6 +14,7 @@ export type PlatformConfig = {
   switches?: Array<SwitchConfig>;
   keys?: Record<string, string>;
   wol?: WolOptions;
+  upnp?: UPnPConfig;
   clientId?: string;
   clientSecret?: string;
 };

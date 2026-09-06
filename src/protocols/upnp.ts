@@ -4,10 +4,12 @@ import { networkInterfaces } from 'os';
 import { Device } from '../device/index.js';
 import { parseUPnPChange, UPnPparser } from '../lib/parsers.js';
 import { SamsungPlatform } from '../platform.js';
+import { UPnPConfig } from '../types/index.js';
 
 export class UPnPManager {
   private server: http.Server | null = null;
   private devices = new Map<string, Device>();
+  private config: UPnPConfig;
   private localIp: string;
   private localPort: number = 0;
 
@@ -15,6 +17,10 @@ export class UPnPManager {
   private resolveServerReady!: () => void;
 
   constructor(private readonly platform: SamsungPlatform) {
+    this.config = {
+      port: 0,
+      ...platform.config.upnp,
+    };
     this.localIp = this.detectLocalIp();
 
     this.isServerReady = new Promise((resolve) => {
@@ -63,8 +69,7 @@ export class UPnPManager {
       }
     });
 
-    // TODO: 0 sa fie UPNP_PORT sau ceva config.
-    this.server.listen(0, () => {
+    this.server.listen(this.config.port, () => {
       const addr = this.server?.address();
       this.localPort = addr && typeof addr !== 'string' ? addr.port : 0;
       this.platform.log.debug(`UPnP Manager server started on http://${this.localIp}:${this.localPort}`);

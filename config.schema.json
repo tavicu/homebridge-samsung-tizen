@@ -94,6 +94,16 @@
             "minimum": 0
           }
         }
+      },
+      "upnp": {
+        "type": "object",
+        "properties": {
+          "port": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 65535
+          }
+        }
       }
     },
     "properties": {
@@ -110,6 +120,7 @@
       },
       "keys": { "$ref": "#/definitions/keys" },
       "wol": { "$ref": "#/definitions/wol" },
+      "upnp": { "$ref": "#/definitions/upnp" },
       "devices": {
         "type": "array",
         "items": {
