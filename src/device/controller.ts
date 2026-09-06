@@ -194,15 +194,15 @@ export class DeviceController {
 
     const isSleeping = await this.ping();
 
-    this.power.latchOptimistic(true);
-
-    if (isSleeping) {
-      await this.ws.click('KEY_POWER');
-    } else {
-      await wol(this.device.config.mac, { ...this.device.config.wol, ip: this.device.config.ip }).catch((error) => {
-        throw new Error('Failed to wake up TV', { cause: error });
-      });
-    }
+    await this.power.withPowerLatch(true, async () => {
+      if (isSleeping) {
+        await this.ws.click('KEY_POWER');
+      } else {
+        await wol(this.device.config.mac, { ...this.device.config.wol, ip: this.device.config.ip }).catch((error) => {
+          throw new Error('Failed to wake up TV', { cause: error });
+        });
+      }
+    });
   }
 
   public async powerOff(): Promise<void> {
@@ -214,9 +214,7 @@ export class DeviceController {
       throw new TvAlreadyOffError();
     }
 
-    this.power.latchOptimistic(false);
-
-    await this.ws.click('KEY_POWER');
+    await this.power.withPowerLatch(false, () => this.ws.click('KEY_POWER'));
   }
 
   private waitPowering(): Promise<void> {

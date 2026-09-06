@@ -37,19 +37,15 @@ export class PowerMonitor {
     return this.latch !== null;
   }
 
-  public latchOptimistic(value: boolean): void {
-    this.clearLatch();
+  public async withPowerLatch(value: boolean, action: () => Promise<void>): Promise<void> {
+    this.latchOptimistic(value);
 
-    this.latch = {
-      value,
-      expiresAt: Date.now() + POWERING_TIMEOUT,
-      timer: setTimeout(() => {
-        this.latch = null;
-        void this.confirmViaPing('powering');
-      }, POWERING_TIMEOUT),
-    };
-
-    this.applyPower(value, 'command');
+    try {
+      await action();
+    } catch (error) {
+      this.abortLatch(!value);
+      throw error;
+    }
   }
 
   public async settled(): Promise<void> {
@@ -110,6 +106,26 @@ export class PowerMonitor {
     }
 
     this.applyPower(candidate, source);
+  }
+
+  private latchOptimistic(value: boolean): void {
+    this.clearLatch();
+
+    this.latch = {
+      value,
+      expiresAt: Date.now() + POWERING_TIMEOUT,
+      timer: setTimeout(() => {
+        this.latch = null;
+        void this.confirmViaPing('powering');
+      }, POWERING_TIMEOUT),
+    };
+
+    this.applyPower(value, 'command');
+  }
+
+  private abortLatch(revertTo: boolean): void {
+    this.clearLatch();
+    this.applyPower(revertTo, 'command');
   }
 
   private applyPower(value: boolean, _source: Source): void {
