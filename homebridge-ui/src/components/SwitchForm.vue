@@ -1,5 +1,6 @@
 <script setup>
 import { computed, watch } from 'vue';
+import SwitchesIcon from '../assets/icons/switches.svg';
 import { useConfig } from '../composables/useConfig';
 import { useForm } from '../composables/useForm';
 import { useRouter } from '../composables/useRouter';
@@ -212,12 +213,19 @@ watch(
 
 <template>
   <div class="d-flex align-items-center justify-content-between mb-3">
-    <div>
-      <h6 class="fw-bold mb-0">{{ isEdit ? `Edit Switch - ${form.name}` : 'Add Switch' }}</h6>
-      <div class="text-muted">
-        <template v-if="isEdit">Adjust the configuration for this switch</template>
-        <template v-else-if="isDeviceScoped">Configure a new switch for this device</template>
-        <template v-else>Configure a new global switch that applies to all devices</template>
+    <div class="page-title">
+      <div class="page-title-icon text-muted">
+        <SwitchesIcon />
+      </div>
+      <div>
+        <h6 class="fw-bold mb-0">{{ isEdit ? 'Edit Switch' : 'Add Switch' }}</h6>
+        <div class="text-muted">
+          <template v-if="isEdit">
+            Update the configuration for <span class="fw-semibold">{{ form.name }}</span> switch
+          </template>
+          <template v-else-if="isDeviceScoped">Configure a new switch for this device</template>
+          <template v-else>Configure a new global switch that applies to all devices</template>
+        </div>
       </div>
     </div>
 

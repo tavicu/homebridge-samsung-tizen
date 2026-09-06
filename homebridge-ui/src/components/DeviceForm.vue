@@ -6,6 +6,7 @@ import { useForm } from '../composables/useForm';
 import { useRouter } from '../composables/useRouter';
 import { useSmartThings } from '../composables/useSmartThings';
 import { useToast } from '../composables/useToast';
+import TvIcon from '../assets/icons/tv.svg';
 import Callout from './Callout.vue';
 import InputsList from './InputsList.vue';
 import KeysForm from './KeysForm.vue';
@@ -205,10 +206,18 @@ watch(
 
 <template>
   <div class="d-flex align-items-center justify-content-between mb-3">
-    <div>
-      <h6 class="fw-bold mb-0">{{ isEdit ? `Edit Device - ${form.name}` : 'Add Device' }}</h6>
-      <div class="text-muted">
-        {{ isEdit ? 'Adjust the connection and control settings for this TV' : 'Configure a new Samsung TV for Homebridge control' }}
+    <div class="page-title">
+      <div class="page-title-icon text-muted">
+        <TvIcon />
+      </div>
+      <div>
+        <h6 class="fw-bold mb-0">{{ isEdit ? 'Edit Device' : 'Add Device' }}</h6>
+        <div class="text-muted">
+          <template v-if="isEdit">
+            Update the configuration for <span class="fw-semibold">{{ form.name }}</span>
+          </template>
+          <template v-else>Configure a new Samsung TV for Homebridge control</template>
+        </div>
       </div>
     </div>
 

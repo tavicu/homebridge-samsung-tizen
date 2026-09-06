@@ -1,5 +1,6 @@
 <script setup>
 import { computed, watch } from 'vue';
+import InputsIcon from '../assets/icons/inputs.svg';
 import { useConfig } from '../composables/useConfig';
 import { useForm } from '../composables/useForm';
 import { useRouter } from '../composables/useRouter';
@@ -182,12 +183,19 @@ watch(
 
 <template>
   <div class="d-flex align-items-center justify-content-between mb-3">
-    <div>
-      <h6 class="fw-bold mb-0">{{ isEdit ? `Edit Input - ${form.name}` : 'Add Input' }}</h6>
-      <div class="text-muted">
-        <template v-if="isEdit">Adjust the configuration for this input</template>
-        <template v-else-if="isDeviceScoped">Configure a new input for this device</template>
-        <template v-else>Configure a new global input that applies to all devices</template>
+    <div class="page-title">
+      <div class="page-title-icon text-muted">
+        <InputsIcon />
+      </div>
+      <div>
+        <h6 class="fw-bold mb-0">{{ isEdit ? 'Edit Input' : 'Add Input' }}</h6>
+        <div class="text-muted">
+          <template v-if="isEdit">
+            Update the configuration for <span class="fw-semibold">{{ form.name }}</span> input
+          </template>
+          <template v-else-if="isDeviceScoped">Configure a new input for this device</template>
+          <template v-else>Configure a new global input that applies to all devices</template>
+        </div>
       </div>
     </div>
 
