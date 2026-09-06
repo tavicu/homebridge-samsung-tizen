@@ -1,5 +1,6 @@
 import { CharacteristicValue } from 'homebridge';
 import { TelevisionAccessory } from '../accessories/television.js';
+import { encodeDisplayOrder } from '../lib/identifiers.js';
 import { getRemoteKeysMap } from '../lib/remote.js';
 import { sleep } from '../lib/tools.js';
 import { LinkedService } from '../types/types.js';
@@ -16,11 +17,11 @@ export class TelevisionService extends ServiceWrapper {
 
     this.remoteKeys = getRemoteKeysMap(this.device, this.characteristic);
 
-    const displayOrder = this.accessory.inputs.map((input: InputService) => input.config.identifier);
+    const displayOrder = encodeDisplayOrder(this.accessory.inputs.map((input: InputService) => input.config.identifier));
 
     this.service = new this.hap.Service.Television(this.device.config.name)
       .setCharacteristic(this.characteristic.ConfiguredName, this.device.config.name)
-      .setCharacteristic(this.characteristic.DisplayOrder, this.hap.encode(1, displayOrder).toString('base64'))
+      .setCharacteristic(this.characteristic.DisplayOrder, displayOrder)
       .setCharacteristic(this.characteristic.SleepDiscoveryMode, this.characteristic.SleepDiscoveryMode.ALWAYS_DISCOVERABLE);
 
     this.service.getCharacteristic(this.characteristic.Active).onGet(this.getActive.bind(this)).onSet(this.setActive.bind(this));
