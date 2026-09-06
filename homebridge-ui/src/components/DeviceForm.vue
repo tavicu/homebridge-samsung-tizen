@@ -1,12 +1,12 @@
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue';
+import TvIcon from '../assets/icons/tv.svg';
 import { useConfig } from '../composables/useConfig';
 import { useDevice } from '../composables/useDevice';
 import { useForm } from '../composables/useForm';
 import { useRouter } from '../composables/useRouter';
 import { useSmartThings } from '../composables/useSmartThings';
 import { useToast } from '../composables/useToast';
-import TvIcon from '../assets/icons/tv.svg';
 import Callout from './Callout.vue';
 import InputsList from './InputsList.vue';
 import KeysForm from './KeysForm.vue';
@@ -250,20 +250,26 @@ watch(
         <div class="invalid-feedback">Please enter a valid device name.</div>
       </div>
 
-      <div class="row mb-3">
+      <div class="row">
         <div class="col-md-6">
           <label for="ipAddress" class="form-label">IP Address</label>
-          <input
-            id="ipAddress"
-            v-model="form.ip"
-            name="ip"
-            type="text"
-            class="form-control"
-            placeholder="e.g. 192.168.1.100"
-            pattern="^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
-            required
-          />
-          <div class="invalid-feedback">Please enter a valid IP address</div>
+          <div class="input-group has-validation">
+            <input
+              id="ipAddress"
+              v-model="form.ip"
+              name="ip"
+              type="text"
+              class="form-control"
+              placeholder="e.g. 192.168.1.100"
+              pattern="^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
+              required
+            />
+            <button type="button" class="btn btn-secondary text-nowrap" :disabled="!canTest(formEl?.ip)" @click="handleTestConnection">
+              <i v-if="isTesting" class="fas fa-spinner fa-spin me-1" />
+              {{ isTesting ? 'Testing...' : 'Test' }}
+            </button>
+            <div class="invalid-feedback">Please enter a valid IP address</div>
+          </div>
           <small class="form-text text-muted">The IP address of your Samsung TV</small>
         </div>
 
@@ -282,11 +288,6 @@ watch(
           <small class="form-text text-muted">The MAC address of your Samsung TV</small>
         </div>
       </div>
-
-      <button type="button" class="btn btn-sm btn-outline-secondary" :disabled="!canTest(formEl?.ip)" @click="handleTestConnection">
-        <i v-if="isTesting" class="fas fa-spinner fa-spin me-1" />
-        {{ isTesting ? 'Testing...' : 'Test connection' }}
-      </button>
 
       <Callout
         v-if="testResult"

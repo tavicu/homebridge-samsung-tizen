@@ -126,6 +126,15 @@ hr {
   border-color: var(--form-control-border);
 }
 
+.input-group {
+  --bs-border-radius: 0.4rem;
+}
+
+.input-group > .btn {
+  z-index: 3;
+  font-size: 0.875rem;
+}
+
 .form-control:hover,
 .form-select:hover {
   background-color: var(--form-control-hover-bg);
