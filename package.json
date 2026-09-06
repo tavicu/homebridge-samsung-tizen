@@ -65,12 +65,12 @@
     "vite": "^8.2.2",
     "vite-svg-loader": "^5.1.2",
     "vue": "^3.5.41",
-    "vue-i18n": "^10.0.8"
+    "vue-i18n": "^11.4.10"
   },
   "dependencies": {
     "@homebridge/plugin-ui-utils": "^2.2.5",
     "axios": "^1.18.1",
-    "deepmerge-ts": "^7.1.5",
+    "deepmerge-ts": "^8.0.2",
     "fast-xml-parser": "^5.9.3",
     "peer-ssdp": "^0.0.5",
     "ws": "^8.21.0"
