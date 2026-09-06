@@ -8,7 +8,7 @@ export type PowerProbe = {
 };
 
 type Source = 'ssdp' | 'ping' | 'command';
-type Trigger = 'poll' | 'powering';
+type Trigger = 'poll' | 'powering' | 'upnp';
 
 const POLL_INTERVAL = 1000 * 45;
 const SSDP_FRESH_LIMIT = 1000 * 60;
@@ -34,6 +34,14 @@ export class PowerMonitor {
       } else if (event === SsdpEvent.BYEBYE) {
         this.handleSsdpByebye();
       }
+    });
+
+    this.device.on('upnp:update', () => {
+      if (this.device.power) {
+        return;
+      }
+
+      void this.confirmViaPing('upnp');
     });
   }
 
