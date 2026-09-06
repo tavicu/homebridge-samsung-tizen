@@ -19,14 +19,18 @@ export class Storage {
 
   async initialize(): Promise<void> {
     try {
-      // Ensure the directory exists (native replacement for ensureDir)
       await fs.mkdir(path.dirname(this.filePath), { recursive: true });
 
-      const stats = await fs.stat(this.filePath);
-      this.lastKnownMtime = stats.mtimeMs;
+      await retry(
+        async () => {
+          const stats = await fs.stat(this.filePath);
+          this.lastKnownMtime = stats.mtimeMs;
 
-      const data = await fs.readFile(this.filePath, 'utf-8');
-      this.accessories = JSON.parse(data);
+          const data = await fs.readFile(this.filePath, 'utf-8');
+          this.accessories = JSON.parse(data);
+        },
+        { retries: 1, delay: 500 },
+      );
     } catch {
       this.accessories = {};
     }

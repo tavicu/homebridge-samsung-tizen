@@ -40,7 +40,7 @@ export class SwitchAccessory {
     this.getServices().forEach((service) => {
       try {
         this.platformAccessory.addService(service);
-      } catch (error) {}
+      } catch {}
     });
   }
 

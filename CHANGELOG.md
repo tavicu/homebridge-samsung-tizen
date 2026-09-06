@@ -4,6 +4,10 @@
 
 This is a full rewrite of the plugin in TypeScript. Your existing devices are kept, you don't have to add the TVs in Home app again, but a few settings changed and SmartThings has to be authorized again. Inputs and custom switches in Home are identified differently than in 5.x, so hidden sources, custom names and scenes that targeted a specific input may need to be set up once after the upgrade.
 
+**Not available yet**
+
+- Support for Frame TVs is not implemented in this version. The `Art Mode` and `Power` switches, the `art` input type and the `Frame.RealPowerMode`, `Frame.ArtSwitch.Disable` and `Frame.PowerSwitch.Disable` options are not available for now.
+
 **Requirements**
 
 - Node.js 22.10+, 24, or 26
@@ -40,7 +44,7 @@ These were removed and are ignored if they are still present in your configurati
 
 **Improved**
 
-- Storage backups: Plugin storage (`samsung-tizen.json`) is now automatically backed up before each write to `backups/samsung-tizen/`, keeping the last 10 backups for recovery.
+- Storage backups: When you change plugin storage from the configuration interface, `samsung-tizen.json` is backed up first to `backups/samsung-tizen/`, keeping the last 10 backups. Saves made by the plugin itself (pairing tokens, cached device info) do not create a backup.
 
 **Changed**
 
@@ -57,10 +61,6 @@ These were removed and are ignored if they are still present in your configurati
 - The power switch in Home app no longer jumps back to off right after you turn the TV on, while the TV is still starting.
 - A TV that is unplugged, or loses power without sending a goodbye announcement, is no longer stuck on "on" forever.
 - TVs that keep announcing themselves while in standby are reported as off, not on.
-
-**Not available yet**
-
-- Support for Frame TVs is not implemented in this version. The `Art Mode` and `Power` switches, the `art` input type and the `Frame.RealPowerMode`, `Frame.ArtSwitch.Disable` and `Frame.PowerSwitch.Disable` options are not available for now.
 
 ## 5.2.6
 
