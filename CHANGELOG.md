@@ -2,36 +2,65 @@
 
 ## 6.0.0
 
-This is a full rewrite of the plugin in TypeScript. Your existing devices are kept, you don't have to add the TVs in Home app again, but a few settings changed and SmartThings has to be authorized again. Inputs and custom switches in Home are identified differently than in 5.x, so hidden sources, custom names and scenes that targeted a specific input may need to be set up once after the upgrade.
+This is a full rewrite of the plugin in TypeScript. It is backwards compatible: your existing TVs stay in Home, you don't have to add them again. A few settings changed, SmartThings has to be authorized again, and inputs or custom switches may need their Home names and scenes set up once more.
 
 **Not available yet**
 
-- Support for Frame TVs is not implemented in this version. The `Art Mode` and `Power` switches, the `art` input type and the `Frame.RealPowerMode`, `Frame.ArtSwitch.Disable` and `Frame.PowerSwitch.Disable` options are not available for now.
+- Support for Frame TVs is not implemented in this version and it will come back in a later release.
 
 **Requirements**
 
 - Node.js 22.10+, 24, or 26
-- Homebridge 1.8 or newer (Homebridge 2.0 is supported)
+- Homebridge 1.8 or newer (Homebridge 2.0 is recommended)
+- Homebridge Config UI X v5.27.0 or newer, for the interactive configuration interface
 
 **New**
 
 - The plugin is now written in TypeScript and shipped as an ES module.
-- Brand new configuration interface for Config UI X, built with Vue: add, edit and delete devices, inputs and switches without touching the JSON config. Requires Config UI X v5.27.0 or newer.
-- When SmartThings is connected, the device form lists TVs from your account so you can pick a Device ID instead of typing the UUID. Other still opens the manual field.
-- Add and Edit Device include a Test connection button that probes the TV on port 8001. If the MAC field is empty and the TV reports one, it is filled in.
-- Input source is a dropdown in the configuration interface (Digital TV, HDMI 1–6, USB, USB-C, Display Port), on both inputs and switches.
+- Brand new interactive configuration interface for Config UI X.
 - The state of the TV is now updated in real time through SSDP announcements. If those announcements never arrive or stop without a goodbye, the plugin falls back to checking whether the TV is reachable.
 - Volume and mute are read in real time from the TV through DMR (UPnP) events, so the values in Home app follow the physical remote.
 - Absolute volume control is now available without SmartThings.
 - The speaker now reports the same on/off state as the TV, so the volume buttons in the iOS Remote widget stay enabled when the TV is on.
-- New `Device.Disable` option, so a device can be turned off from the plugin without deleting its configuration.
+- New option to disable a device from the plugin without removing it from the configuration.
 - `keys`, `inputs`, `switches` and `wol` can now be configured once at plugin level and are inherited by every device. Anything set on a device still wins.
-- Remote `keys` now map every iOS Remote button Home shows for a TV, and can be edited in the configuration interface.
+- Remote `keys` now map every iOS Remote button Home shows for a TV.
 - All dependencies were updated to their latest versions.
+
+**Improved**
+
+- Storage backups: When you change plugin storage from the configuration interface, `samsung-tizen.json` is backed up first to `backups/samsung-tizen/`, keeping the last 10 backups. Saves made by the plugin itself (pairing tokens, cached device info) do not create a backup.
+
+**Changed**
+
+- When Home asks which input is active, the plugin now prioritizes inputs so it makes as few requests to the TV as possible to determine the active input.
+- A custom switch that has more than one option with a state, for example `sleep` together with `mute`, now shows as ON when any of those options is active. Before, all of them had to be active at the same time.
+- Custom switches that launch an app, select an input source or set a picture mode now stay ON in Home while that app, source or picture mode is active on the TV. They are checked automatically while the TV is on. Command, volume and channel switches still behave as momentary and turn off after a short delay.
+- Using a switch while the TV is off, when that switch is not set to turn the TV on, no longer looks like a failure in Home. The switch turns back off and a warning is written to the log.
+- `device_id` was renamed to `deviceId`. The old name still works for now.
+- Inputs and custom switches are identified in Home by what they do (source, app, commands, switch actions), not by their position in the config. Reordering the list only changes the order they appear in Home. Renaming a switch no longer creates a new accessory. An input or switch without a name is skipped and logged, instead of taking down the whole TV.
+
+**Fixed**
+
+- Turning the TV on or off when it is already in that state, or while it is still switching, no longer makes Home app show "No Response". The command is ignored instead.
+- The power switch in Home app no longer jumps back to off right after you turn the TV on, while the TV is still starting.
+- A TV that is unplugged, or loses power without sending a goodbye announcement, is no longer stuck on "on" forever.
+- TVs that keep announcing themselves while in standby are reported as off, not on.
+- Custom remote key mappings no longer leak between TVs. Each TV keeps its own `keys`.
+
+**Interactive configuration interface**
+
+The plugin now has its own interface in Config UI X. You add, edit and delete devices, inputs and switches from there, without touching the JSON config.
+
+Before you add a TV, you can test the connection. If the connection is successful and the TV returns a MAC address, it is filled in automatically.
+
+SmartThings is authorized from a step by step wizard in the same screen. Once it's connected, it will help with different interactions in the interface, such as pre-filling the Device ID.
 
 **SmartThings uses a new authorization flow**
 
-SmartThings dropped support for the personal access tokens that never expire, so the `api_key` setting is gone. The plugin now uses the official OAuth flow: you create a SmartThings app once, fill in the client ID and client secret, and the plugin refreshes the access token on its own. There is a step by step wizard in the new configuration interface. Until you go through it, every feature that depends on SmartThings (inputs that select a source, picture mode, and changing channels through the API) stays unavailable.
+SmartThings dropped support for the personal access tokens that never expire, so the `api_key` setting is gone. The plugin now uses the official OAuth flow: you create a SmartThings app once, fill in the client ID and client secret, and the plugin refreshes the access token on its own. 
+
+There is a step by step wizard in the new configuration interface. Until you go through it, every feature that depends on SmartThings stays unavailable.
 
 **Settings that are no longer used**
 
@@ -41,26 +70,6 @@ These were removed and are ignored if they are still present in your configurati
 - `delay`, `timeout` and `wait_time` - these timings are now handled internally.
 - `method` and `port` - the connection to the TV is detected automatically.
 - `api_key` - replaced by the SmartThings authorization flow described above.
-
-**Improved**
-
-- Storage backups: When you change plugin storage from the configuration interface, `samsung-tizen.json` is backed up first to `backups/samsung-tizen/`, keeping the last 10 backups. Saves made by the plugin itself (pairing tokens, cached device info) do not create a backup.
-
-**Changed**
-
-- When Home asks which input is active, the plugin now checks the currently selected source first, then non-app sources (HDMI, TV, USB), and only then apps. Each app needs a request to the TV, so this order cuts down extra requests when the source is already known or is a physical input.
-- A custom switch that has more than one option with a state, for example `sleep` together with `mute`, now shows as ON when any of those options is active. Before, all of them had to be active at the same time.
-- Custom switches that launch an app, select an input source or set a picture mode now stay ON in Home while that app, source or picture mode is active on the TV. They are checked automatically while the TV is on. Command, volume and channel switches still behave as momentary and turn off after a short delay.
-- Using a switch while the TV is off, when that switch is not set to turn the TV on, no longer looks like a failure in Home. The switch turns back off and a warning is written to the log.
-- `device_id` was renamed to `deviceId`. The old name still works.
-- Inputs and custom switches are identified in Home by what they do (source, app, commands, switch actions), not by their position in the config. Reordering the list only changes the order they appear in Home. Renaming a switch no longer creates a new accessory. An input or switch without a name is skipped and logged, instead of taking down the whole TV.
-
-**Fixed**
-
-- Turning the TV on or off when it is already in that state, or while it is still switching, no longer makes Home app show "No Response". The command is ignored instead.
-- The power switch in Home app no longer jumps back to off right after you turn the TV on, while the TV is still starting.
-- A TV that is unplugged, or loses power without sending a goodbye announcement, is no longer stuck on "on" forever.
-- TVs that keep announcing themselves while in standby are reported as off, not on.
 
 ## 5.2.6
 

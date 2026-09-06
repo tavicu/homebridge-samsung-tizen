@@ -16,7 +16,7 @@ Devices and settings are managed from the plugin’s own interface in Homebridge
 
 This release is a full rewrite in TypeScript. Existing TVs stay in Home, so you do not have to add them again. A few settings changed, SmartThings has to be authorized again, and inputs or custom switches may need their Home names and scenes set up once more. Everything else is backwards compatible.
 
-**New in 6.0**
+**New in this release:**
 
 - Configuration UI in Homebridge Config UI X (v5.27.0 or newer): add, edit and delete devices, inputs and switches without editing JSON
 - Live power state through SSDP, with a fallback when announcements are missing
@@ -24,9 +24,11 @@ This release is a full rewrite in TypeScript. Existing TVs stay in Home, so you 
 - Plugin-level defaults for keys, inputs, switches and Wake on LAN, inherited by every TV
 - SmartThings OAuth instead of personal access tokens that no longer expire
 
-**Not in this version yet:** Frame TV Art Mode and the related power/art switches. Those will come back in a later release.
+You can see the [changelog](CHANGELOG.md) for the full list of changes.
 
-See the [changelog](CHANGELOG.md) for the full list of changes.
+**Not in this version yet:**
+
+- Frame TV Art Mode and the related power/art switches. Those will come back in a later release.
 
 ## Requirements
 
