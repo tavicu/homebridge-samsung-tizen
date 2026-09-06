@@ -46,9 +46,9 @@ export class TelevisionAccessory {
     };
 
     this.getServices().forEach((service) => {
-      try {
+      if (!this.platformAccessory.services.includes(service)) {
         this.platformAccessory.addService(service);
-      } catch {}
+      }
 
       if (service.linked) {
         this.services.main.addLinkedService(service);

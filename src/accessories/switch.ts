@@ -38,9 +38,9 @@ export class SwitchAccessory {
     };
 
     this.getServices().forEach((service) => {
-      try {
+      if (!this.platformAccessory.services.includes(service)) {
         this.platformAccessory.addService(service);
-      } catch {}
+      }
     });
   }
 

@@ -8,7 +8,9 @@ export class InformationService extends ServiceWrapper {
   constructor(accessory: TelevisionAccessory | SwitchAccessory) {
     super(accessory);
 
-    this.service = new this.hap.Service.AccessoryInformation(this.device.config.name)
+    this.service = accessory.platformAccessory.getService(this.hap.Service.AccessoryInformation)!;
+
+    this.service
       .setCharacteristic(this.characteristic.Model, this.device.storage.model || 'Tizen OS')
       .setCharacteristic(this.characteristic.Manufacturer, 'Samsung TV')
       .setCharacteristic(this.characteristic.Name, this.device.config.name)
