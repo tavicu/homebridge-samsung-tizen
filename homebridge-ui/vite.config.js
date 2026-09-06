@@ -33,6 +33,11 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, 'public'),
     emptyOutDir: true,
+    rolldownOptions: {
+      checks: {
+        pluginTimings: false,
+      },
+    },
     rollupOptions: {
       input: path.resolve(import.meta.dirname, 'index.html'),
     },
