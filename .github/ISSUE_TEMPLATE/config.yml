@@ -7,6 +7,3 @@ contact_links:
   - name: Common issues
     url: https://tavicu.github.io/homebridge-samsung-tizen/troubleshooting/common-issues.html
     about: Pairing popups, VLAN/subnet limits, Home app, and other frequent problems.
-  - name: How to collect debug logs
-    url: https://tavicu.github.io/homebridge-samsung-tizen/troubleshooting/open-new-issue.html
-    about: Enable Homebridge debug mode and copy the plugin logs before opening a bug.
