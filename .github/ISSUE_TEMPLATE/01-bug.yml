@@ -1,7 +1,7 @@
 # yaml-language-server: $schema=https://json.schemastore.org/github-issue-forms.json
 name: Bug report
 description: Something is not working as expected. Debug logs are required.
-title: "[Bug] "
+title: '[Bug] '
 labels: [bug]
 body:
   - type: markdown
@@ -46,7 +46,7 @@ body:
     attributes:
       label: Plugin version
       description: From Homebridge UI → Plugins, or `npm list -g homebridge-samsung-tizen`.
-      placeholder: "6.x.x"
+      placeholder: '6.x.x'
     validations:
       required: true
 
@@ -54,7 +54,7 @@ body:
     id: homebridge-version
     attributes:
       label: Homebridge version
-      placeholder: "1.8.x or 2.x"
+      placeholder: '1.8.x or 2.x'
     validations:
       required: true
 
@@ -63,7 +63,7 @@ body:
     attributes:
       label: Node.js version
       description: Required versions are 22.10+, 24, or 26.
-      placeholder: "22.x"
+      placeholder: '22.x'
     validations:
       required: true
 
@@ -71,8 +71,8 @@ body:
     id: tv-model
     attributes:
       label: TV model and year
-      description: Tizen 2017 or later. Example: QE55Q80T (2020).
-      placeholder: "Model (year)"
+      description: 'Tizen 2017 or later. Example: QE55Q80T (2020).'
+      placeholder: 'Model (year)'
     validations:
       required: true
 
@@ -82,8 +82,8 @@ body:
       label: Is the TV on the same subnet as Homebridge?
       description: Samsung blocks the WebSocket remote across VLANs. The TV and Homebridge must be on the same subnet.
       options:
-        - "Yes"
-        - "No"
+        - 'Yes'
+        - 'No'
         - Not sure
     validations:
       required: true
