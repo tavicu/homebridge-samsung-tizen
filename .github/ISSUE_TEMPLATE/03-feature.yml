@@ -1,0 +1,56 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-issue-forms.json
+name: Feature request
+description: Suggest a new capability or an improvement.
+title: "[Feature] "
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please check the [documentation](https://tavicu.github.io/homebridge-samsung-tizen/) so the request is not already covered as a setting or a known limitation.
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before opening
+      options:
+        - label: I searched [existing issues](https://github.com/tavicu/homebridge-samsung-tizen/issues?q=is%3Aissue) (open and closed)
+          required: true
+
+  - type: dropdown
+    id: topic
+    attributes:
+      label: Area
+      options:
+        - Configuration / plugin UI
+        - SmartThings
+        - Home app / HomeKit / Apple TV Remote
+        - Power, volume, or mute
+        - Inputs or custom switches
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What can you not do today, and why does it matter?
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: How you would like it to work. Keep it specific.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives
+      description: Optional. Workarounds you use now, or other approaches you considered.
+    validations:
+      required: false

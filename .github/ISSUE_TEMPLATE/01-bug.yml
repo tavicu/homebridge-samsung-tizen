@@ -1,0 +1,127 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-issue-forms.json
+name: Bug report
+description: Something is not working as expected. Debug logs are required.
+title: "[Bug] "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a problem. Please check the [common issues](https://tavicu.github.io/homebridge-samsung-tizen/troubleshooting/common-issues.html) page first.
+
+        **Do not paste** SmartThings `clientId`, `clientSecret`, `deviceId`, or the old `api_key` / `device_id` values. Redact them from config first.
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before opening
+      options:
+        - label: I read the [documentation](https://tavicu.github.io/homebridge-samsung-tizen/) and [common issues](https://tavicu.github.io/homebridge-samsung-tizen/troubleshooting/common-issues.html)
+          required: true
+        - label: I searched [existing issues](https://github.com/tavicu/homebridge-samsung-tizen/issues?q=is%3Aissue) (open and closed)
+          required: true
+        - label: I enabled Homebridge debug mode (`-D`) and captured logs for this problem
+          required: true
+
+  - type: dropdown
+    id: topic
+    attributes:
+      label: Area
+      description: Pick the closest match. You can select more than one.
+      multiple: true
+      options:
+        - Pairing / TV permission popup
+        - Installation
+        - Configuration / plugin UI
+        - SmartThings
+        - Home app / HomeKit / Apple TV Remote
+        - Power, volume, or mute
+        - Inputs or custom switches
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: plugin-version
+    attributes:
+      label: Plugin version
+      description: From Homebridge UI → Plugins, or `npm list -g homebridge-samsung-tizen`.
+      placeholder: "6.x.x"
+    validations:
+      required: true
+
+  - type: input
+    id: homebridge-version
+    attributes:
+      label: Homebridge version
+      placeholder: "1.8.x or 2.x"
+    validations:
+      required: true
+
+  - type: input
+    id: node-version
+    attributes:
+      label: Node.js version
+      description: Required versions are 22.10+, 24, or 26.
+      placeholder: "22.x"
+    validations:
+      required: true
+
+  - type: input
+    id: tv-model
+    attributes:
+      label: TV model and year
+      description: Tizen 2017 or later. Example: QE55Q80T (2020).
+      placeholder: "Model (year)"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: same-subnet
+    attributes:
+      label: Is the TV on the same subnet as Homebridge?
+      description: Samsung blocks the WebSocket remote across VLANs. The TV and Homebridge must be on the same subnet.
+      options:
+        - "Yes"
+        - "No"
+        - Not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What you expected, what actually happened, and how to reproduce it.
+      placeholder: |
+        Expected:
+        Actual:
+        Steps:
+        1.
+        2.
+        3.
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Debug logs
+      description: |
+        Enable **Homebridge Debug Mode (-D)** in Homebridge Settings, restart, reproduce the problem, then paste the relevant lines.
+
+        Look for the TV name from the plugin settings or `homebridge-samsung-tizen`. Gray lines are debug; red lines are failures. The debug lines right after a failure are the most useful.
+
+        See [how to open a new issue](https://tavicu.github.io/homebridge-samsung-tizen/troubleshooting/open-new-issue.html).
+      render: shell
+    validations:
+      required: true
+
+  - type: textarea
+    id: config
+    attributes:
+      label: Relevant configuration
+      description: Optional. Paste only the plugin / device snippet. Remove `clientId`, `clientSecret`, `deviceId`, `api_key`, and `device_id`.
+      render: json
+    validations:
+      required: false
