@@ -25,32 +25,32 @@ class PluginUiServer extends HomebridgePluginUiServer {
   }
 
   async stAuthUrl(config) {
-    const { clientId, clientSecret } = config;
+    const { clientId, clientSecret, redirectUrl } = config;
 
     if (!clientId || !clientSecret) {
       throw new Error('Client ID and client secret are required');
     }
 
-    const redirectUrl = 'https://tavicu.github.io/homebridge-samsung-tizen/token.html';
+    const resolvedRedirectUrl = this.#resolveRedirectUrl(redirectUrl);
     const scopes = 'r:devices:* x:devices:*'.replace(' ', '%20');
 
-    return `https://api.smartthings.com/oauth/authorize?client_id=${clientId}&response_type=code&redirect_uri=${encodeURIComponent(redirectUrl)}&scope=${scopes}`;
+    return `https://api.smartthings.com/oauth/authorize?client_id=${clientId}&response_type=code&redirect_uri=${encodeURIComponent(resolvedRedirectUrl)}&scope=${scopes}`;
   }
 
   async stAuthToken(config) {
-    const { clientId, clientSecret, authorizationCode } = config;
+    const { clientId, clientSecret, authorizationCode, redirectUrl } = config;
 
     if (!clientId || !clientSecret || !authorizationCode) {
       throw new Error('Client ID, client secret, and authorization code are required');
     }
 
-    const redirectUrl = 'https://tavicu.github.io/homebridge-samsung-tizen/token.html';
+    const resolvedRedirectUrl = this.#resolveRedirectUrl(redirectUrl);
     const credentialsBase64 = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
 
     const body = new URLSearchParams({
       grant_type: 'authorization_code',
       code: authorizationCode,
-      redirect_uri: redirectUrl,
+      redirect_uri: resolvedRedirectUrl,
     });
 
     const response = await fetch('https://api.smartthings.com/oauth/token', {
@@ -134,6 +134,14 @@ class PluginUiServer extends HomebridgePluginUiServer {
     } catch {
       return { reachable: false };
     }
+  }
+
+  #resolveRedirectUrl(redirectUrl) {
+    if (typeof redirectUrl === 'string' && redirectUrl.trim()) {
+      return redirectUrl.trim();
+    }
+
+    return 'https://tavicu.github.io/homebridge-samsung-tizen/token.html';
   }
 
   async #readStoredData() {

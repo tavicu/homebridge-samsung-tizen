@@ -20,6 +20,8 @@ const { formEl, validated, checkValidity } = useForm();
 const state = reactive({
   clientId: config.value?.clientId || '',
   clientSecret: config.value?.clientSecret || '',
+  showAdvanced: false,
+  redirectUrl: '',
   authorizationCode: null,
   authorizationUrl: null,
   status: null,
@@ -30,10 +32,15 @@ watch(currentStep, () => {
   validated.value = false;
 });
 
+function customRedirectUrl() {
+  return state.showAdvanced ? state.redirectUrl : undefined;
+}
+
 async function submitStep1() {
   const authorizationUrl = await getAuthUrl({
     clientId: state.clientId,
     clientSecret: state.clientSecret,
+    redirectUrl: customRedirectUrl(),
   });
 
   state.authorizationUrl = authorizationUrl;
@@ -56,6 +63,7 @@ async function submitStep2() {
     clientId: state.clientId,
     clientSecret: state.clientSecret,
     authorizationCode,
+    redirectUrl: customRedirectUrl(),
   });
 
   if (authorizationToken?.error) {
@@ -135,10 +143,22 @@ function handleRetry() {
         />
         <div class="invalid-feedback">Please enter a valid OAuth Client Secret</div>
       </div>
+
+      <div v-if="state.showAdvanced" class="mt-3 mb-2">
+        <label for="redirectUrl" class="form-label">Redirect URL</label>
+        <input id="redirectUrl" v-model="state.redirectUrl" type="url" class="form-control" placeholder="https://tavicu.github.io/homebridge-samsung-tizen/token.html" />
+        <div class="invalid-feedback">Please enter a valid redirect URL</div>
+      </div>
     </div>
-    <div class="card-footer card-actions">
-      <button type="button" class="btn btn-outline-secondary" @click="navigateTo('dashboard')">Cancel</button>
-      <button type="submit" class="btn btn-primary">Continue to authorization <i class="fas fa-arrow-right"></i></button>
+    <div class="card-footer">
+      <div class="form-check mb-0">
+        <input id="showAdvanced" v-model="state.showAdvanced" class="form-check-input" type="checkbox" />
+        <label class="form-check-label small" for="showAdvanced">Advanced settings</label>
+      </div>
+      <div class="card-actions">
+        <button type="button" class="btn btn-outline-secondary" @click="navigateTo('dashboard')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Continue to authorization <i class="fas fa-arrow-right"></i></button>
+      </div>
     </div>
   </form>
 
