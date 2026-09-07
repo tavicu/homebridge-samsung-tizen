@@ -145,7 +145,7 @@ export class SmartThingsManager {
       });
 
       if (response.data?.error) {
-        throw new Error(response.data.error);
+        throw new Error(response.data.error.message || response.data.error);
       }
 
       return response.data as T;

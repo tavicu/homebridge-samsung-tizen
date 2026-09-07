@@ -4,6 +4,7 @@ import InputsIcon from '../assets/icons/inputs.svg';
 import { useConfig } from '../composables/useConfig';
 import { useForm } from '../composables/useForm';
 import { useRouter } from '../composables/useRouter';
+import { useSmartThings } from '../composables/useSmartThings';
 import { useToast } from '../composables/useToast';
 
 const props = defineProps({
@@ -23,6 +24,7 @@ const props = defineProps({
 
 const { config, updateConfig, cleanConfig } = useConfig();
 const { navigateTo, navigateBack } = useRouter();
+const { inputSources } = useSmartThings();
 const toast = useToast();
 const { formEl, validated, checkValidity, createForm, createId, isDirty, markPristine } = useForm();
 
@@ -233,16 +235,7 @@ watch(
         <label for="value-input" class="form-label">Input Source</label>
         <select id="value-input" v-model="form.valueInput" class="form-select" required>
           <option disabled value="">Choose input source ...</option>
-          <option value="digitalTv">Digital TV</option>
-          <option value="HDMI1">HDMI 1</option>
-          <option value="HDMI2">HDMI 2</option>
-          <option value="HDMI3">HDMI 3</option>
-          <option value="HDMI4">HDMI 4</option>
-          <option value="HDMI5">HDMI 5</option>
-          <option value="HDMI6">HDMI 6</option>
-          <option value="USB">USB</option>
-          <option value="USB-C">USB-C</option>
-          <option value="Display Port">Display Port</option>
+          <option v-for="source in inputSources" :key="source.value" :value="source.value">{{ source.label }}</option>
         </select>
         <div class="invalid-feedback">Please choose an input source.</div>
         <small class="form-text text-muted">This input type requires a SmartThings integration.</small>

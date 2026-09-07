@@ -4,6 +4,7 @@ import SwitchesIcon from '../assets/icons/switches.svg';
 import { useConfig } from '../composables/useConfig';
 import { useForm } from '../composables/useForm';
 import { useRouter } from '../composables/useRouter';
+import { useSmartThings } from '../composables/useSmartThings';
 import { useToast } from '../composables/useToast';
 import Callout from './Callout.vue';
 
@@ -24,6 +25,7 @@ const props = defineProps({
 
 const { config, updateConfig, cleanConfig } = useConfig();
 const { navigateTo, navigateBack } = useRouter();
+const { inputSources, pictureModes } = useSmartThings();
 const toast = useToast();
 const { formEl, validated, checkValidity, createForm, createId, isDirty, markPristine } = useForm();
 
@@ -309,22 +311,16 @@ watch(
           <label for="input" class="form-label">Input Source <span class="form-optional">Optional</span></label>
           <select id="input" v-model="form.input" class="form-select">
             <option value="">None</option>
-            <option value="digitalTv">Digital TV</option>
-            <option value="HDMI1">HDMI 1</option>
-            <option value="HDMI2">HDMI 2</option>
-            <option value="HDMI3">HDMI 3</option>
-            <option value="HDMI4">HDMI 4</option>
-            <option value="HDMI5">HDMI 5</option>
-            <option value="HDMI6">HDMI 6</option>
-            <option value="USB">USB</option>
-            <option value="USB-C">USB-C</option>
-            <option value="Display Port">Display Port</option>
+            <option v-for="source in inputSources" :key="source.value" :value="source.value">{{ source.label }}</option>
           </select>
         </div>
 
         <div class="col-md-6">
           <label for="picture_mode" class="form-label">Picture Mode <span class="form-optional">Optional</span></label>
-          <input id="picture_mode" v-model="form.picture_mode" type="text" class="form-control" placeholder="e.g. movie" />
+          <select id="picture_mode" v-model="form.picture_mode" class="form-select">
+            <option value="">None</option>
+            <option v-for="mode in pictureModes" :key="mode" :value="mode">{{ mode }}</option>
+          </select>
         </div>
       </div>
     </div>
