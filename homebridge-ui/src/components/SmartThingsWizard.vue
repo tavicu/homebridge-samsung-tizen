@@ -15,6 +15,7 @@ const { navigateTo } = useRouter();
 const toast = useToast();
 
 const currentStep = ref(1);
+const urlCopied = ref(false);
 const { formEl, validated, checkValidity } = useForm();
 
 const state = reactive({
@@ -105,6 +106,12 @@ function handleRetry() {
   state.authorizationUrl = null;
   currentStep.value = 1;
 }
+
+function copyAuthorizationUrl() {
+  navigator.clipboard.writeText(state.authorizationUrl);
+  urlCopied.value = true;
+  setTimeout(() => (urlCopied.value = false), 2000);
+}
 </script>
 
 <template>
@@ -165,7 +172,7 @@ function handleRetry() {
   <form v-if="currentStep === 2" ref="formEl" class="card shadow" :class="{ 'was-validated': validated }" novalidate @submit.prevent="handleSubmit">
     <div class="card-header">
       <h6 class="fw-semibold mb-0">Authorization Code</h6>
-      <p class="small text-secondary mt-1">Open the authorization URL, then paste the code you receive</p>
+      <p class="small text-secondary mt-1">Copy the authorization URL, paste it in your browser, then paste the code you receive</p>
     </div>
     <div class="card-body">
       <div class="mb-3">
@@ -175,7 +182,7 @@ function handleRetry() {
             <i class="fas fa-link" />
             {{ state.authorizationUrl }}
           </a>
-          <a :href="state.authorizationUrl" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary flex-shrink-0">Open</a>
+          <button type="button" class="btn btn-sm btn-outline-secondary flex-shrink-0" @click="copyAuthorizationUrl">{{ urlCopied ? 'Copied' : 'Copy' }}</button>
         </div>
       </div>
 
