@@ -1,0 +1,53 @@
+name: Issue documentation bot
+
+on:
+  issues:
+    types: [opened]
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: Issue number to triage
+        required: true
+        type: string
+      force:
+        description: Triage even if the issue was opened by the repository owner
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: issue-triage-${{ github.event.issue.number || inputs.issue_number }}
+  cancel-in-progress: true
+
+jobs:
+  triage:
+    if: github.event_name == 'workflow_dispatch' || (github.event.issue.pull_request == null && github.event.issue.author_association != 'OWNER')
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/checkout@v7
+        with:
+          ref: docs
+          path: docs-src
+          sparse-checkout: docs
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      - name: Triage issue
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_MODEL: gpt-5-mini
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          ISSUE_NUMBER: ${{ github.event.issue.number || inputs.issue_number }}
+          FORCE_TRIAGE: ${{ inputs.force || false }}
+          DOCS_ROOT: docs-src/docs
+        run: node .github/scripts/issue-triage.mjs
