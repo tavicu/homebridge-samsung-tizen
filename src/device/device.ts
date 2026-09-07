@@ -74,6 +74,10 @@ export class Device extends EventEmitter<DeviceEvents> {
     this.controller = new DeviceController(this, platform);
     this.poller = new AccessoryPoller(this);
 
+    if (this.storage.tokenSupport === false) {
+      this.log.warn(`The TV ${this.config.name} is not supported by this plugin!`);
+    }
+
     this.accessories = [new TelevisionAccessory(this, platform)];
 
     // Switches

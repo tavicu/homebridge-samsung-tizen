@@ -130,6 +130,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
       return {
         reachable: true,
         mac: data?.device?.wifiMac || null,
+        tokenSupport: data?.device?.TokenAuthSupport === 'true',
       };
     } catch {
       return { reachable: false };

@@ -117,7 +117,7 @@ async function handleTestConnection() {
 
   testResult.value = result;
 
-  if (!form.mac.trim() && result.reachable && result.mac) {
+  if (!form.mac.trim() && !result.error && result.mac) {
     form.mac = normalizeMac(result.mac);
   }
 }
@@ -292,10 +292,10 @@ watch(
       <Callout
         v-if="testResult"
         class="callout-sm mt-3"
-        :state="testResult.reachable ? 'success' : 'danger'"
+        :state="testResult.error ? 'danger' : 'success'"
         :title="testResult.title"
         :text="testResult.message"
-        :icon="testResult.reachable ? 'fa-check' : 'fa-exclamation-triangle'"
+        :icon="testResult.error ? 'fa-exclamation-triangle' : 'fa-check'"
       />
     </div>
 
