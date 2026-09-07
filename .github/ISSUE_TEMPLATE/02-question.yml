@@ -1,0 +1,72 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-issue-forms.json
+name: Question
+description: Ask how something works or how to set it up.
+title: "[Question] "
+labels: [question]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Setup and pairing questions are often already answered in the [documentation](https://tavicu.github.io/homebridge-samsung-tizen/) and on the [common issues](https://tavicu.github.io/homebridge-samsung-tizen/troubleshooting/common-issues.html) page.
+
+        **Do not paste** SmartThings `clientId`, `clientSecret`, `deviceId`, or the old `api_key` / `device_id` values. Redact them from config first.
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before opening
+      options:
+        - label: I read the [documentation](https://tavicu.github.io/homebridge-samsung-tizen/) and [common issues](https://tavicu.github.io/homebridge-samsung-tizen/troubleshooting/common-issues.html)
+          required: true
+        - label: I searched [existing issues](https://github.com/tavicu/homebridge-samsung-tizen/issues?q=is%3Aissue) (open and closed)
+          required: true
+
+  - type: dropdown
+    id: topic
+    attributes:
+      label: Area
+      multiple: true
+      options:
+        - Pairing / TV permission popup
+        - Installation
+        - Configuration / plugin UI
+        - SmartThings
+        - Home app / HomeKit / Apple TV Remote
+        - Power, volume, or mute
+        - Inputs or custom switches
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: plugin-version
+    attributes:
+      label: Plugin version
+      placeholder: "6.x.x"
+    validations:
+      required: true
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Question
+      description: What are you trying to do, and where are you stuck?
+    validations:
+      required: true
+
+  - type: textarea
+    id: tried
+    attributes:
+      label: What you already tried
+      description: Optional. Settings you changed, docs you followed, or errors you saw.
+    validations:
+      required: false
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Debug logs
+      description: Optional, but helpful if something is failing. Enable Homebridge debug mode (`-D`) and redact secrets.
+      render: shell
+    validations:
+      required: false
