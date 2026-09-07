@@ -2,6 +2,7 @@
   --bs-box-shadow: 0 0.25rem 0.7rem rgba(0, 0, 0, 0.075);
   --bs-hr-bg: rgba(0, 0, 0, 0.08);
   --page-title-icon-bg: #f6f9fc;
+  --page-title-icon-color: var(--bs-secondary-color);
   --form-control-bg: #fcfcfc;
   --form-control-border: #e4e7ec;
   --form-control-hover-bg: #fff;
@@ -15,7 +16,8 @@
   --bs-box-shadow: 0 0.25rem 0.8rem rgba(0, 0, 0, 0.4);
   --bs-secondary-color: rgba(130, 130, 130, 0.75);
   --bs-hr-bg: rgba(255, 255, 255, 0.1);
-  --page-title-icon-bg: rgba(0, 0, 0, 0.2);
+  --page-title-icon-bg: #ffffff14;
+  --page-title-icon-color: #ffffffa6;
   --form-control-bg: rgba(255, 255, 255, 0.06);
   --form-control-border: rgba(255, 255, 255, 0.14);
   --form-control-hover-bg: rgba(255, 255, 255, 0.1);
@@ -39,6 +41,7 @@
   flex-shrink: 0;
   border-radius: 0.4rem;
   background: var(--page-title-icon-bg);
+  color: var(--page-title-icon-color);
 }
 
 .page-title-icon svg {
@@ -60,9 +63,10 @@ p:last-child {
   margin-bottom: 0;
 }
 
-hr {
+#app-tizen hr {
   opacity: 1;
   border-color: var(--bs-hr-bg);
+  background-color: var(--bs-hr-bg);
 }
 
 .btn {
@@ -111,6 +115,12 @@ hr {
   height: 1.4em;
   margin-top: 0.05em;
   margin-left: -3.2em;
+}
+
+.dark-mode .form-check-input {
+  --bs-form-switch-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23fff'/%3e%3c/svg%3e");
+  --bs-form-check-bg: var(--form-control-hover-bg);
+  --bs-border-color: var(--form-control-border);
 }
 
 .dark-mode .form-optional {

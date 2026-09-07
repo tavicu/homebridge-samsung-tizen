@@ -39,13 +39,15 @@ const props = defineProps({
 <style scoped>
 .callout {
   --callout-color: var(--bs-info);
+  --callout-border: var(--bs-border-color, rgba(0, 0, 0, 0.125));
+  --callout-bg: color-mix(in srgb, var(--callout-color) 5%, transparent);
 
   padding: 0.75rem 1rem;
-  border: 1px solid var(--bs-border-color, rgba(0, 0, 0, 0.125));
+  border: 1px solid var(--callout-border);
   border-left-width: 3px;
   border-left-color: var(--callout-color);
   border-radius: 0.4rem;
-  background-color: color-mix(in srgb, var(--callout-color) 5%, transparent);
+  background-color: var(--callout-bg);
 }
 
 .callout-sm {
@@ -90,6 +92,7 @@ const props = defineProps({
 }
 
 .dark-mode .callout {
-  background-color: color-mix(in srgb, var(--callout-color) 12%, transparent);
+  --callout-border: #ffffff1a;
+  --callout-bg: color-mix(in srgb, var(--callout-color) 15%, transparent);
 }
 </style>

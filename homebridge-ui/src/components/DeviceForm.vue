@@ -207,7 +207,7 @@ watch(
 <template>
   <div class="d-flex align-items-center justify-content-between mb-3">
     <div class="page-title">
-      <div class="page-title-icon text-muted">
+      <div class="page-title-icon">
         <TvIcon />
       </div>
       <div>

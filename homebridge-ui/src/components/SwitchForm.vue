@@ -216,7 +216,7 @@ watch(
 <template>
   <div class="d-flex align-items-center justify-content-between mb-3">
     <div class="page-title">
-      <div class="page-title-icon text-muted">
+      <div class="page-title-icon">
         <SwitchesIcon />
       </div>
       <div>
@@ -302,7 +302,7 @@ watch(
         </div>
       </div>
 
-      <hr class="mx-2 my-3" />
+      <hr class="my-3" />
 
       <Callout class="callout-sm mb-2" state="warning">These actions require a SmartThings integration.</Callout>
 
