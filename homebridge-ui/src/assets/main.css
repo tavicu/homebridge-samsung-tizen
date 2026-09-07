@@ -219,8 +219,10 @@ p:last-child {
 .card .card-actions {
   gap: 0.5rem;
   display: flex;
+  flex-wrap: nowrap;
   align-items: center;
   justify-content: flex-end;
+  white-space: nowrap;
 }
 
 .card .text-body {
@@ -252,4 +254,10 @@ p:last-child {
 
 .card tr:last-child td {
   border-bottom: 0;
+}
+
+@media (max-width: 575.98px) {
+  .d-xs-none {
+    display: none !important;
+  }
 }

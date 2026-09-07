@@ -39,16 +39,16 @@ const devices = computed(() => config.value?.devices || []);
       <thead>
         <tr class="text-secondary">
           <th>Name</th>
-          <th>IP Address</th>
-          <th>MAC Address</th>
+          <th class="d-xs-none">IP Address</th>
+          <th class="d-xs-none">MAC Address</th>
           <th />
         </tr>
       </thead>
       <tbody>
         <tr v-for="(device, index) in devices" :key="index" class="align-middle">
           <td class="text-body fw-semibold">{{ device.name }}</td>
-          <td class="">{{ device.ip }}</td>
-          <td class="">{{ device.mac }}</td>
+          <td class="d-xs-none">{{ device.ip }}</td>
+          <td class="d-xs-none">{{ device.mac }}</td>
           <td class="text-end">
             <Dropdown>
               <button class="dropdown-item" type="button" @click="navigateTo('device', { action: 'edit', deviceIndex: index })"><i class="fas fa-pen" /> Edit</button>

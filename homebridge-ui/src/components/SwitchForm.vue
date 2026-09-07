@@ -214,9 +214,9 @@ watch(
 </script>
 
 <template>
-  <div class="d-flex align-items-center justify-content-between mb-3">
+  <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
     <div class="page-title">
-      <div class="page-title-icon">
+      <div class="page-title-icon d-xs-none">
         <SwitchesIcon />
       </div>
       <div>
@@ -231,7 +231,7 @@ watch(
       </div>
     </div>
 
-    <div v-if="isEdit" class="d-flex gap-2 flex-shrink-0">
+    <div v-if="isEdit" class="d-flex flex-column flex-sm-row gap-2 flex-shrink-0">
       <button type="button" class="btn btn-outline-secondary" @click="navigateBack('dashboard', { tab: 'switches' })">Back</button>
       <button type="button" class="btn btn-outline-danger" @click="navigateTo('switch', { action: 'delete', switchIndex, deviceIndex })">Delete Switch</button>
     </div>

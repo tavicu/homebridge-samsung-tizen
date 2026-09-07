@@ -108,7 +108,7 @@ function handleRetry() {
 </script>
 
 <template>
-  <WizardSteps :current="currentStep" :outcome="state.status" :steps="['Credentials', 'Auth Code', 'Authorization']" class="my-4 mx-sm-5" />
+  <WizardSteps :current="currentStep" :outcome="state.status" :steps="['Credentials', 'Authorization', 'Result']" class="my-4 mx-sm-5" />
 
   <form v-if="currentStep === 1" ref="formEl" class="card shadow" :class="{ 'was-validated': validated }" novalidate @submit.prevent="handleSubmit">
     <div class="card-header">
@@ -157,7 +157,7 @@ function handleRetry() {
       </div>
       <div class="card-actions">
         <button type="button" class="btn btn-outline-secondary" @click="navigateTo('dashboard')">Cancel</button>
-        <button type="submit" class="btn btn-primary">Continue to authorization <i class="fas fa-arrow-right"></i></button>
+        <button type="submit" class="btn btn-primary">Continue <i class="fas fa-arrow-right"></i></button>
       </div>
     </div>
   </form>
@@ -187,7 +187,7 @@ function handleRetry() {
     </div>
     <div class="card-footer card-actions">
       <button type="button" class="btn btn-outline-secondary" @click="currentStep--">Back</button>
-      <button type="submit" class="btn btn-primary">Authorize SmartThings <i class="fas fa-arrow-right"></i></button>
+      <button type="submit" class="btn btn-primary">Authorize <i class="fas fa-arrow-right"></i></button>
     </div>
   </form>
 

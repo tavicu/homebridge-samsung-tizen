@@ -57,7 +57,7 @@ const formatValue = (value) => (Array.isArray(value) ? value.join(', ') : value 
       <thead>
         <tr class="text-secondary">
           <th>Name</th>
-          <th>Actions</th>
+          <th class="d-xs-none">Actions</th>
           <th />
         </tr>
       </thead>
@@ -65,7 +65,7 @@ const formatValue = (value) => (Array.isArray(value) ? value.join(', ') : value 
         <tr v-for="(switchItem, index) in switches" :key="index" class="align-middle">
           <td class="text-body fw-semibold">{{ switchItem.name }}</td>
 
-          <td>
+          <td class="d-xs-none">
             <ul class="mb-0 small">
               <li v-for="[key, value] in switchEntries(switchItem)" :key="key" class="text-capitalize">
                 <span class="text-body">{{ formatKey(key) }}:</span>
