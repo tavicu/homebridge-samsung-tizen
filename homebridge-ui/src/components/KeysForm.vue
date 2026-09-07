@@ -56,7 +56,7 @@ async function handleSubmit() {
     }
 
     markPristine();
-    toast.success('Remote keys updated successfully');
+    toast.success('Remote keys updated successfully. Restart Homebridge for the change to take effect.');
   } catch {
     toast.error('Failed to update remote keys');
   }

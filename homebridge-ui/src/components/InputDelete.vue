@@ -57,7 +57,7 @@ async function confirmDelete() {
       await updateConfig({ inputs: updatedInputs });
     }
 
-    toast.success('Input deleted successfully');
+    toast.success('Input deleted successfully. Restart Homebridge for the change to take effect.');
     goBack();
   } catch {
     toast.error('Failed to delete input');

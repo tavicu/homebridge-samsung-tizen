@@ -180,11 +180,11 @@ async function handleSubmit() {
       const updatedSwitches = getCurrentSwitches().map((item, index) => (index === props.switchIndex ? switchData : item));
       await persistSwitches(updatedSwitches);
 
-      toast.success('Switch updated successfully');
+      toast.success('Switch updated successfully. Restart Homebridge for the change to take effect.');
     } else {
       await persistSwitches([...getCurrentSwitches(), switchData]);
 
-      toast.success('Switch added successfully');
+      toast.success('Switch added successfully. Restart Homebridge for the change to take effect.');
     }
 
     navigateBack('dashboard', { tab: 'switches' });

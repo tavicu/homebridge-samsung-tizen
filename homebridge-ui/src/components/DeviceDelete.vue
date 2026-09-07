@@ -23,7 +23,7 @@ async function confirmDelete() {
     const updatedDevices = config.value.devices.filter((_, index) => index !== props.deviceIndex);
     await updateConfig({ devices: updatedDevices });
 
-    toast.success('Device deleted successfully');
+    toast.success('Device deleted successfully. Restart Homebridge for the change to take effect.');
     navigateTo('dashboard', { tab: 'devices' });
   } catch {
     toast.error('Failed to delete device');

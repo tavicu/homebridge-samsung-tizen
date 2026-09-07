@@ -150,11 +150,11 @@ async function handleSubmit() {
       const updatedInputs = getCurrentInputs().map((input, index) => (index === props.inputIndex ? inputData : input));
       await persistInputs(updatedInputs);
 
-      toast.success('Input updated successfully');
+      toast.success('Input updated successfully. Restart Homebridge for the change to take effect.');
     } else {
       await persistInputs([...getCurrentInputs(), inputData]);
 
-      toast.success('Input added successfully');
+      toast.success('Input added successfully. Restart Homebridge for the change to take effect.');
     }
 
     navigateBack('dashboard', { tab: 'inputs' });

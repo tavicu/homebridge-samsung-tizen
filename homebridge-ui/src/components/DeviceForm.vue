@@ -177,12 +177,12 @@ async function handleSubmit() {
       await updateConfig({ devices: updatedDevices });
 
       markPristine();
-      toast.success('Device updated successfully');
+      toast.success('Device updated successfully. Restart Homebridge for the change to take effect.');
     } else {
       const newDevice = buildDeviceData();
       await updateConfig({ devices: [...currentDevices, newDevice] });
 
-      toast.success('Device added successfully');
+      toast.success('Device added successfully. Restart Homebridge for the change to take effect.');
       navigateTo('device', { action: 'edit', deviceIndex: currentDevices.length });
     }
   } catch {
