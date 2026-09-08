@@ -33,7 +33,7 @@ jobs:
         run: npm run lint
 
       - name: Check formatting
-        run: npm run format:check
+        run: npm run prettier
 
       - name: Build the project
         run: npm run build

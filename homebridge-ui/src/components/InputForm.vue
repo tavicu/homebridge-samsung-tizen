@@ -235,7 +235,7 @@ watch(
         <label for="value-input" class="form-label">Input Source</label>
         <select id="value-input" v-model="form.valueInput" class="form-select" required>
           <option disabled value="">Choose input source ...</option>
-            <option v-for="source in inputSources" :key="source.id" :value="source.id">{{ source.name }}</option>
+          <option v-for="source in inputSources" :key="source.id" :value="source.id">{{ source.name }}</option>
         </select>
         <div class="invalid-feedback">Please choose an input source.</div>
         <small class="form-text text-muted">This input type requires a SmartThings integration.</small>

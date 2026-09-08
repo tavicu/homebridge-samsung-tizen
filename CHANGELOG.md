@@ -62,7 +62,7 @@ SmartThings is authorized from a step by step wizard in the same screen. Once it
 
 **SmartThings uses a new authorization flow**
 
-SmartThings dropped support for the personal access tokens that never expire, so the `api_key` setting is gone. The plugin now uses the official OAuth flow: you create a SmartThings app once, fill in the client ID and client secret, and the plugin refreshes the access token on its own. 
+SmartThings dropped support for the personal access tokens that never expire, so the `api_key` setting is gone. The plugin now uses the official OAuth flow: you create a SmartThings app once, fill in the client ID and client secret, and the plugin refreshes the access token on its own.
 
 There is a step by step wizard in the new configuration interface. Until you go through it, every feature that depends on SmartThings stays unavailable.
 

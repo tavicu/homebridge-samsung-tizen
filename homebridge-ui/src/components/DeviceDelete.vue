@@ -43,13 +43,10 @@ watch(
 </script>
 
 <template>
-  <Confirm
-    title="Delete device"
-    confirm-label="Delete Device"
-    @cancel="navigateBack('device', { action: 'edit', deviceIndex })"
-    @confirm="confirmDelete"
-  >
-    <p>Are you sure you want to delete the device <span class="fw-semibold">{{ device?.name }}</span> from configuration?</p>
+  <Confirm title="Delete device" confirm-label="Delete Device" @cancel="navigateBack('device', { action: 'edit', deviceIndex })" @confirm="confirmDelete">
+    <p>
+      Are you sure you want to delete the device <span class="fw-semibold">{{ device?.name }}</span> from configuration?
+    </p>
     <p>This action is irreversible. Confirming saves the plugin configuration immediately.</p>
   </Confirm>
 </template>
