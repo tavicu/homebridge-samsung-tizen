@@ -36,9 +36,15 @@ const VALID_KEYS = ['power', 'sleep', 'mute', 'volume', 'app', 'input', 'channel
 
 const switchEntries = (switchItem) => Object.entries(switchItem).filter(([key]) => VALID_KEYS.includes(key));
 
-const formatKey = (key) => key.replace('_', ' ');
+const formatAction = (key, value) => {
+  if (key === 'mute') {
+    return { label: value ? 'Mute' : 'Unmute' };
+  }
 
-const formatValue = (value) => (Array.isArray(value) ? value.join(', ') : value || 'N/A');
+  const formattedValue = Array.isArray(value) ? value.join(', ') : value === undefined || value === null || value === '' ? 'N/A' : value;
+
+  return { label: key.replace('_', ' '), value: formattedValue };
+};
 </script>
 
 <template>
@@ -67,9 +73,9 @@ const formatValue = (value) => (Array.isArray(value) ? value.join(', ') : value 
 
           <td class="d-xs-none">
             <ul class="mb-0 small">
-              <li v-for="[key, value] in switchEntries(switchItem)" :key="key" class="text-capitalize">
-                <span class="text-body">{{ formatKey(key) }}:</span>
-                <span class="fw-semibold ms-1">{{ formatValue(value) }}</span>
+              <li v-for="action in switchEntries(switchItem).map(([key, value]) => ({ key, ...formatAction(key, value) }))" :key="action.key" class="text-capitalize">
+                <span class="text-body">{{ action.label }}<template v-if="action.value != null">:</template></span>
+                <span v-if="action.value != null" class="fw-semibold ms-1">{{ action.value }}</span>
               </li>
             </ul>
           </td>

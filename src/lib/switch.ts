@@ -75,10 +75,10 @@ const OPTION_DEFINITIONS: Array<SwitchOptionDefinition> = [
   {
     key: 'mute',
     offable: true,
-    build: ({ device }) => ({
-      get: async () => device.mute,
+    build: ({ config, device }) => ({
+      get: async () => device.mute === config.mute,
       set: async (switchValue: boolean) => {
-        await device.setMute(switchValue);
+        await device.setMute(switchValue === config.mute);
       },
     }),
   },

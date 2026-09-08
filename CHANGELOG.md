@@ -50,6 +50,7 @@ This is a full rewrite of the plugin in TypeScript. It is backwards compatible: 
 - A TV that is unplugged, or loses power without sending a goodbye announcement, is no longer stuck on "on" forever.
 - TVs that keep announcing themselves while in standby are reported as off, not on.
 - Custom remote key mappings no longer leak between TVs. Each TV keeps its own `keys`.
+- Custom switches now honor `mute: false` and unmute the TV. Until v5 they always sent `KEY_MUTE`, so the value in the config had no effect. The configuration interface lets you pick None, Mute or Unmute.
 
 **Interactive configuration interface**
 

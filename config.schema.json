@@ -39,7 +39,10 @@
             "required": true
           },
           "power": { "type": "boolean" },
-          "mute": { "type": "boolean" },
+          "mute": {
+            "type": "boolean",
+            "description": "true mutes when the switch turns on, false unmutes. Omit the key for no mute action."
+          },
           "sleep": {
             "type": "integer",
             "minimum": 1

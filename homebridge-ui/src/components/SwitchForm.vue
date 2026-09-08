@@ -53,7 +53,7 @@ const form = createForm({
   name: '',
   power: false,
   sleep: '',
-  mute: false,
+  mute: '',
   volume: '',
   app: '',
   input: '',
@@ -65,7 +65,7 @@ const form = createForm({
 function hasAnyAction() {
   return (
     form.power ||
-    form.mute ||
+    form.mute !== '' ||
     form.sleep !== '' ||
     form.volume !== '' ||
     form.app.trim() !== '' ||
@@ -80,7 +80,7 @@ function fillForm(switchItem = {}) {
   form.name = switchItem.name || '';
   form.power = !!switchItem.power;
   form.sleep = switchItem.sleep !== undefined && switchItem.sleep !== null ? String(switchItem.sleep) : '';
-  form.mute = !!switchItem.mute;
+  form.mute = switchItem.mute === true ? 'mute' : switchItem.mute === false ? 'unmute' : '';
   form.volume = switchItem.volume !== undefined && switchItem.volume !== null ? String(switchItem.volume) : '';
   form.app = switchItem.app != null ? String(switchItem.app) : '';
   form.input = switchItem.input || '';
@@ -146,7 +146,7 @@ function buildSwitchData() {
     name: form.name,
     power: form.power || undefined,
     sleep: form.sleep !== '' ? Number(form.sleep) : undefined,
-    mute: form.mute || undefined,
+    mute: form.mute === 'mute' ? true : form.mute === 'unmute' ? false : undefined,
     volume: form.volume !== '' ? Number(form.volume) : undefined,
     app: form.app,
     input: form.input,
@@ -290,22 +290,32 @@ watch(
 
     <div class="card-body">
       <div class="mb-3">
-        <div class="form-check form-switch">
-          <input id="mute" v-model="form.mute" class="form-check-input" type="checkbox" role="switch" />
-          <label class="form-check-label" for="mute">Mute</label>
+        <div class="form-label">Mute</div>
+        <div class="btn-group btn-group-sm">
+          <input id="mute-none" v-model="form.mute" class="btn-check" type="radio" name="mute" value="" />
+          <label class="btn btn-outline-primary" for="mute-none">None</label>
+
+          <input id="mute-on" v-model="form.mute" class="btn-check" type="radio" name="mute" value="mute" />
+          <label class="btn btn-outline-primary" for="mute-on">Mute</label>
+
+          <input id="mute-off" v-model="form.mute" class="btn-check" type="radio" name="mute" value="unmute" />
+          <label class="btn btn-outline-primary" for="mute-off">Unmute</label>
         </div>
-        <small class="form-text text-muted">Sends the mute toggle command to the TV.</small>
+        <small class="form-text text-muted d-block">Choose whether this switch should control the TV mute status.</small>
       </div>
 
       <div class="row mb-3">
         <div class="col-md-6">
-          <label for="sleep" class="form-label">Sleep <span class="text-muted">(minutes)</span></label>
-          <input id="sleep" v-model="form.sleep" type="number" class="form-control" min="1" step="1" placeholder="e.g. 60" />
+          <label for="sleep" class="form-label">Sleep</label>
+          <div class="input-group">
+            <input id="sleep" v-model="form.sleep" type="number" class="form-control" min="1" step="1" placeholder="e.g. 60" />
+            <span class="input-group-text">minutes</span>
+          </div>
           <small class="form-text text-muted">Turn the TV off after the given number of minutes.</small>
         </div>
 
         <div class="col-md-6">
-          <label for="volume" class="form-label">Volume <span class="form-optional">Optional</span></label>
+          <label for="volume" class="form-label">Volume</label>
           <input id="volume" v-model="form.volume" type="number" class="form-control" min="0" max="100" step="1" placeholder="e.g. 10" />
           <small class="form-text text-muted">Requires SmartThings. Sets the speaker volume.</small>
         </div>
@@ -313,7 +323,7 @@ watch(
 
       <div class="row mb-3">
         <div class="col-md-6">
-          <label for="app" class="form-label">Application ID <span class="form-optional">Optional</span></label>
+          <label for="app" class="form-label">Application ID</label>
           <input id="app" v-model="form.app" type="text" class="form-control" placeholder="e.g. 111299001912" pattern="^[0-9]+$" inputmode="numeric" />
           <small class="form-text text-muted">
             Opens the selected application. See the
@@ -321,7 +331,7 @@ watch(
           </small>
         </div>
         <div class="col-md-6">
-          <label for="channel" class="form-label">Channel <span class="form-optional">Optional</span></label>
+          <label for="channel" class="form-label">Channel</label>
           <input id="channel" v-model="form.channel" type="number" class="form-control" min="1" step="1" placeholder="e.g. 13" />
         </div>
       </div>
@@ -332,7 +342,7 @@ watch(
 
       <div class="row">
         <div class="col-md-6">
-          <label for="input" class="form-label">Input Source <span class="form-optional">Optional</span></label>
+          <label for="input" class="form-label">Input Source</label>
           <select id="input" v-model="form.input" class="form-select">
             <option value="">None</option>
             <option v-for="source in inputSources" :key="source.id" :value="source.id">{{ source.name }}</option>
@@ -340,7 +350,7 @@ watch(
         </div>
 
         <div class="col-md-6">
-          <label for="picture_mode" class="form-label">Picture Mode <span class="form-optional">Optional</span></label>
+          <label for="picture_mode" class="form-label">Picture Mode</label>
           <select id="picture_mode" v-model="form.picture_mode" class="form-select">
             <option value="">None</option>
             <option v-for="mode in pictureModes" :key="mode.id" :value="mode.id">{{ mode.name }}</option>
@@ -359,7 +369,7 @@ watch(
         >You can repeat a command with <code class="fw-semibold">KEY_VOLUP*3</code> and hold a key by using <code class="fw-semibold">KEY_POWER*2.5s</code>.</Callout
       >
 
-      <label class="form-label">Key(s) to execute <span class="form-optional">Optional</span></label>
+      <label class="form-label">Key(s) to execute</label>
       <div class="d-flex flex-column gap-2">
         <div v-for="command in form.commands" :key="command.id" class="input-group input-group-sm">
           <input v-model="command.value" type="text" class="form-control font-monospace text-uppercase" placeholder="e.g. KEY_VOLUP" />
