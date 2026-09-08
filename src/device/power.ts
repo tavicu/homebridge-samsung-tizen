@@ -11,12 +11,12 @@ type Source = 'ssdp' | 'ping' | 'command';
 type Trigger = 'poll' | 'powering' | 'upnp';
 
 const POLL_INTERVAL = 1000 * 45;
-const SSDP_FRESH_LIMIT = 1000 * 60;
+const SSDP_FRESH_LIMIT = 1000 * 90;
 const POWERING_TIMEOUT = 1000 * 3;
 
 // A TV that went off keeps answering on port 8001 while in standby, around 17 seconds.
 // Without PowerState there is nothing to tell standby apart from on, so we wait it out.
-const STANDBY_TIMEOUT = 1000 * 18;
+const STANDBY_TIMEOUT = 1000 * 20;
 
 export class PowerMonitor {
   private skipPingUntil = 0;
@@ -89,6 +89,10 @@ export class PowerMonitor {
 
       if (!reachable) {
         this.reconcile(false, 'ping');
+        return;
+      }
+
+      if (trigger === 'poll' && this.device.power) {
         return;
       }
 
