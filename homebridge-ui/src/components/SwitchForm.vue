@@ -1,5 +1,5 @@
 <script setup>
-import { computed, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import SwitchesIcon from '../assets/icons/switches.svg';
 import { useConfig } from '../composables/useConfig';
 import { useForm } from '../composables/useForm';
@@ -25,7 +25,7 @@ const props = defineProps({
 
 const { config, updateConfig, cleanConfig } = useConfig();
 const { navigateTo, navigateBack } = useRouter();
-const { inputSources, pictureModes } = useSmartThings();
+const { inputSources, pictureModes: defaultPictureModes, getPictureModes } = useSmartThings();
 const toast = useToast();
 const { formEl, validated, checkValidity, createForm, createId, isDirty, markPristine } = useForm();
 
@@ -47,6 +47,7 @@ function toCommands(value) {
 
 const isEdit = computed(() => props.action === 'edit');
 const isDeviceScoped = computed(() => props.deviceIndex !== undefined);
+const pictureModes = ref(defaultPictureModes);
 
 const form = createForm({
   name: '',
@@ -90,11 +91,32 @@ function fillForm(switchItem = {}) {
 }
 
 function getCurrentSwitches() {
-  if (props.deviceIndex !== undefined) {
+  if (isDeviceScoped.value) {
     return config.value.devices?.[props.deviceIndex]?.switches || [];
   }
 
   return config.value.switches || [];
+}
+
+async function loadPictureModes() {
+  let modes = defaultPictureModes;
+
+  if (isDeviceScoped.value) {
+    const device = config.value.devices?.[props.deviceIndex];
+    const fetched = await getPictureModes(device?.deviceId || device?.device_id);
+
+    if (fetched.length) {
+      modes = fetched;
+    }
+  }
+
+  const currentMode = form.picture_mode;
+
+  if (currentMode && !modes.some((mode) => mode.id === currentMode)) {
+    modes = [...modes, { id: currentMode, name: currentMode }];
+  }
+
+  pictureModes.value = modes;
 }
 
 function init() {
@@ -113,6 +135,8 @@ function init() {
   } else {
     fillForm();
   }
+
+  loadPictureModes();
 }
 
 function buildSwitchData() {
@@ -133,7 +157,7 @@ function buildSwitchData() {
 }
 
 async function persistSwitches(nextSwitches) {
-  if (props.deviceIndex !== undefined) {
+  if (isDeviceScoped.value) {
     const updatedDevices = (config.value.devices || []).map((item, index) => {
       if (index !== props.deviceIndex) {
         return item;
@@ -311,7 +335,7 @@ watch(
           <label for="input" class="form-label">Input Source <span class="form-optional">Optional</span></label>
           <select id="input" v-model="form.input" class="form-select">
             <option value="">None</option>
-            <option v-for="source in inputSources" :key="source.value" :value="source.value">{{ source.label }}</option>
+            <option v-for="source in inputSources" :key="source.id" :value="source.id">{{ source.name }}</option>
           </select>
         </div>
 
@@ -319,7 +343,7 @@ watch(
           <label for="picture_mode" class="form-label">Picture Mode <span class="form-optional">Optional</span></label>
           <select id="picture_mode" v-model="form.picture_mode" class="form-select">
             <option value="">None</option>
-            <option v-for="mode in pictureModes" :key="mode.id" :value="mode.id">{{ mode.value }}</option>
+            <option v-for="mode in pictureModes" :key="mode.id" :value="mode.id">{{ mode.name }}</option>
           </select>
         </div>
       </div>
@@ -331,7 +355,9 @@ watch(
     </div>
 
     <div class="card-body">
-      <Callout class="callout-sm mb-2">You can repeat a command with <code class="fw-semibold">KEY_VOLUP*3</code> and hold a key by using <code class="fw-semibold">KEY_POWER*2.5s</code>.</Callout>
+      <Callout class="callout-sm mb-2"
+        >You can repeat a command with <code class="fw-semibold">KEY_VOLUP*3</code> and hold a key by using <code class="fw-semibold">KEY_POWER*2.5s</code>.</Callout
+      >
 
       <label class="form-label">Key(s) to execute <span class="form-optional">Optional</span></label>
       <div class="d-flex flex-column gap-2">

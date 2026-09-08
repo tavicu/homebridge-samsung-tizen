@@ -18,6 +18,7 @@ This is a full rewrite of the plugin in TypeScript. It is backwards compatible: 
 
 - The plugin is now written in TypeScript and shipped as an ES module.
 - Brand new interactive configuration interface for Config UI X.
+- When SmartThings is connected, the configuration interface loads your TVs from SmartThings so you can pick the Device ID, and loads that TV's picture modes for custom switches.
 - The state of the TV is now updated in real time through SSDP announcements. If those announcements never arrive or stop without a goodbye, the plugin falls back to checking whether the TV is reachable.
 - Volume and mute are read in real time from the TV through DMR (UPnP) events, so the values in Home app follow the physical remote.
 - Absolute volume control is now available without SmartThings.
@@ -56,7 +57,7 @@ The plugin now has its own interface in Config UI X. You add, edit and delete de
 
 Before you add a TV, you can test the connection. If the connection is successful and the TV returns a MAC address, it is filled in automatically.
 
-SmartThings is authorized from a step by step wizard in the same screen. Once it's connected, it will help with different interactions in the interface, such as pre-filling the Device ID.
+SmartThings is authorized from a step by step wizard in the same screen. Once it is connected, Device ID and picture modes are loaded from SmartThings as described above.
 
 **SmartThings uses a new authorization flow**
 

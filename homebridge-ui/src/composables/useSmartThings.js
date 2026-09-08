@@ -1,25 +1,28 @@
 import { computed, ref } from 'vue';
+import { useCache } from './useCache';
 import { useHomebridge } from './useHomebridge';
 
 const INPUT_SOURCES = [
-  { value: 'digitalTv', label: 'Digital TV' },
-  { value: 'HDMI1', label: 'HDMI 1' },
-  { value: 'HDMI2', label: 'HDMI 2' },
-  { value: 'HDMI3', label: 'HDMI 3' },
-  { value: 'HDMI4', label: 'HDMI 4' },
-  { value: 'HDMI5', label: 'HDMI 5' },
-  { value: 'HDMI6', label: 'HDMI 6' },
-  { value: 'USB', label: 'USB' },
-  { value: 'USB-C', label: 'USB-C' },
-  { value: 'Display Port', label: 'Display Port' },
+  { id: 'digitalTv', name: 'Digital TV' },
+  { id: 'HDMI1', name: 'HDMI 1' },
+  { id: 'HDMI2', name: 'HDMI 2' },
+  { id: 'HDMI3', name: 'HDMI 3' },
+  { id: 'HDMI4', name: 'HDMI 4' },
+  { id: 'HDMI5', name: 'HDMI 5' },
+  { id: 'HDMI6', name: 'HDMI 6' },
+  { id: 'USB', name: 'USB' },
+  { id: 'USB-C', name: 'USB-C' },
+  { id: 'Display Port', name: 'Display Port' },
 ];
 
 const PICTURE_MODES = [
-  { id: 'modeDynamic', value: 'Dynamic' },
-  { id: 'modeStandard', value: 'Standard' },
-  { id: 'modeNatural', value: 'Natural' },
-  { id: 'modeMovie', value: 'Movie' },
+  { id: 'modeDynamic', name: 'Dynamic' },
+  { id: 'modeStandard', name: 'Standard' },
+  { id: 'modeNatural', name: 'Natural' },
+  { id: 'modeMovie', name: 'Movie' },
 ];
+
+const deviceCache = useCache();
 
 const smartthings = ref(null);
 const isLoading = ref(false);
@@ -48,16 +51,36 @@ export function useSmartThings() {
   }
 
   async function saveToken(token) {
+    deviceCache.clear();
     return serverRequest('/smartthings/save-token', token);
   }
 
   async function disconnect() {
     await serverRequest('/smartthings/disconnect');
     smartthings.value = null;
+    deviceCache.clear();
   }
 
   async function getDevices() {
-    return serverRequest('/smartthings/get-devices');
+    return deviceCache.get('st:devices', () => serverRequest('/smartthings/get-devices'));
+  }
+
+  async function getDeviceStatus(deviceId) {
+    if (!deviceId) {
+      return {};
+    }
+
+    return deviceCache.get(`st:${deviceId}`, () => serverRequest('/smartthings/get-device-status', { deviceId }));
+  }
+
+  async function getInputSources(deviceId) {
+    const deviceStatus = await getDeviceStatus(deviceId);
+    return Array.isArray(deviceStatus?.supportedInputSourcesMap) ? deviceStatus.supportedInputSourcesMap : [];
+  }
+
+  async function getPictureModes(deviceId) {
+    const deviceStatus = await getDeviceStatus(deviceId);
+    return Array.isArray(deviceStatus?.supportedPictureModesMap) ? deviceStatus.supportedPictureModesMap : [];
   }
 
   const status = computed(() => {
@@ -84,5 +107,8 @@ export function useSmartThings() {
     saveToken,
     disconnect,
     getDevices,
+    getDeviceStatus,
+    getInputSources,
+    getPictureModes,
   };
 }

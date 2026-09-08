@@ -19,6 +19,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
     this.onRequest('/smartthings/get-token', this.stGetToken.bind(this));
     this.onRequest('/smartthings/disconnect', this.stDisconnect.bind(this));
     this.onRequest('/smartthings/get-devices', this.stGetDevices.bind(this));
+    this.onRequest('/smartthings/get-device-status', this.stGetDeviceStatus.bind(this));
     this.onRequest('/device/get-info', this.deviceGetInfo.bind(this));
 
     this.ready();
@@ -111,6 +112,33 @@ class PluginUiServer extends HomebridgePluginUiServer {
         .map((item) => ({ deviceId: item.deviceId, name: item.label || item.name }));
     } catch {
       return [];
+    }
+  }
+
+  async stGetDeviceStatus({ deviceId } = {}) {
+    const stData = await this.stGetToken();
+
+    if (!stData?.accessToken || !deviceId) {
+      return {};
+    }
+
+    try {
+      const response = await fetch(`https://api.smartthings.com/v1/devices/${deviceId}/status`, {
+        headers: { Authorization: `Bearer ${stData.accessToken}` },
+      });
+
+      const data = await response.json();
+
+      const main = data.components?.main || data.main;
+      const mediaInputSource = main?.['samsungvd.mediaInputSource'] || {};
+      const pictureModeSource = main?.['custom.picturemode'] || {};
+
+      return {
+        supportedInputSourcesMap: mediaInputSource.supportedInputSourcesMap?.value ?? null,
+        supportedPictureModesMap: pictureModeSource.supportedPictureModesMap?.value ?? null,
+      };
+    } catch {
+      return {};
     }
   }
 
