@@ -2,7 +2,7 @@ import axios from 'axios';
 import { Device } from '../device/device.js';
 import { SmartThingsNotAvailable } from '../errors.js';
 import { SamsungPlatform } from '../platform.js';
-import { SmartThingsClientState, SmartThingsDeviceStates, SmartThingsRequestConfig, SmartThingsStorage } from '../types/index.js';
+import { SmartThingsClientState, SmartThingsDeviceStates, SmartThingsPictureMode, SmartThingsRequestConfig, SmartThingsStorage } from '../types/index.js';
 
 const STORAGE_KEY = 'smartthings';
 
@@ -168,6 +168,7 @@ export class SmartThingsClient {
     tvChannelName: null,
     inputSource: null,
   };
+  private pictureModes: SmartThingsPictureMode[] = [];
 
   private lastUpdate = 0;
   private updatePromise: Promise<SmartThingsClientState> | null = null;
@@ -222,7 +223,9 @@ export class SmartThingsClient {
       try {
         await this.refresh();
         const response = await this.send<SmartThingsDeviceStates>({ endpoint: this.apiStatesUrl });
+        const pictureModes = response.main?.supportedPictureModesMap?.value;
 
+        this.pictureModes = pictureModes ? JSON.parse(pictureModes) : [];
         this.state = {
           tvChannel: response.main?.tvChannel?.value || null,
           tvChannelName: response.main?.tvChannelName?.value || null,
@@ -281,10 +284,11 @@ export class SmartThingsClient {
     }
 
     await this.getStatus();
-    return this.state.pictureMode;
+
+    return this.pictureModes.find((mode) => mode.name === this.state.pictureMode)?.id || this.state.pictureMode;
   }
 
-  public async setInputSource(value: string): Promise<void> {
+  public setInputSource(value: string): Promise<void> {
     const capability = ['USB-C', 'Display Port'].includes(value) ? 'samsungvd.mediaInputSource' : 'mediaInputSource';
 
     return this.send({
@@ -294,9 +298,11 @@ export class SmartThingsClient {
   }
 
   public setPictureMode(value: string): Promise<void> {
+    const pictureMode = this.pictureModes.find((mode) => mode.id === value)?.name || value;
+
     return this.send({
       endpoint: this.apiCommandUrl,
-      commands: { component: 'main', capability: 'custom.picturemode', command: 'setPictureMode', arguments: [value] },
+      commands: { component: 'main', capability: 'custom.picturemode', command: 'setPictureMode', arguments: [pictureMode] },
     });
   }
 

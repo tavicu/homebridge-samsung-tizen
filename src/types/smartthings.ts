@@ -22,12 +22,18 @@ export type SmartThingsCapabilityState = {
   value?: string | null;
 };
 
+export type SmartThingsPictureMode = {
+  id: string;
+  name: string;
+};
+
 export type SmartThingsDeviceStates = {
   main?: {
     tvChannel?: SmartThingsCapabilityState;
     tvChannelName?: SmartThingsCapabilityState;
     inputSource?: SmartThingsCapabilityState;
     pictureMode?: SmartThingsCapabilityState;
+    supportedPictureModesMap?: SmartThingsCapabilityState;
   };
 };
 

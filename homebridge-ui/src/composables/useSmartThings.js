@@ -14,7 +14,12 @@ const INPUT_SOURCES = [
   { value: 'Display Port', label: 'Display Port' },
 ];
 
-const PICTURE_MODES = ['Dynamic', 'Standard', 'Natural', 'Movie'];
+const PICTURE_MODES = [
+  { id: 'modeDynamic', value: 'Dynamic' },
+  { id: 'modeStandard', value: 'Standard' },
+  { id: 'modeNatural', value: 'Natural' },
+  { id: 'modeMovie', value: 'Movie' },
+];
 
 const smartthings = ref(null);
 const isLoading = ref(false);

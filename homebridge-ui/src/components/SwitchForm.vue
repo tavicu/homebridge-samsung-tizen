@@ -319,7 +319,7 @@ watch(
           <label for="picture_mode" class="form-label">Picture Mode <span class="form-optional">Optional</span></label>
           <select id="picture_mode" v-model="form.picture_mode" class="form-select">
             <option value="">None</option>
-            <option v-for="mode in pictureModes" :key="mode" :value="mode">{{ mode }}</option>
+            <option v-for="mode in pictureModes" :key="mode.id" :value="mode.id">{{ mode.value }}</option>
           </select>
         </div>
       </div>

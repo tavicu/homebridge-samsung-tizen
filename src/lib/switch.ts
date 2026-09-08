@@ -15,6 +15,20 @@ type SwitchOptionDefinition = Pick<SwitchOption, 'key' | 'offable' | 'polled'> &
   build: (ctx: SwitchOptionContext) => Pick<SwitchOption, 'get' | 'set'>;
 };
 
+// Before picture modes were identified by their SmartThings mode id (e.g. `modeMovie`), the
+// configuration interface saved the English display name instead. Those are the only 4 values
+// that could ever have been saved, so old configs are mapped to their id here.
+const LEGACY_PICTURE_MODE_IDS: Record<string, string> = {
+  Dynamic: 'modeDynamic',
+  Standard: 'modeStandard',
+  Natural: 'modeNatural',
+  Movie: 'modeMovie',
+};
+
+function normalizePictureMode(value: string): string {
+  return LEGACY_PICTURE_MODE_IDS[value] || value;
+}
+
 /**
  * One definition per config key a switch can act on. `key` is only written here; identifier
  * fingerprints in identifiers.ts derive the list of keys from this array.
@@ -111,12 +125,16 @@ const OPTION_DEFINITIONS: Array<SwitchOptionDefinition> = [
   {
     key: 'picture_mode',
     polled: true,
-    build: ({ config, device }) => ({
-      get: async () => (await device.getPictureMode()) === config.picture_mode,
-      set: async (_switchValue: boolean) => {
-        await device.setPictureMode(config.picture_mode as string);
-      },
-    }),
+    build: ({ config, device }) => {
+      const pictureMode = normalizePictureMode(config.picture_mode as string);
+
+      return {
+        get: async () => (await device.getPictureMode()) === pictureMode,
+        set: async (_switchValue: boolean) => {
+          await device.setPictureMode(pictureMode);
+        },
+      };
+    },
   },
 
   {

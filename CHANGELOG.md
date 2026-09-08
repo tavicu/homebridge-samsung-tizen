@@ -39,6 +39,7 @@ This is a full rewrite of the plugin in TypeScript. It is backwards compatible: 
 - Custom switches that launch an app, select an input source or set a picture mode now stay ON in Home while that app, source or picture mode is active on the TV. They are checked automatically while the TV is on. Command, volume and channel switches still behave as momentary and turn off after a short delay.
 - Using a switch while the TV is off, when that switch is not set to turn the TV on, no longer looks like a failure in Home. The switch turns back off and a warning is written to the log.
 - `device_id` was renamed to `deviceId`. The old name still works for now.
+- Custom switches that set a picture mode now store the SmartThings mode id (e.g. `modeMovie`) instead of its English display name, so the correct value is sent regardless of the TV's language. Existing switches with the old English names (`Dynamic`, `Standard`, `Natural`, `Movie`) keep working automatically.
 - Inputs and custom switches are identified in Home by what they do (source, app, commands, switch actions), not by their position in the config. Reordering the list only changes the order they appear in Home. Renaming a switch no longer creates a new accessory. An input or switch without a name is skipped and logged, instead of taking down the whole TV.
 
 **Fixed**

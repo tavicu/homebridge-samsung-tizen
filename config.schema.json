@@ -389,7 +389,7 @@
                     {
                       "key": "switches[].picture_mode",
                       "title": "Picture Mode",
-                      "placeholder": "movie"
+                      "placeholder": "modeMovie"
                     }
                   ]
                 },
