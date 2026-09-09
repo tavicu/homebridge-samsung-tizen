@@ -7,10 +7,6 @@
   "schema": {
     "type": "object",
     "definitions": {
-      "inputSource": {
-        "type": "string",
-        "enum": ["digitalTv", "HDMI1", "HDMI2", "HDMI3", "HDMI4", "HDMI5", "HDMI6", "USB", "USB-C", "Display Port"]
-      },
       "input": {
         "type": "object",
         "required": ["name", "type", "value"],
@@ -53,7 +49,7 @@
             "maximum": 100
           },
           "app": { "type": "string" },
-          "input": { "$ref": "#/definitions/inputSource" },
+          "input": { "type": "string" },
           "channel": {
             "type": "integer",
             "minimum": 1
@@ -266,9 +262,9 @@
                 {
                   "key": "inputs[].value",
                   "title": "Input Source",
-                  "enum": ["digitalTv", "HDMI1", "HDMI2", "HDMI3", "HDMI4", "HDMI5", "HDMI6", "USB", "USB-C", "Display Port"],
+                  "enum": ["dtv", "HDMI1", "HDMI2", "HDMI3", "HDMI4", "HDMI5", "HDMI6", "USB", "USB-C", "Display Port"],
                   "titleMap": {
-                    "digitalTv": "Digital TV",
+                    "dtv": "Digital TV",
                     "HDMI1": "HDMI 1",
                     "HDMI2": "HDMI 2",
                     "HDMI3": "HDMI 3",
@@ -375,9 +371,9 @@
                     {
                       "key": "switches[].input",
                       "title": "Input Source",
-                      "enum": ["digitalTv", "HDMI1", "HDMI2", "HDMI3", "HDMI4", "HDMI5", "HDMI6", "USB", "USB-C", "Display Port"],
+                      "enum": ["dtv", "HDMI1", "HDMI2", "HDMI3", "HDMI4", "HDMI5", "HDMI6", "USB", "USB-C", "Display Port"],
                       "titleMap": {
-                        "digitalTv": "Digital TV",
+                        "dtv": "Digital TV",
                         "HDMI1": "HDMI 1",
                         "HDMI2": "HDMI 2",
                         "HDMI3": "HDMI 3",

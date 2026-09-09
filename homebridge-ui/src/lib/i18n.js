@@ -1,6 +1,6 @@
 import { createI18n } from 'vue-i18n';
-import { useHomebridge } from './composables/useHomebridge';
-import en from './locales/en.json';
+import { useHomebridge } from '../composables/useHomebridge';
+import en from '../locales/en.json';
 
 export const i18n = createI18n({
   legacy: false,
@@ -11,7 +11,7 @@ export const i18n = createI18n({
   },
 });
 
-const localesMap = import.meta.glob(['./locales/*.json', '!./locales/en.json']);
+const localesMap = import.meta.glob(['../locales/*.json', '!../locales/en.json']);
 
 export async function setupI18n(app) {
   const { hb } = useHomebridge();

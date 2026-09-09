@@ -47,7 +47,7 @@ export class InputService {
       return this.characteristic.InputSourceType.APPLICATION;
     }
 
-    if (value === 'digitalTv') {
+    if (value === 'dtv' || value === 'digitalTv') {
       return this.characteristic.InputSourceType.TUNER;
     }
 

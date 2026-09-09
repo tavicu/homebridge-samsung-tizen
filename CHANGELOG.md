@@ -18,7 +18,7 @@ This is a full rewrite of the plugin in TypeScript. It is backwards compatible: 
 
 - The plugin is now written in TypeScript and shipped as an ES module.
 - Brand new interactive configuration interface for Config UI X.
-- When SmartThings is connected, the configuration interface loads your TVs from SmartThings so you can pick the Device ID, and loads that TV's picture modes for custom switches.
+- When SmartThings is connected, the configuration interface loads your TVs from SmartThings so you can pick the Device ID, and loads that TV's picture modes and input sources for custom switches and inputs.
 - The state of the TV is now updated in real time through SSDP announcements. If those announcements never arrive or stop without a goodbye, the plugin falls back to checking whether the TV is reachable.
 - Volume and mute are read in real time from the TV through DMR (UPnP) events, so the values in Home app follow the physical remote.
 - Absolute volume control is now available without SmartThings.
@@ -41,6 +41,7 @@ This is a full rewrite of the plugin in TypeScript. It is backwards compatible: 
 - Using a switch while the TV is off, when that switch is not set to turn the TV on, no longer looks like a failure in Home. The switch turns back off and a warning is written to the log.
 - `device_id` was renamed to `deviceId`. The old name still works for now.
 - Custom switches that set a picture mode now store the SmartThings mode id (e.g. `modeMovie`) instead of its English display name, so the correct value is sent regardless of the TV's language. Existing switches with the old English names (`Dynamic`, `Standard`, `Natural`, `Movie`) keep working automatically.
+- Digital TV now uses the SmartThings id `dtv` instead of `digitalTv`. If you still have `digitalTv` in the config, open the input or switch in the configuration interface and save it again as `dtv`. Until you do, it will not show as the active source in Home.
 - Inputs and custom switches are identified in Home by what they do (source, app, commands, switch actions), not by their position in the config. Reordering the list only changes the order they appear in Home. Renaming a switch no longer creates a new accessory. An input or switch without a name is skipped and logged, instead of taking down the whole TV.
 
 **Fixed**

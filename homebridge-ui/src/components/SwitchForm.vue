@@ -6,6 +6,7 @@ import { useForm } from '../composables/useForm';
 import { useRouter } from '../composables/useRouter';
 import { useSmartThings } from '../composables/useSmartThings';
 import { useToast } from '../composables/useToast';
+import { DEFAULT_INPUT_SOURCES, DEFAULT_PICTURE_MODES, groupInputSources } from '../lib/device';
 import Callout from './Callout.vue';
 
 const props = defineProps({
@@ -25,7 +26,7 @@ const props = defineProps({
 
 const { config, updateConfig, cleanConfig } = useConfig();
 const { navigateTo, navigateBack } = useRouter();
-const { inputSources, pictureModes: defaultPictureModes, getPictureModes } = useSmartThings();
+const { getInputSources, getPictureModes } = useSmartThings();
 const toast = useToast();
 const { formEl, validated, checkValidity, createForm, createId, isDirty, markPristine } = useForm();
 
@@ -46,8 +47,10 @@ function toCommands(value) {
 }
 
 const isEdit = computed(() => props.action === 'edit');
-const isDeviceScoped = computed(() => props.deviceIndex !== undefined);
-const pictureModes = ref(defaultPictureModes);
+const device = computed(() => (props.deviceIndex === undefined ? undefined : config.value.devices?.[props.deviceIndex]));
+const deviceId = computed(() => device.value?.deviceId || device.value?.device_id);
+const pictureModes = ref(DEFAULT_PICTURE_MODES);
+const inputSources = ref({ available: [], other: DEFAULT_INPUT_SOURCES });
 
 const form = createForm({
   name: '',
@@ -91,23 +94,19 @@ function fillForm(switchItem = {}) {
 }
 
 function getCurrentSwitches() {
-  if (isDeviceScoped.value) {
-    return config.value.devices?.[props.deviceIndex]?.switches || [];
+  if (props.deviceIndex !== undefined) {
+    return device.value?.switches || [];
   }
 
   return config.value.switches || [];
 }
 
 async function loadPictureModes() {
-  let modes = defaultPictureModes;
+  let modes = DEFAULT_PICTURE_MODES;
+  const fetched = await getPictureModes(deviceId.value);
 
-  if (isDeviceScoped.value) {
-    const device = config.value.devices?.[props.deviceIndex];
-    const fetched = await getPictureModes(device?.deviceId || device?.device_id);
-
-    if (fetched.length) {
-      modes = fetched;
-    }
+  if (fetched.length) {
+    modes = fetched;
   }
 
   const currentMode = form.picture_mode;
@@ -117,6 +116,13 @@ async function loadPictureModes() {
   }
 
   pictureModes.value = modes;
+}
+
+async function loadInputSources() {
+  const grouped = groupInputSources(await getInputSources(deviceId.value), form.input);
+
+  inputSources.value = grouped;
+  form.input = grouped.value;
 }
 
 function init() {
@@ -137,6 +143,7 @@ function init() {
   }
 
   loadPictureModes();
+  loadInputSources();
 }
 
 function buildSwitchData() {
@@ -157,7 +164,7 @@ function buildSwitchData() {
 }
 
 async function persistSwitches(nextSwitches) {
-  if (isDeviceScoped.value) {
+  if (props.deviceIndex !== undefined) {
     const updatedDevices = (config.value.devices || []).map((item, index) => {
       if (index !== props.deviceIndex) {
         return item;
@@ -184,6 +191,7 @@ function handleReset() {
 
   validated.value = false;
   fillForm(switchItem);
+  loadInputSources();
 }
 
 async function handleSubmit() {
@@ -249,7 +257,7 @@ watch(
           <template v-if="isEdit">
             Update the configuration for <span class="fw-semibold">{{ form.name }}</span> switch
           </template>
-          <template v-else-if="isDeviceScoped">Configure a new switch for this device</template>
+          <template v-else-if="deviceIndex !== undefined">Configure a new switch for this device</template>
           <template v-else>Configure a new global switch that applies to all devices</template>
         </div>
       </div>
@@ -346,7 +354,17 @@ watch(
           <label for="input" class="form-label">Input Source</label>
           <select id="input" v-model="form.input" class="form-select">
             <option value="">None</option>
-            <option v-for="source in inputSources" :key="source.id" :value="source.id">{{ source.name }}</option>
+            <template v-if="inputSources.available.length">
+              <optgroup label="Available">
+                <option v-for="source in inputSources.available" :key="source.id" :value="source.id">{{ source.name }}</option>
+              </optgroup>
+              <optgroup v-if="inputSources.other.length" label="Other">
+                <option v-for="source in inputSources.other" :key="source.id" :value="source.id">{{ source.name }}</option>
+              </optgroup>
+            </template>
+            <template v-else>
+              <option v-for="source in inputSources.other" :key="source.id" :value="source.id">{{ source.name }}</option>
+            </template>
           </select>
         </div>
 

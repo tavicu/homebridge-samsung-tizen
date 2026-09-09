@@ -2,26 +2,6 @@ import { computed, ref } from 'vue';
 import { useCache } from './useCache';
 import { useHomebridge } from './useHomebridge';
 
-const INPUT_SOURCES = [
-  { id: 'digitalTv', name: 'Digital TV' },
-  { id: 'HDMI1', name: 'HDMI 1' },
-  { id: 'HDMI2', name: 'HDMI 2' },
-  { id: 'HDMI3', name: 'HDMI 3' },
-  { id: 'HDMI4', name: 'HDMI 4' },
-  { id: 'HDMI5', name: 'HDMI 5' },
-  { id: 'HDMI6', name: 'HDMI 6' },
-  { id: 'USB', name: 'USB' },
-  { id: 'USB-C', name: 'USB-C' },
-  { id: 'Display Port', name: 'Display Port' },
-];
-
-const PICTURE_MODES = [
-  { id: 'modeDynamic', name: 'Dynamic' },
-  { id: 'modeStandard', name: 'Standard' },
-  { id: 'modeNatural', name: 'Natural' },
-  { id: 'modeMovie', name: 'Movie' },
-];
-
 const deviceCache = useCache();
 
 const smartthings = ref(null);
@@ -99,8 +79,6 @@ export function useSmartThings() {
     smartthings,
     isLoading,
     status,
-    inputSources: INPUT_SOURCES,
-    pictureModes: PICTURE_MODES,
     getAuthUrl,
     getAuthToken,
     getToken,

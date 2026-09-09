@@ -1,4 +1,4 @@
-import { useHomebridge } from './composables/useHomebridge';
+import { useHomebridge } from '../composables/useHomebridge';
 
 export function isConfigUiXSupported(minVersion = '5.27.0') {
   const { hb } = useHomebridge();

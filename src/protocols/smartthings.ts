@@ -262,23 +262,16 @@ export class SmartThingsClient {
       return null;
     }
 
-    let finalValue = inputSource;
-
-    if (finalValue === 'dtv') {
-      finalValue = 'digitalTv';
-    }
-
     // It's an application if the tvChannelName includes a dot
     if (tvChannelName?.includes('.')) {
       return null;
     }
 
-    // digitalTv should have a valid channel
-    if (!tvChannel && finalValue === 'digitalTv') {
+    if (!tvChannel && (inputSource === 'dtv' || inputSource === 'digitalTv')) {
       return null;
     }
 
-    return finalValue;
+    return inputSource;
   }
 
   public async getPictureMode(): Promise<string | null> {

@@ -2,8 +2,8 @@ import { createApp } from 'vue';
 import App from './App.vue';
 import { useConfig } from './composables/useConfig';
 import { useHomebridge } from './composables/useHomebridge';
-import { isConfigUiXSupported } from './homebridge';
-import { setupI18n } from './i18n';
+import { isConfigUiXSupported } from './lib/homebridge';
+import { setupI18n } from './lib/i18n';
 import './assets/main.css';
 
 async function startApp() {

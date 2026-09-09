@@ -1,11 +1,12 @@
 <script setup>
-import { computed, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import InputsIcon from '../assets/icons/inputs.svg';
 import { useConfig } from '../composables/useConfig';
 import { useForm } from '../composables/useForm';
 import { useRouter } from '../composables/useRouter';
 import { useSmartThings } from '../composables/useSmartThings';
 import { useToast } from '../composables/useToast';
+import { DEFAULT_INPUT_SOURCES, groupInputSources } from '../lib/device';
 
 const props = defineProps({
   action: {
@@ -24,7 +25,7 @@ const props = defineProps({
 
 const { config, updateConfig, cleanConfig } = useConfig();
 const { navigateTo, navigateBack } = useRouter();
-const { inputSources } = useSmartThings();
+const { getInputSources } = useSmartThings();
 const toast = useToast();
 const { formEl, validated, checkValidity, createForm, createId, isDirty, markPristine } = useForm();
 
@@ -45,7 +46,9 @@ function toCommands(value) {
 }
 
 const isEdit = computed(() => props.action === 'edit');
-const isDeviceScoped = computed(() => props.deviceIndex !== undefined);
+const device = computed(() => (props.deviceIndex === undefined ? undefined : config.value.devices?.[props.deviceIndex]));
+const deviceId = computed(() => device.value?.deviceId || device.value?.device_id);
+const inputSources = ref({ available: [], other: DEFAULT_INPUT_SOURCES });
 
 const form = createForm({
   name: '',
@@ -66,10 +69,17 @@ function fillForm(input = {}) {
 
 function getCurrentInputs() {
   if (props.deviceIndex !== undefined) {
-    return config.value.devices?.[props.deviceIndex]?.inputs || [];
+    return device.value?.inputs || [];
   }
 
   return config.value.inputs || [];
+}
+
+async function loadInputSources() {
+  const grouped = groupInputSources(await getInputSources(deviceId.value), form.valueInput);
+
+  inputSources.value = grouped;
+  form.valueInput = grouped.value;
 }
 
 function init() {
@@ -88,6 +98,8 @@ function init() {
   } else {
     fillForm();
   }
+
+  loadInputSources();
 }
 
 function buildInputData() {
@@ -136,6 +148,7 @@ function handleReset() {
 
   validated.value = false;
   fillForm(input);
+  loadInputSources();
 }
 
 async function handleSubmit() {
@@ -195,7 +208,7 @@ watch(
           <template v-if="isEdit">
             Update the configuration for <span class="fw-semibold">{{ form.name }}</span> input
           </template>
-          <template v-else-if="isDeviceScoped">Configure a new input for this device</template>
+          <template v-else-if="deviceIndex !== undefined">Configure a new input for this device</template>
           <template v-else>Configure a new global input that applies to all devices</template>
         </div>
       </div>
@@ -235,7 +248,17 @@ watch(
         <label for="value-input" class="form-label">Input Source</label>
         <select id="value-input" v-model="form.valueInput" class="form-select" required>
           <option disabled value="">Choose input source ...</option>
-          <option v-for="source in inputSources" :key="source.id" :value="source.id">{{ source.name }}</option>
+          <template v-if="inputSources.available.length">
+            <optgroup label="Available">
+              <option v-for="source in inputSources.available" :key="source.id" :value="source.id">{{ source.name }}</option>
+            </optgroup>
+            <optgroup v-if="inputSources.other.length" label="Other">
+              <option v-for="source in inputSources.other" :key="source.id" :value="source.id">{{ source.name }}</option>
+            </optgroup>
+          </template>
+          <template v-else>
+            <option v-for="source in inputSources.other" :key="source.id" :value="source.id">{{ source.name }}</option>
+          </template>
         </select>
         <div class="invalid-feedback">Please choose an input source.</div>
         <small class="form-text text-muted">This input type requires a SmartThings integration.</small>
