@@ -129,7 +129,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
 
       const data = await response.json();
 
-      const main = data.components?.main || data.main;
+      const main = data.components?.main;
       const mediaInputSource = main?.['samsungvd.mediaInputSource'] || {};
       const pictureModeSource = main?.['custom.picturemode'] || {};
 

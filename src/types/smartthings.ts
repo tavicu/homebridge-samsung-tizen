@@ -18,8 +18,10 @@ export type SmartThingsRequestConfig = {
   commands?: SmartThingsCommand | SmartThingsCommand[];
 };
 
-export type SmartThingsCapabilityState = {
-  value?: string | null;
+export type SmartThingsAttribute<T = string | null> = {
+  value?: T;
+  timestamp?: string;
+  unit?: string;
 };
 
 export type SmartThingsPictureMode = {
@@ -27,13 +29,24 @@ export type SmartThingsPictureMode = {
   name: string;
 };
 
-export type SmartThingsDeviceStates = {
-  main?: {
-    tvChannel?: SmartThingsCapabilityState;
-    tvChannelName?: SmartThingsCapabilityState;
-    inputSource?: SmartThingsCapabilityState;
-    pictureMode?: SmartThingsCapabilityState;
-    supportedPictureModesMap?: SmartThingsCapabilityState;
+export type SmartThingsDeviceStatus = {
+  components?: {
+    main?: {
+      tvChannel?: {
+        tvChannel?: SmartThingsAttribute;
+        tvChannelName?: SmartThingsAttribute;
+      };
+      mediaInputSource?: {
+        inputSource?: SmartThingsAttribute;
+      };
+      'samsungvd.mediaInputSource'?: {
+        inputSource?: SmartThingsAttribute;
+      };
+      'custom.picturemode'?: {
+        pictureMode?: SmartThingsAttribute;
+        supportedPictureModesMap?: SmartThingsAttribute<SmartThingsPictureMode[]>;
+      };
+    };
   };
 };
 

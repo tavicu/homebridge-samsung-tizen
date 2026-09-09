@@ -2,7 +2,7 @@ import axios from 'axios';
 import { Device } from '../device/device.js';
 import { SmartThingsNotAvailable } from '../errors.js';
 import { SamsungPlatform } from '../platform.js';
-import { SmartThingsClientState, SmartThingsDeviceStates, SmartThingsPictureMode, SmartThingsRequestConfig, SmartThingsStorage } from '../types/index.js';
+import { SmartThingsClientState, SmartThingsDeviceStatus, SmartThingsPictureMode, SmartThingsRequestConfig, SmartThingsStorage } from '../types/index.js';
 
 const STORAGE_KEY = 'smartthings';
 
@@ -158,7 +158,7 @@ export class SmartThingsManager {
 export class SmartThingsClient {
   private deviceId: string | undefined;
   private apiBaseUrl: string;
-  private apiStatesUrl: string;
+  private apiStatusUrl: string;
   private apiCommandUrl: string;
   private readonly manager: SmartThingsManager;
 
@@ -181,7 +181,7 @@ export class SmartThingsClient {
 
     this.deviceId = this.device.config.deviceId || this.device.config.device_id;
     this.apiBaseUrl = `https://api.smartthings.com/v1/devices/${this.deviceId}`;
-    this.apiStatesUrl = `${this.apiBaseUrl}/states`;
+    this.apiStatusUrl = `${this.apiBaseUrl}/status`;
     this.apiCommandUrl = `${this.apiBaseUrl}/commands`;
   }
 
@@ -222,15 +222,18 @@ export class SmartThingsClient {
     this.updatePromise = (async () => {
       try {
         await this.refresh();
-        const response = await this.send<SmartThingsDeviceStates>({ endpoint: this.apiStatesUrl });
-        const pictureModes = response.main?.supportedPictureModesMap?.value;
+        const response = await this.send<SmartThingsDeviceStatus>({ endpoint: this.apiStatusUrl });
+        const main = response.components?.main;
+        const mediaInputSource = main?.['samsungvd.mediaInputSource'] || main?.mediaInputSource;
+        const pictureModeSource = main?.['custom.picturemode'];
+        const pictureModes = pictureModeSource?.supportedPictureModesMap?.value;
 
-        this.pictureModes = pictureModes ? JSON.parse(pictureModes) : [];
+        this.pictureModes = Array.isArray(pictureModes) ? pictureModes : [];
         this.state = {
-          tvChannel: response.main?.tvChannel?.value || null,
-          tvChannelName: response.main?.tvChannelName?.value || null,
-          inputSource: response.main?.inputSource?.value || null,
-          pictureMode: response.main?.pictureMode?.value || null,
+          tvChannel: main?.tvChannel?.tvChannel?.value || null,
+          tvChannelName: main?.tvChannel?.tvChannelName?.value || null,
+          inputSource: mediaInputSource?.inputSource?.value || null,
+          pictureMode: pictureModeSource?.pictureMode?.value || null,
         };
 
         this.lastUpdate = Date.now();
