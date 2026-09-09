@@ -317,7 +317,7 @@ watch(
         <div class="col-md-6">
           <label for="volume" class="form-label">Volume</label>
           <input id="volume" v-model="form.volume" type="number" class="form-control" min="0" max="100" step="1" placeholder="e.g. 10" />
-          <small class="form-text text-muted">Requires SmartThings. Sets the speaker volume.</small>
+          <small class="form-text text-muted">Sets the speaker volume from 0 to 100.</small>
         </div>
       </div>
 
@@ -333,6 +333,7 @@ watch(
         <div class="col-md-6">
           <label for="channel" class="form-label">Channel</label>
           <input id="channel" v-model="form.channel" type="number" class="form-control" min="1" step="1" placeholder="e.g. 13" />
+          <small class="form-text text-muted">Tunes the TV to the given channel number.</small>
         </div>
       </div>
 
