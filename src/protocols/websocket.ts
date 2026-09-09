@@ -93,7 +93,8 @@ export class WebSocket {
       const socket = new WsClient(connectionUrl, {
         handshakeTimeout: 750,
         rejectUnauthorized: false,
-      });
+        servername: '',
+      } as WsClient.ClientOptions);
 
       socket.on('close', () => {
         this.forgetSocket(socket);
@@ -113,6 +114,8 @@ export class WebSocket {
         try {
           const response = JSON.parse(data.toString());
 
+          this.device.log.debug(`[WS] response: ${JSON.stringify(response)}`);
+
           if (response.event === 'ms.channel.connect') {
             this.ws = socket;
             resolve();
@@ -122,7 +125,13 @@ export class WebSocket {
               this.device.storage.token = this.token || undefined;
             }
           } else if (response.event === 'ms.error') {
-            // this.device.log?.debug?.(`[Remote] TV Error: ${response.data?.message}`);
+            this.device.log.debug(`[WS] TV Error: ${response.data?.message}`);
+          } else {
+            if (response.event === 'ms.channel.unauthorized') {
+              this.device.log.error('[WS] TV rejected the WebSocket connection (unauthorized)');
+            }
+
+            reject(new Error(`Failed to open socket (${response.event})`));
           }
         } catch (e) {
           // Ignore JSON parsing errors for irrelevant messages
