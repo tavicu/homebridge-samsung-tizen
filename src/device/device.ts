@@ -168,6 +168,10 @@ export class Device extends EventEmitter<DeviceEvents> {
     return this.controller.setSleep(minutes, onComplete);
   }
 
+  public getChannel(): Promise<string | null> {
+    return this.controller.getChannel();
+  }
+
   public setChannel(channel: number | string): Promise<void> {
     return this.controller.setChannel(channel);
   }

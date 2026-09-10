@@ -37,7 +37,7 @@ This is a full rewrite of the plugin in TypeScript. It is backwards compatible: 
 
 - When Home asks which input is active, the plugin now prioritizes inputs so it makes as few requests to the TV as possible to determine the active input.
 - A custom switch that has more than one option with a state, for example `sleep` together with `mute`, now shows as ON when any of those options is active. Before, all of them had to be active at the same time.
-- Custom switches that launch an app, select an input source or set a picture mode now stay ON in Home while that app, source or picture mode is active on the TV. They are checked automatically while the TV is on. Command, volume and channel switches still behave as momentary and turn off after a short delay.
+- Custom switches that launch an app, select an input source, set a picture mode or a TV channel now stay ON in Home while that app, source, picture mode or channel is active on the TV. They are checked automatically while the TV is on. Command and volume switches still turn off after a short delay.
 - Using a switch while the TV is off, when that switch is not set to turn the TV on, no longer looks like a failure in Home. The switch turns back off and a warning is written to the log.
 - `device_id` was renamed to `deviceId`. The old name still works for now.
 - Custom switches that set a picture mode now store the SmartThings mode id (e.g. `modeMovie`) instead of its English display name, so the correct value is sent regardless of the TV's language. Existing switches with the old English names (`Dynamic`, `Standard`, `Natural`, `Movie`) keep working automatically.
@@ -71,7 +71,7 @@ There is a step by step wizard in the new configuration interface. Until you go 
 
 These were removed and are ignored if they are still present in your configuration:
 
-- `refresh` - there is no configurable poll interval anymore. Power state arrives through SSDP, with a built-in fallback check when announcements are missing. Volume and mute arrive through DMR events. Switches that track an app, an input source or a picture mode are checked on a fixed internal interval, only while the TV is on.
+- `refresh` - there is no configurable poll interval anymore. Power state arrives through SSDP, with a built-in fallback check when announcements are missing. Volume and mute arrive through DMR events. Switches that track an app, an input source, a picture mode or a TV channel are checked on a fixed internal interval, only while the TV is on.
 - `delay`, `timeout` and `wait_time` - these timings are now handled internally.
 - `method` and `port` - the connection to the TV is detected automatically.
 - `api_key` - replaced by the SmartThings authorization flow described above.

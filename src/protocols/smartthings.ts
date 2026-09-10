@@ -286,6 +286,27 @@ export class SmartThingsClient {
     return this.pictureModes.find((mode) => mode.name === this.state.pictureMode)?.id || this.state.pictureMode;
   }
 
+  public async getTvChannel(): Promise<string | null> {
+    if (!this.isAvailable) {
+      return null;
+    }
+
+    await this.getStatus();
+
+    const { inputSource, tvChannelName, tvChannel } = this.state;
+
+    // It's an application if the tvChannelName includes a dot
+    if (tvChannelName?.includes('.')) {
+      return null;
+    }
+
+    if (inputSource !== 'dtv' && inputSource !== 'digitalTv') {
+      return null;
+    }
+
+    return tvChannel;
+  }
+
   public setInputSource(value: string): Promise<void> {
     const capability = ['USB-C', 'Display Port'].includes(value) ? 'samsungvd.mediaInputSource' : 'mediaInputSource';
 

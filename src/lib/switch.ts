@@ -36,9 +36,9 @@ function normalizePictureMode(value: string): string {
  * `offable` is about set: Home can turn the option off (mute, sleep). Without it, OFF is ignored
  * (app, input, command) because there is no matching TV action.
  * `polled` is about get: state is not in DeviceState / events, so AccessoryPoller must ask the TV
- * (app visibility, HDMI source, picture mode). Those gets are skipped when the TV is off.
+ * (app visibility, HDMI source, picture mode, channel). Those gets are skipped when the TV is off.
  * mute/sleep have get but are not polled.
- * A switch is stateless when no option has get (command, volume, channel).
+ * A switch is stateless when no option has get (command, volume).
  */
 const OPTION_DEFINITIONS: Array<SwitchOptionDefinition> = [
   {
@@ -115,7 +115,9 @@ const OPTION_DEFINITIONS: Array<SwitchOptionDefinition> = [
 
   {
     key: 'channel',
+    polled: true,
     build: ({ config, device }) => ({
+      get: async () => (await device.getChannel()) === String(config.channel),
       set: async (_switchValue: boolean) => {
         await device.setChannel(config.channel as number | string);
       },

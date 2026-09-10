@@ -130,6 +130,10 @@ export class DeviceController {
     );
   }
 
+  public getChannel(): Promise<string | null> {
+    return this.smartthings.getTvChannel();
+  }
+
   public async setChannel(channel: number | string): Promise<void> {
     await this.waitPowering();
 
