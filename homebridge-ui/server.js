@@ -105,7 +105,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
       });
 
       const data = await response.json();
-      const tvCapabilities = ['tvChannel', 'mediaInputSource', 'samsungvd.mediaInputSource', 'custom.picturemode', 'custom.soundmode'];
+      const tvCapabilities = ['tvChannel', 'samsungvd.mediaInputSource', 'custom.picturemode'];
 
       return (data.items || [])
         .filter((item) => item.components?.some((component) => component.capabilities?.some((capability) => tvCapabilities.includes(capability.id))))
