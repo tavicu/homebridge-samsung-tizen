@@ -91,9 +91,9 @@ export class WebSocket {
       this.disconnect();
 
       const socket = new WsClient(connectionUrl, {
+        servername: '',
         handshakeTimeout: 750,
         rejectUnauthorized: false,
-        servername: '',
       } as WsClient.ClientOptions);
 
       socket.on('close', () => {

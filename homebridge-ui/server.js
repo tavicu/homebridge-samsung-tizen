@@ -68,15 +68,13 @@ class PluginUiServer extends HomebridgePluginUiServer {
   }
 
   async stSaveToken(data) {
-    const storedData = await this.#patchStoredData({
+    return this.#patchStoredData({
       smartthings: {
         accessToken: data.access_token,
         refreshToken: data.refresh_token,
         expiresAt: Date.now() + data.expires_in * 1000,
       },
     });
-
-    return storedData;
   }
 
   async stGetToken() {

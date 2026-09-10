@@ -91,6 +91,7 @@ export class SmartThingsManager {
         await this.ensureValidToken();
         this.scheduleRefresh();
       } catch (error: any) {
+        this.isAvailable = false;
         this.platform.log.error(`[SmartThings] Background refresh token failed: ${error.message}`);
       }
     }, delay);
