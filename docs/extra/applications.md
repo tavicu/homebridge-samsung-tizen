@@ -66,7 +66,7 @@ Most of the IDs changed starting with year 2020. If you know your TV model is fr
 | Explore Google Assistant | `3202004020674`                                     |
 | Amazon Alexa             | `3202004020626`                                     |
 | My5                      | `121299000612`                                      |
-| SmartThings              | `3201710015016` / `3201910019378`                   |
+| SmartThings              | `3201710015016` / `3201910019378` / `3202311033054` |
 | BritBox                  | `3201909019175`                                     |
 | TikTok                   | `3202008021577`                                     |
 | RaiPlay                  | `111399002034`                                      |
@@ -97,6 +97,9 @@ Most of the IDs changed starting with year 2020. If you know your TV model is fr
 | Google Meet              | `3202008021439`                                     |
 | Kidoodle.TV              | `3201910019457`                                     |
 | Emby                     | `3201606009872`                                     |
+| Samsung TV Plus          | `3202405035480`                                     |
+| Amazon Luna              | `3202203026819`                                     |
+| Copilot                  | `3202503039231`                                     |
 | Pathe Thuis              | `3201506003175`                                     |
 | Canaal Digitaal          | `3201803015869`                                     |
 | NL Ziet                  | `3202012022421`                                     |
@@ -104,7 +107,7 @@ Most of the IDs changed starting with year 2020. If you know your TV model is fr
 | Kijk                     | `3201901017768`                                     |
 | Videoland                | `3201810017074`                                     |
 | Universal Guide          | `3201710015067`                                     |
-| CANAL+                   | `3201606009910`                                     |
+| CANAL+                   | `3201606009910` / `3202010022094`                   |
 | Molotov                  | `3201611011210`                                     |
 | OQEE by Free             | `3202103023185`                                     |
 | B.tv                     | `3201910019420`                                     |
@@ -115,6 +118,11 @@ Most of the IDs changed starting with year 2020. If you know your TV model is fr
 | ARTE                     | `3202011022316`                                     |
 | Benshi                   | `3202007021336`                                     |
 | france.tv                | `3202103023232`                                     |
+| TF1+                     | `3202209028524`                                     |
+| M6+                      | `3202207027908`                                     |
+| RMC BFM Play             | `3202303030351`                                     |
+| Pathe Home               | `3202311033030`                                     |
+| Orange TV                | `3202105023867`                                     |
 | Mako                     | `3201506003716`                                     |
 | Reshet13                 | `3201812017600`                                     |
 | Kan11                    | `3201803015997`                                     |
