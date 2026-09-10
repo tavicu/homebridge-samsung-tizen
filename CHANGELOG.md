@@ -18,7 +18,8 @@ This is a full rewrite of the plugin in TypeScript. It is backwards compatible: 
 
 - The plugin is now written in TypeScript and shipped as an ES module.
 - Brand new interactive configuration interface for Config UI X.
-- When SmartThings is connected, the configuration interface loads your TVs from SmartThings so you can pick the Device ID, and loads that TV's picture modes and input sources for custom switches and inputs.
+- When SmartThings is connected, the configuration interface loads your TVs from SmartThings so you can pick the Device ID, and loads that TV's picture modes, sound modes and input sources for custom switches and inputs.
+- Custom switches can set a sound mode through SmartThings.
 - The state of the TV is now updated in real time through SSDP announcements. If those announcements never arrive or stop without a goodbye, the plugin falls back to checking whether the TV is reachable.
 - Volume and mute are read in real time from the TV through DMR (UPnP) events, so the values in Home app follow the physical remote.
 - Absolute volume control is now available without SmartThings.
@@ -37,7 +38,7 @@ This is a full rewrite of the plugin in TypeScript. It is backwards compatible: 
 
 - When Home asks which input is active, the plugin now prioritizes inputs so it makes as few requests to the TV as possible to determine the active input.
 - A custom switch that has more than one option with a state, for example `sleep` together with `mute`, now shows as ON when any of those options is active. Before, all of them had to be active at the same time.
-- Custom switches that launch an app, select an input source, set a picture mode or a TV channel now stay ON in Home while that app, source, picture mode or channel is active on the TV. They are checked automatically while the TV is on. Command and volume switches still turn off after a short delay.
+- Custom switches that launch an app, select an input source, set a picture mode, a sound mode or a TV channel now stay ON in Home while that app, source, picture mode, sound mode or channel is active on the TV. They are checked automatically while the TV is on. Command and volume switches still turn off after a short delay.
 - Using a switch while the TV is off, when that switch is not set to turn the TV on, no longer looks like a failure in Home. The switch turns back off and a warning is written to the log.
 - `device_id` was renamed to `deviceId`. The old name still works for now.
 - Custom switches that set a picture mode now store the SmartThings mode id (e.g. `modeMovie`) instead of its English display name, so the correct value is sent regardless of the TV's language. Existing switches with the old English names (`Dynamic`, `Standard`, `Natural`, `Movie`) keep working automatically.
@@ -59,7 +60,7 @@ The plugin now has its own interface in Config UI X. You add, edit and delete de
 
 Before you add a TV, you can test the connection. If the connection is successful and the TV returns a MAC address, it is filled in automatically.
 
-SmartThings is authorized from a step by step wizard in the same screen. Once it is connected, Device ID and picture modes are loaded from SmartThings as described above.
+SmartThings is authorized from a step by step wizard in the same screen. Once it is connected, Device ID, picture modes and sound modes are loaded from SmartThings as described above.
 
 **SmartThings uses a new authorization flow**
 
@@ -71,7 +72,7 @@ There is a step by step wizard in the new configuration interface. Until you go 
 
 These were removed and are ignored if they are still present in your configuration:
 
-- `refresh` - there is no configurable poll interval anymore. Power state arrives through SSDP, with a built-in fallback check when announcements are missing. Volume and mute arrive through DMR events. Switches that track an app, an input source, a picture mode or a TV channel are checked on a fixed internal interval, only while the TV is on.
+- `refresh` - there is no configurable poll interval anymore. Power state arrives through SSDP, with a built-in fallback check when announcements are missing. Volume and mute arrive through DMR events. Switches that track an app, an input source, a picture mode, a sound mode or a TV channel are checked on a fixed internal interval, only while the TV is on.
 - `delay`, `timeout` and `wait_time` - these timings are now handled internally.
 - `method` and `port` - the connection to the TV is detected automatically.
 - `api_key` - replaced by the SmartThings authorization flow described above.

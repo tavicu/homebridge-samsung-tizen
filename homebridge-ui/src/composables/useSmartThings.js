@@ -63,6 +63,11 @@ export function useSmartThings() {
     return Array.isArray(deviceStatus?.supportedPictureModesMap) ? deviceStatus.supportedPictureModesMap : [];
   }
 
+  async function getSoundModes(deviceId) {
+    const deviceStatus = await getDeviceStatus(deviceId);
+    return Array.isArray(deviceStatus?.supportedSoundModesMap) ? deviceStatus.supportedSoundModesMap : [];
+  }
+
   const status = computed(() => {
     if (!smartthings.value) {
       return 'disconnected';
@@ -88,5 +93,6 @@ export function useSmartThings() {
     getDeviceStatus,
     getInputSources,
     getPictureModes,
+    getSoundModes,
   };
 }

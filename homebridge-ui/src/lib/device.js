@@ -20,6 +20,12 @@ export const DEFAULT_PICTURE_MODES = [
   { id: 'modeMovie', name: 'Movie' },
 ];
 
+export const DEFAULT_SOUND_MODES = [
+  { id: 'modeStandard', name: 'Standard' },
+  { id: 'modeSmart', name: 'Smart' },
+  { id: 'modeAmplify', name: 'Amplify' },
+];
+
 export function groupInputSources(sources = [], currentValue = '') {
   const available = sources.map((item) => {
     if (item.id === 'dtv') {

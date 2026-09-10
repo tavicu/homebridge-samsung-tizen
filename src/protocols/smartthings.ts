@@ -2,7 +2,7 @@ import axios from 'axios';
 import { Device } from '../device/device.js';
 import { SmartThingsNotAvailable } from '../errors.js';
 import { SamsungPlatform } from '../platform.js';
-import { SmartThingsClientState, SmartThingsCommand, SmartThingsDeviceStatus, SmartThingsPictureMode, SmartThingsRequestConfig, SmartThingsStorage } from '../types/index.js';
+import { SmartThingsClientState, SmartThingsCommand, SmartThingsDeviceStatus, SmartThingsModeMap, SmartThingsRequestConfig, SmartThingsStorage } from '../types/index.js';
 
 const STORAGE_KEY = 'smartthings';
 
@@ -163,11 +163,13 @@ export class SmartThingsClient {
 
   private state: SmartThingsClientState = {
     pictureMode: null,
+    soundMode: null,
     tvChannel: null,
     tvChannelName: null,
     inputSource: null,
   };
-  private pictureModes: SmartThingsPictureMode[] = [];
+  private pictureModes: SmartThingsModeMap[] = [];
+  private soundModes: SmartThingsModeMap[] = [];
 
   private lastUpdate = 0;
   private updatePromise: Promise<SmartThingsClientState> | null = null;
@@ -229,15 +231,19 @@ export class SmartThingsClient {
         const mediaInputSource = main?.['samsungvd.mediaInputSource'] || main?.mediaInputSource;
         const pictureModeSource = main?.['custom.picturemode'];
         const pictureModes = pictureModeSource?.supportedPictureModesMap?.value;
+        const soundModeSource = main?.['custom.soundmode'];
+        const soundModes = soundModeSource?.supportedSoundModesMap?.value;
 
         this.lastUpdate = Date.now();
         this.pictureModes = Array.isArray(pictureModes) ? pictureModes : [];
+        this.soundModes = Array.isArray(soundModes) ? soundModes : [];
 
         this.state = {
           tvChannel: main?.tvChannel?.tvChannel?.value || null,
           tvChannelName: main?.tvChannel?.tvChannelName?.value || null,
           inputSource: mediaInputSource?.inputSource?.value || null,
           pictureMode: pictureModeSource?.pictureMode?.value || null,
+          soundMode: soundModeSource?.soundMode?.value || null,
         };
       } catch (error) {
         this.device.log.error(`[SmartThings] Error updating status for device ${this.device.config.name}`, error);
@@ -286,6 +292,16 @@ export class SmartThingsClient {
     return this.pictureModes.find((mode) => mode.name === this.state.pictureMode)?.id || this.state.pictureMode;
   }
 
+  public async getSoundMode(): Promise<string | null> {
+    if (!this.isAvailable) {
+      return null;
+    }
+
+    await this.getStatus();
+
+    return this.soundModes.find((mode) => mode.name === this.state.soundMode)?.id || this.state.soundMode;
+  }
+
   public async getTvChannel(): Promise<string | null> {
     if (!this.isAvailable) {
       return null;
@@ -317,6 +333,12 @@ export class SmartThingsClient {
     const pictureMode = this.pictureModes.find((mode) => mode.id === value)?.name || value;
 
     return this.command({ capability: 'custom.picturemode', command: 'setPictureMode', arguments: [pictureMode] });
+  }
+
+  public setSoundMode(value: string): Promise<void> {
+    const soundMode = this.soundModes.find((mode) => mode.id === value)?.name || value;
+
+    return this.command({ capability: 'custom.soundmode', command: 'setSoundMode', arguments: [soundMode] });
   }
 
   public setTvChannel(value: string | number): Promise<void> {

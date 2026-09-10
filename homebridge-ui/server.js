@@ -105,7 +105,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
       });
 
       const data = await response.json();
-      const tvCapabilities = ['tvChannel', 'mediaInputSource', 'samsungvd.mediaInputSource', 'custom.picturemode'];
+      const tvCapabilities = ['tvChannel', 'mediaInputSource', 'samsungvd.mediaInputSource', 'custom.picturemode', 'custom.soundmode'];
 
       return (data.items || [])
         .filter((item) => item.components?.some((component) => component.capabilities?.some((capability) => tvCapabilities.includes(capability.id))))
@@ -132,10 +132,12 @@ class PluginUiServer extends HomebridgePluginUiServer {
       const main = data.components?.main;
       const mediaInputSource = main?.['samsungvd.mediaInputSource'] || {};
       const pictureModeSource = main?.['custom.picturemode'] || {};
+      const soundModeSource = main?.['custom.soundmode'] || {};
 
       return {
         supportedInputSourcesMap: mediaInputSource.supportedInputSourcesMap?.value ?? null,
         supportedPictureModesMap: pictureModeSource.supportedPictureModesMap?.value ?? null,
+        supportedSoundModesMap: soundModeSource.supportedSoundModesMap?.value ?? null,
       };
     } catch {
       return {};

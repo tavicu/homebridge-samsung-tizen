@@ -6,7 +6,7 @@ import { useForm } from '../composables/useForm';
 import { useRouter } from '../composables/useRouter';
 import { useSmartThings } from '../composables/useSmartThings';
 import { useToast } from '../composables/useToast';
-import { DEFAULT_INPUT_SOURCES, DEFAULT_PICTURE_MODES, groupInputSources } from '../lib/device';
+import { DEFAULT_INPUT_SOURCES, DEFAULT_PICTURE_MODES, DEFAULT_SOUND_MODES, groupInputSources } from '../lib/device';
 import Callout from './Callout.vue';
 
 const props = defineProps({
@@ -26,7 +26,7 @@ const props = defineProps({
 
 const { config, updateConfig, cleanConfig } = useConfig();
 const { navigateTo, navigateBack } = useRouter();
-const { getInputSources, getPictureModes } = useSmartThings();
+const { getInputSources, getPictureModes, getSoundModes } = useSmartThings();
 const toast = useToast();
 const { formEl, validated, checkValidity, createForm, createId, isDirty, markPristine } = useForm();
 
@@ -50,6 +50,7 @@ const isEdit = computed(() => props.action === 'edit');
 const device = computed(() => (props.deviceIndex === undefined ? undefined : config.value.devices?.[props.deviceIndex]));
 const deviceId = computed(() => device.value?.deviceId || device.value?.device_id);
 const pictureModes = ref(DEFAULT_PICTURE_MODES);
+const soundModes = ref(DEFAULT_SOUND_MODES);
 const inputSources = ref({ available: [], other: DEFAULT_INPUT_SOURCES });
 
 const form = createForm({
@@ -62,6 +63,7 @@ const form = createForm({
   input: '',
   channel: '',
   picture_mode: '',
+  sound_mode: '',
   commands: [createCommand()],
 });
 
@@ -75,6 +77,7 @@ function hasAnyAction() {
     form.input.trim() !== '' ||
     form.channel !== '' ||
     form.picture_mode.trim() !== '' ||
+    form.sound_mode.trim() !== '' ||
     form.commands.some((command) => command.value.trim() !== '')
   );
 }
@@ -89,6 +92,7 @@ function fillForm(switchItem = {}) {
   form.input = switchItem.input || '';
   form.channel = switchItem.channel !== undefined && switchItem.channel !== null ? String(switchItem.channel) : '';
   form.picture_mode = switchItem.picture_mode || '';
+  form.sound_mode = switchItem.sound_mode || '';
   form.commands = switchItem.command !== undefined ? toCommands(switchItem.command) : [createCommand()];
   markPristine();
 }
@@ -101,6 +105,14 @@ function getCurrentSwitches() {
   return config.value.switches || [];
 }
 
+function withCurrentMode(modes, currentMode) {
+  if (currentMode && !modes.some((mode) => mode.id === currentMode)) {
+    return [...modes, { id: currentMode, name: currentMode }];
+  }
+
+  return modes;
+}
+
 async function loadPictureModes() {
   let modes = DEFAULT_PICTURE_MODES;
   const fetched = await getPictureModes(deviceId.value);
@@ -109,13 +121,18 @@ async function loadPictureModes() {
     modes = fetched;
   }
 
-  const currentMode = form.picture_mode;
+  pictureModes.value = withCurrentMode(modes, form.picture_mode);
+}
 
-  if (currentMode && !modes.some((mode) => mode.id === currentMode)) {
-    modes = [...modes, { id: currentMode, name: currentMode }];
+async function loadSoundModes() {
+  let modes = DEFAULT_SOUND_MODES;
+  const fetched = await getSoundModes(deviceId.value);
+
+  if (fetched.length) {
+    modes = fetched;
   }
 
-  pictureModes.value = modes;
+  soundModes.value = withCurrentMode(modes, form.sound_mode);
 }
 
 async function loadInputSources() {
@@ -143,6 +160,7 @@ function init() {
   }
 
   loadPictureModes();
+  loadSoundModes();
   loadInputSources();
 }
 
@@ -159,6 +177,7 @@ function buildSwitchData() {
     input: form.input,
     channel: form.channel !== '' ? Number(form.channel) : undefined,
     picture_mode: form.picture_mode,
+    sound_mode: form.sound_mode,
     command: commands.length > 0 ? commands : undefined,
   });
 }
@@ -349,7 +368,7 @@ watch(
 
       <Callout class="callout-sm mb-2" state="warning">These actions require a SmartThings integration.</Callout>
 
-      <div class="row">
+      <div class="row mb-3">
         <div class="col-md-6">
           <label for="input" class="form-label">Input Source</label>
           <select id="input" v-model="form.input" class="form-select">
@@ -373,6 +392,16 @@ watch(
           <select id="picture_mode" v-model="form.picture_mode" class="form-select">
             <option value="">None</option>
             <option v-for="mode in pictureModes" :key="mode.id" :value="mode.id">{{ mode.name }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <label for="sound_mode" class="form-label">Sound Mode</label>
+          <select id="sound_mode" v-model="form.sound_mode" class="form-select">
+            <option value="">None</option>
+            <option v-for="mode in soundModes" :key="mode.id" :value="mode.id">{{ mode.name }}</option>
           </select>
         </div>
       </div>

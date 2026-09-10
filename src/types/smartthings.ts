@@ -24,7 +24,7 @@ export type SmartThingsAttribute<T = string | null> = {
   unit?: string;
 };
 
-export type SmartThingsPictureMode = {
+export type SmartThingsModeMap = {
   id: string;
   name: string;
 };
@@ -44,7 +44,11 @@ export type SmartThingsDeviceStatus = {
       };
       'custom.picturemode'?: {
         pictureMode?: SmartThingsAttribute;
-        supportedPictureModesMap?: SmartThingsAttribute<SmartThingsPictureMode[]>;
+        supportedPictureModesMap?: SmartThingsAttribute<SmartThingsModeMap[]>;
+      };
+      'custom.soundmode'?: {
+        soundMode?: SmartThingsAttribute;
+        supportedSoundModesMap?: SmartThingsAttribute<SmartThingsModeMap[]>;
       };
     };
   };
@@ -55,4 +59,5 @@ export type SmartThingsClientState = {
   tvChannelName: string | null;
   inputSource: string | null;
   pictureMode: string | null;
+  soundMode: string | null;
 };

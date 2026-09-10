@@ -37,6 +37,7 @@ export type SwitchConfig = {
   input?: string;
   channel?: number;
   picture_mode?: string;
+  sound_mode?: string;
   command?: string | string[];
 };
 

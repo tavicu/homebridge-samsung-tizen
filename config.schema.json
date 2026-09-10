@@ -55,6 +55,7 @@
             "minimum": 1
           },
           "picture_mode": { "type": "string" },
+          "sound_mode": { "type": "string" },
           "command": { "type": "string" }
         }
       },
@@ -309,7 +310,7 @@
       "items": [
         {
           "type": "help",
-          "helpvalue": "<p class='help-block'>These switches are created for every TV, unless a device has its own list. Input source, picture mode and channel need SmartThings, which is only available in the new configuration interface.</p>"
+          "helpvalue": "<p class='help-block'>These switches are created for every TV, unless a device has its own list. Input source, picture mode, sound mode and channel need SmartThings, which is only available in the new configuration interface.</p>"
         },
         {
           "key": "switches",
@@ -389,6 +390,11 @@
                       "key": "switches[].picture_mode",
                       "title": "Picture Mode",
                       "placeholder": "modeMovie"
+                    },
+                    {
+                      "key": "switches[].sound_mode",
+                      "title": "Sound Mode",
+                      "placeholder": "modeStandard"
                     }
                   ]
                 },

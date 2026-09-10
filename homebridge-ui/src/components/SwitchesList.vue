@@ -32,7 +32,7 @@ const switches = computed(() => {
   return config.value?.switches || [];
 });
 
-const VALID_KEYS = ['power', 'sleep', 'mute', 'volume', 'app', 'input', 'channel', 'picture_mode', 'command'];
+const VALID_KEYS = ['power', 'sleep', 'mute', 'volume', 'app', 'input', 'channel', 'picture_mode', 'sound_mode', 'command'];
 
 const switchEntries = (switchItem) => Object.entries(switchItem).filter(([key]) => VALID_KEYS.includes(key));
 

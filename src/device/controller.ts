@@ -83,6 +83,15 @@ export class DeviceController {
     return this.smartthings.setPictureMode(value);
   }
 
+  public getSoundMode(): Promise<string | null> {
+    return this.smartthings.getSoundMode();
+  }
+
+  public async setSoundMode(value: string): Promise<void> {
+    await this.waitPowering();
+    return this.smartthings.setSoundMode(value);
+  }
+
   public getSleep(): boolean {
     return this.sleepTimeout !== null;
   }

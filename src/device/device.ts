@@ -164,6 +164,14 @@ export class Device extends EventEmitter<DeviceEvents> {
     return this.controller.setPictureMode(value);
   }
 
+  public getSoundMode(): Promise<string | null> {
+    return this.controller.getSoundMode();
+  }
+
+  public setSoundMode(value: string): Promise<void> {
+    return this.controller.setSoundMode(value);
+  }
+
   public setSleep(minutes: number, onComplete?: () => Promise<void> | void): Promise<void> {
     return this.controller.setSleep(minutes, onComplete);
   }
