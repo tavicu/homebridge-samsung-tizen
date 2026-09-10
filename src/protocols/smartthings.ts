@@ -2,7 +2,7 @@ import axios from 'axios';
 import { Device } from '../device/device.js';
 import { SmartThingsNotAvailable } from '../errors.js';
 import { SamsungPlatform } from '../platform.js';
-import { SmartThingsClientState, SmartThingsDeviceStatus, SmartThingsPictureMode, SmartThingsRequestConfig, SmartThingsStorage } from '../types/index.js';
+import { SmartThingsClientState, SmartThingsCommand, SmartThingsDeviceStatus, SmartThingsPictureMode, SmartThingsRequestConfig, SmartThingsStorage } from '../types/index.js';
 
 const STORAGE_KEY = 'smartthings';
 
@@ -157,7 +157,6 @@ export class SmartThingsManager {
 
 export class SmartThingsClient {
   private deviceId: string | undefined;
-  private apiBaseUrl: string;
   private apiStatusUrl: string;
   private apiCommandUrl: string;
   private readonly manager: SmartThingsManager;
@@ -180,9 +179,10 @@ export class SmartThingsClient {
     this.manager = platform.smartthingsManager;
 
     this.deviceId = this.device.config.deviceId || this.device.config.device_id;
-    this.apiBaseUrl = `https://api.smartthings.com/v1/devices/${this.deviceId}`;
-    this.apiStatusUrl = `${this.apiBaseUrl}/status`;
-    this.apiCommandUrl = `${this.apiBaseUrl}/commands`;
+
+    const apiBaseUrl = `https://api.smartthings.com/v1/devices/${this.deviceId}`;
+    this.apiStatusUrl = `${apiBaseUrl}/status`;
+    this.apiCommandUrl = `${apiBaseUrl}/commands`;
   }
 
   public get isAvailable(): boolean {
@@ -197,11 +197,15 @@ export class SmartThingsClient {
     return this.manager.send<T>(config);
   }
 
-  private refresh(): Promise<void> {
+  private command({ component = 'main', ...rest }: SmartThingsCommand): Promise<void> {
     return this.send({
       endpoint: this.apiCommandUrl,
-      commands: { component: 'main', capability: 'refresh', command: 'refresh' },
+      commands: { component, ...rest },
     });
+  }
+
+  private refresh(): Promise<void> {
+    return this.command({ capability: 'refresh', command: 'refresh' });
   }
 
   public async getStatus(): Promise<SmartThingsClientState> {
@@ -209,9 +213,7 @@ export class SmartThingsClient {
       return this.state;
     }
 
-    const now = Date.now();
-
-    if (now - this.lastUpdate < 2500) {
+    if (Date.now() - this.lastUpdate < 2500) {
       return this.state;
     }
 
@@ -228,15 +230,15 @@ export class SmartThingsClient {
         const pictureModeSource = main?.['custom.picturemode'];
         const pictureModes = pictureModeSource?.supportedPictureModesMap?.value;
 
+        this.lastUpdate = Date.now();
         this.pictureModes = Array.isArray(pictureModes) ? pictureModes : [];
+
         this.state = {
           tvChannel: main?.tvChannel?.tvChannel?.value || null,
           tvChannelName: main?.tvChannel?.tvChannelName?.value || null,
           inputSource: mediaInputSource?.inputSource?.value || null,
           pictureMode: pictureModeSource?.pictureMode?.value || null,
         };
-
-        this.lastUpdate = Date.now();
       } catch (error) {
         this.device.log.error(`[SmartThings] Error updating status for device ${this.device.config.name}`, error);
       } finally {
@@ -287,25 +289,16 @@ export class SmartThingsClient {
   public setInputSource(value: string): Promise<void> {
     const capability = ['USB-C', 'Display Port'].includes(value) ? 'samsungvd.mediaInputSource' : 'mediaInputSource';
 
-    return this.send({
-      endpoint: this.apiCommandUrl,
-      commands: { component: 'main', capability: capability, command: 'setInputSource', arguments: [value] },
-    });
+    return this.command({ capability, command: 'setInputSource', arguments: [value] });
   }
 
   public setPictureMode(value: string): Promise<void> {
     const pictureMode = this.pictureModes.find((mode) => mode.id === value)?.name || value;
 
-    return this.send({
-      endpoint: this.apiCommandUrl,
-      commands: { component: 'main', capability: 'custom.picturemode', command: 'setPictureMode', arguments: [pictureMode] },
-    });
+    return this.command({ capability: 'custom.picturemode', command: 'setPictureMode', arguments: [pictureMode] });
   }
 
   public setTvChannel(value: string | number): Promise<void> {
-    return this.send({
-      endpoint: this.apiCommandUrl,
-      commands: { component: 'main', capability: 'tvChannel', command: 'setTvChannel', arguments: [value + ''] },
-    });
+    return this.command({ capability: 'tvChannel', command: 'setTvChannel', arguments: [value + ''] });
   }
 }

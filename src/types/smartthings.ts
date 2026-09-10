@@ -6,7 +6,7 @@ export type SmartThingsStorage = {
 };
 
 export type SmartThingsCommand = {
-  component: string;
+  component?: string;
   capability: string;
   command: string;
   arguments?: (string | number | boolean | null)[];
