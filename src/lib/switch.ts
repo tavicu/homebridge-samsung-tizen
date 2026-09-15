@@ -1,8 +1,8 @@
 import type { SwitchAccessory } from '../accessories/index.js';
-import type { Device } from '../device/device.js';
+import type { Device } from '../device/index.js';
 import { TvOfflineError } from '../errors.js';
 import type { SwitchService } from '../services/index.js';
-import { SwitchOption } from '../types/types.js';
+import { SwitchOption } from '../types/index.js';
 import { sleep } from './tools.js';
 
 type SwitchOptionContext = {

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Device } from '../device/device.js';
+import { Device } from '../device/index.js';
 import { SmartThingsNotAvailable } from '../errors.js';
 import { SamsungPlatform } from '../platform.js';
 import { SmartThingsClientState, SmartThingsCommand, SmartThingsDeviceStatus, SmartThingsModeMap, SmartThingsRequestConfig, SmartThingsStorage } from '../types/index.js';

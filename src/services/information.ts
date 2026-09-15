@@ -1,5 +1,5 @@
 import { SwitchAccessory, TelevisionAccessory } from '../accessories/index.js';
-import { LinkedService } from '../types/types.js';
+import { LinkedService } from '../types/index.js';
 import { ServiceWrapper } from './wrapper.js';
 
 export class InformationService extends ServiceWrapper {

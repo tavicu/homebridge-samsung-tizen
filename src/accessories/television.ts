@@ -4,7 +4,7 @@ import { withInputIdentifiers } from '../lib/identifiers.js';
 import { SamsungPlatform } from '../platform.js';
 import { InformationService, InputService, SpeakerService, TelevisionService } from '../services/index.js';
 import { LinkedService } from '../types/index.js';
-import { SwitchAccessory } from './index.js';
+import { SwitchAccessory } from './switch.js';
 
 export type TelevisionServices = {
   main: TelevisionService;

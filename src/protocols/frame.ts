@@ -1,5 +1,5 @@
 import WsClient, { RawData } from 'ws';
-import { Device } from '../device/device.js';
+import { Device } from '../device/index.js';
 import { sleep } from '../lib/tools.js';
 import { FrameEvent } from '../types/index.js';
 

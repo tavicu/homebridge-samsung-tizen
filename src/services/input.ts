@@ -1,6 +1,6 @@
 import { Characteristic } from 'homebridge';
-import { TelevisionAccessory } from '../accessories/television.js';
-import { Device } from '../device/device.js';
+import { TelevisionAccessory } from '../accessories/index.js';
+import { Device } from '../device/index.js';
 import { SamsungPlatform } from '../platform.js';
 import { InputConfig, LinkedService } from '../types/index.js';
 

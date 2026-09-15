@@ -1,9 +1,9 @@
 import { CharacteristicValue } from 'homebridge';
-import { TelevisionAccessory } from '../accessories/television.js';
+import { TelevisionAccessory } from '../accessories/index.js';
 import { encodeDisplayOrder } from '../lib/identifiers.js';
 import { getRemoteKeysMap } from '../lib/remote.js';
 import { sleep } from '../lib/tools.js';
-import { LinkedService } from '../types/types.js';
+import { LinkedService } from '../types/index.js';
 import { InputService } from './input.js';
 import { CharacteristicRef, ServiceWrapper } from './wrapper.js';
 

@@ -1,5 +1,5 @@
 import { Characteristic, CharacteristicValue, HAPStatus, Service, type HAP } from 'homebridge';
-import type { Device } from '../device/device.js';
+import type { Device } from '../device/index.js';
 import { IgnorableError } from '../errors.js';
 import { race } from '../lib/tools.js';
 import type { SamsungPlatform } from '../platform.js';

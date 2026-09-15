@@ -2,8 +2,7 @@ import { API, APIEvent, IndependentPlatformPlugin, Logging } from 'homebridge';
 import { SwitchAccessory, TelevisionAccessory } from './accessories/index.js';
 import { Device } from './device/index.js';
 import { Storage } from './lib/storage.js';
-import { SmartThingsManager, SSDP } from './protocols/index.js';
-import { UPnPManager } from './protocols/upnp.js';
+import { SmartThingsManager, SSDP, UPnPManager } from './protocols/index.js';
 import { PLUGIN_NAME } from './settings.js';
 import { DeviceConfig, PlatformConfig } from './types/index.js';
 

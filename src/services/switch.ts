@@ -1,5 +1,5 @@
 import { CharacteristicValue } from 'homebridge';
-import { SwitchAccessory } from '../accessories/switch.js';
+import { SwitchAccessory } from '../accessories/index.js';
 import { TvOfflineError } from '../errors.js';
 import { getSwitchOptions } from '../lib/switch.js';
 import { sleep } from '../lib/tools.js';

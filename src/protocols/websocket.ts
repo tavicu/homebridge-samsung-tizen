@@ -1,5 +1,5 @@
 import WsClient, { RawData } from 'ws';
-import { Device } from '../device/device.js';
+import { Device } from '../device/index.js';
 import { retry, sleep } from '../lib/tools.js';
 
 // Heartbeat timeout, 8 seconds (6 ping + 2 for safety)

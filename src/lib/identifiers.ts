@@ -1,4 +1,4 @@
-import { InputConfig, SwitchConfig } from '../types/types.js';
+import { InputConfig, SwitchConfig } from '../types/index.js';
 import { SWITCH_OPTION_KEYS } from './switch.js';
 
 /**

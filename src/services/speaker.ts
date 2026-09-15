@@ -1,5 +1,5 @@
 import { CharacteristicValue } from 'homebridge';
-import { TelevisionAccessory } from '../accessories/television.js';
+import { TelevisionAccessory } from '../accessories/index.js';
 import { LinkedService } from '../types/index.js';
 import { ServiceWrapper } from './wrapper.js';
 

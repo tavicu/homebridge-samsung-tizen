@@ -1,5 +1,5 @@
 import { Characteristic } from 'homebridge';
-import { Device } from '../device/device.js';
+import { Device } from '../device/index.js';
 
 const DEFAULTS: Record<string, string> = {
   REWIND: 'KEY_REWIND',
