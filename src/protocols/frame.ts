@@ -1,49 +1,55 @@
 import WsClient, { RawData } from 'ws';
 import { Device } from '../device/device.js';
-import { retry, sleep } from '../lib/tools.js';
+import { sleep } from '../lib/tools.js';
+import { FrameEvent } from '../types/index.js';
 
 // Heartbeat timeout, 8 seconds (6 ping + 2 for safety)
 const HEARTBEAT_TIMEOUT = 8 * 1000;
 
-export class WebSocket {
+export class FrameSocket {
   private ws: WsClient | null = null;
   private url: string;
   private name: string;
-  private token: string | null = null;
+  private id: string | null = null;
   private heartbeatTimeout?: NodeJS.Timeout;
   private connectionPromise: Promise<void> | null = null;
 
   constructor(private readonly device: Device) {
     this.name = Buffer.from('Homebridge').toString('base64');
-    this.url = `wss://${this.device.config.ip}:8002/api/v2/channels/samsung.remote.control?name=${this.name}`;
+    this.url = `wss://${this.device.config.ip}:8002/api/v2/channels/com.samsung.art-app?name=${this.name}`;
 
-    this.startPairing()
-      .then(() => this.device.emit('paired', { token: this.token || this.device.storage.token }))
-      .catch((error) => {
-        this.device.log.error(error.message);
-        this.device.log.debug(error.stack);
-      });
-  }
+    this.device.once('paired', () => {
+      if (!this.isSupported) {
+        return;
+      }
 
-  public async click(key: string, action: 'Click' | 'Press' | 'Release' = 'Click') {
-    return this.send({
-      method: 'ms.remote.control',
-      params: {
-        Cmd: action,
-        DataOfCmd: key,
-        Option: 'false',
-        TypeOfRemote: 'SendRemoteKey',
-      },
+      this.start();
+
+      this.device.on('state:update', (prop, value) => prop === 'power' && value && this.start());
     });
   }
 
-  public async hold(key: string, duration: number) {
-    await this.click(key, 'Press');
-    await sleep(duration);
-    await this.click(key, 'Release');
+  public get isSupported(): boolean {
+    return !!this.device.storage.frameSupport;
   }
 
-  private async send(data: any): Promise<void> {
+  public start(): void {
+    if (!this.isSupported) {
+      return;
+    }
+
+    this.refreshArtMode().catch(() => {});
+  }
+
+  public setArtMode(value: boolean): Promise<void> {
+    return this.send('set_artmode_status', { value: value ? 'on' : 'off' });
+  }
+
+  public refreshArtMode(): Promise<void> {
+    return this.send('get_artmode_status');
+  }
+
+  private async send(request: string, params: Record<string, any> = {}): Promise<void> {
     await this.ensureConnected();
 
     clearTimeout(this.heartbeatTimeout);
@@ -53,7 +59,22 @@ export class WebSocket {
         return reject(new Error('Socket is not open'));
       }
 
-      this.ws.send(JSON.stringify(data), (error) => {
+      const data = JSON.stringify({
+        request,
+        id: this.id || 'noop-id',
+        ...params,
+      });
+
+      const payload = JSON.stringify({
+        method: 'ms.channel.emit',
+        params: {
+          event: 'art_app_request',
+          to: 'host',
+          data,
+        },
+      });
+
+      this.ws.send(payload, (error) => {
         if (error) {
           return reject(new Error(error.message));
         }
@@ -84,15 +105,14 @@ export class WebSocket {
   }
 
   private connect(): Promise<void> {
-    const token = this.token || this.device.storage.token || '';
-    const connectionUrl = token ? `${this.url}&token=${token}` : this.url;
+    const token = this.device.storage.token || '';
 
     return new Promise((resolve, reject) => {
       this.disconnect();
 
-      const socket = new WsClient(connectionUrl, {
+      const socket = new WsClient(`${this.url}&token=${token}`, {
         servername: '',
-        handshakeTimeout: 750,
+        handshakeTimeout: 2000,
         rejectUnauthorized: false,
       } as WsClient.ClientOptions);
 
@@ -115,18 +135,17 @@ export class WebSocket {
           const response = JSON.parse(data.toString());
 
           if (response.event === 'ms.channel.connect') {
+            this.id = response.data?.id || null;
+          } else if (response.event === 'ms.channel.ready') {
             this.ws = socket;
             resolve();
-
-            if (response.data?.token) {
-              this.token = response.data.token;
-              this.device.storage.token = this.token || undefined;
-            }
+          } else if (response.event === 'd2d_service_message') {
+            this.handleMessage(response.data);
           } else if (response.event === 'ms.error') {
-            this.device.log.debug(`[WS] TV Error: ${response.data?.message}`);
+            this.device.log.debug(`[Frame] TV Error: ${response.data?.message}`);
           } else {
             if (response.event === 'ms.channel.unauthorized') {
-              this.device.log.error('[WS] TV rejected the WebSocket connection (unauthorized)');
+              this.device.log.error('[Frame] TV rejected the WebSocket connection (unauthorized)');
             }
 
             reject(new Error(`Failed to open socket (${response.event})`));
@@ -138,23 +157,20 @@ export class WebSocket {
     });
   }
 
-  private async startPairing(): Promise<void> {
-    if (this.device.storage.token) {
-      return;
-    }
+  private handleMessage(payload: string): void {
+    try {
+      const data = JSON.parse(payload);
 
-    await retry(() => this.pair(), { retries: 3, delay: 3000 });
-  }
-
-  private async pair() {
-    if (!this.device.power) {
-      throw new Error('TV is not powered on');
-    }
-
-    this.disconnect();
-
-    await sleep(1000);
-    await this.connect();
+      if (data.event === 'get_artmode_status') {
+        this.device.emit('frame:artmode', data.value === 'on');
+      } else if (data.event === 'art_mode_changed') {
+        this.device.emit('frame:artmode', data.status === 'on');
+      } else if (data.event === 'go_to_standby') {
+        this.device.emit('frame:power', FrameEvent.STANDBY);
+      } else if (data.event === 'wakeup') {
+        this.device.emit('frame:power', FrameEvent.WAKEUP);
+      }
+    } catch {}
   }
 
   private forgetSocket(socket: WsClient) {
@@ -164,12 +180,14 @@ export class WebSocket {
 
     clearTimeout(this.heartbeatTimeout);
     this.ws = null;
+    this.id = null;
   }
 
   private disconnect() {
     clearTimeout(this.heartbeatTimeout);
     this.ws?.terminate();
     this.ws = null;
+    this.id = null;
   }
 
   private startHeartbeat() {

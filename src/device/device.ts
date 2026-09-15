@@ -5,6 +5,7 @@ import { SwitchAccessory, TelevisionAccessory } from '../accessories/index.js';
 import { Cache } from '../lib/cache.js';
 import { withSwitchIdentifiers } from '../lib/identifiers.js';
 import { createDeviceLogger } from '../lib/logger.js';
+import { debounce } from '../lib/tools.js';
 import { SamsungPlatform } from '../platform.js';
 import { DeviceConfig, DeviceEvents, DeviceOptions, DeviceState, DeviceStorage, TizenApplication } from '../types/index.js';
 import { DeviceController } from './controller.js';
@@ -19,12 +20,14 @@ export class Device extends EventEmitter<DeviceEvents> {
 
   public UUID: string;
   public config: DeviceConfig;
+  public mainAccessory: TelevisionAccessory;
   public accessories: Array<TelevisionAccessory | SwitchAccessory>;
 
   private state: DeviceState = {
     power: false,
     mute: false,
     volume: 10,
+    artmode: false,
   };
 
   constructor(config: DeviceConfig, platform: SamsungPlatform) {
@@ -78,7 +81,8 @@ export class Device extends EventEmitter<DeviceEvents> {
       this.log.warn(`The TV ${this.config.name} is not supported by this plugin!`);
     }
 
-    this.accessories = [new TelevisionAccessory(this, platform)];
+    this.mainAccessory = new TelevisionAccessory(this, platform);
+    this.accessories = [this.mainAccessory];
 
     // Switches
     withSwitchIdentifiers(this.config.switches).forEach((switchConfig) => {
@@ -95,17 +99,19 @@ export class Device extends EventEmitter<DeviceEvents> {
       this.state.mute = mute ?? this.state.mute;
     });
 
+    this.on('frame:artmode', (value) => {
+      this.state.artmode = value;
+    });
+
     this.on('state:update', (prop) => {
       if (prop === 'power') {
         this.controller.clearSleep();
       }
 
-      this.accessories.forEach((accessory) => {
-        Object.values(accessory.services).forEach((wrapper) => void wrapper.updateValue());
-      });
+      this.syncAccessories();
     });
 
-    this.on('paired', ({ token }) => {
+    this.once('paired', ({ token }) => {
       this.log.debug(`Device paired with success (token: ${token})`);
       this.poller.sync();
     });
@@ -127,6 +133,10 @@ export class Device extends EventEmitter<DeviceEvents> {
     return this.state.volume;
   }
 
+  public get artmode(): boolean {
+    return this.state.artmode;
+  }
+
   public get sleep(): boolean {
     return this.power && this.controller.getSleep();
   }
@@ -146,6 +156,10 @@ export class Device extends EventEmitter<DeviceEvents> {
 
   public setVolume(value: number): Promise<void> {
     return this.controller.setVolume(value);
+  }
+
+  public setArtMode(value: boolean): Promise<void> {
+    return this.controller.setArtMode(value);
   }
 
   public getInputSource(): Promise<string | null> {
@@ -200,10 +214,20 @@ export class Device extends EventEmitter<DeviceEvents> {
     return !!(key && this.config.options?.includes(key));
   }
 
+  public get isFrame(): boolean {
+    return !!this.storage.frameSupport;
+  }
+
   public destroy(): void {
     this.poller.destroy();
     this.controller.destroy();
   }
+
+  private syncAccessories = debounce(() => {
+    this.accessories.forEach((accessory) => {
+      Object.values(accessory.services || {}).forEach((wrapper) => void wrapper.updateValue());
+    });
+  }, 200);
 
   public static isDisabled(config: DeviceConfig): boolean {
     return Array.isArray(config?.options) && config.options.includes('Device.Disable');

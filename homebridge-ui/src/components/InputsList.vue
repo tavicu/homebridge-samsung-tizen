@@ -33,7 +33,13 @@ const inputs = computed(() => {
   return config.value?.inputs || [];
 });
 
-const formatValue = (value) => (Array.isArray(value) ? value.join(', ') : value || 'N/A');
+const formatValue = (input) => {
+  if (input.type === 'artmode') {
+    return '';
+  }
+
+  return Array.isArray(input.value) ? input.value.join(', ') : input.value || 'N/A';
+};
 </script>
 
 <template>
@@ -60,7 +66,7 @@ const formatValue = (value) => (Array.isArray(value) ? value.join(', ') : value 
         <tr v-for="(input, index) in inputs" :key="index" class="align-middle">
           <td class="text-body fw-semibold">{{ input.name }}</td>
           <td>
-            <Tooltip :text="formatValue(input.value)">
+            <Tooltip :text="formatValue(input)">
               <span class="text-abbr text-capitalize">{{ input.type }}</span>
             </Tooltip>
           </td>

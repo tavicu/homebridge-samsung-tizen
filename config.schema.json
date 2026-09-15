@@ -9,7 +9,7 @@
     "definitions": {
       "input": {
         "type": "object",
-        "required": ["name", "type", "value"],
+        "required": ["name", "type"],
         "properties": {
           "name": {
             "type": "string",
@@ -18,12 +18,20 @@
           "type": {
             "type": "string",
             "required": true,
-            "enum": ["input", "app", "command"]
+            "enum": ["input", "app", "command", "artmode"]
           },
           "value": {
-            "type": "string",
-            "required": true
+            "type": ["string", "array"]
           }
+        },
+        "if": {
+          "properties": {
+            "type": { "enum": ["input", "app", "command"] }
+          },
+          "required": ["type"]
+        },
+        "then": {
+          "required": ["value"]
         }
       },
       "switch": {
@@ -250,7 +258,8 @@
                       "titleMap": {
                         "input": "Input",
                         "app": "Application",
-                        "command": "Command"
+                        "command": "Command",
+                        "artmode": "Art Mode"
                       }
                     },
                     {

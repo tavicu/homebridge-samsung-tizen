@@ -38,11 +38,11 @@ export class TelevisionService extends ServiceWrapper {
   }
 
   private async getActive(): Promise<CharacteristicValue> {
-    return this.device.power ? this.characteristic.Active.ACTIVE : this.characteristic.Active.INACTIVE;
+    return this.accessory.getMain() ? this.characteristic.Active.ACTIVE : this.characteristic.Active.INACTIVE;
   }
 
   private async setActive(value: CharacteristicValue) {
-    await this.handleSet(this.device.setPower(value as boolean), { errorMessage: `Failed to set power state to ${value}` });
+    await this.handleSet(this.accessory.setMain(!!value), { errorMessage: `Failed to set power state to ${value}` });
   }
 
   private async setRemoteKey(value: CharacteristicValue) {

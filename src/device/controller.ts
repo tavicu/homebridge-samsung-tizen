@@ -4,6 +4,7 @@ import { parseCommands } from '../lib/parsers.js';
 import { isPortReachable, sleep } from '../lib/tools.js';
 import { wol } from '../lib/wol.js';
 import { SamsungPlatform } from '../platform.js';
+import { FrameSocket } from '../protocols/frame.js';
 import { SmartThingsClient, UPnPClient, WebSocket } from '../protocols/index.js';
 import { TizenApplication, TizenDeviceInfo } from '../types/index.js';
 import { Device } from './device.js';
@@ -14,7 +15,7 @@ export class DeviceController {
   private upnp: UPnPClient;
   private smartthings: SmartThingsClient;
   private power: PowerMonitor;
-
+  private frame: FrameSocket;
   private sleepTimeout: NodeJS.Timeout | null = null;
 
   constructor(
@@ -25,6 +26,7 @@ export class DeviceController {
     this.upnp = new UPnPClient(this.device, platform);
     this.smartthings = new SmartThingsClient(this.device, platform);
     this.power = new PowerMonitor(this.device, this);
+    this.frame = new FrameSocket(this.device);
 
     // Get device info on startup
     this.getInfo().catch(() => {});
@@ -178,6 +180,15 @@ export class DeviceController {
     return response.data;
   }
 
+  public async setArtMode(value: boolean): Promise<void> {
+    if (!this.device.power && !this.power.isPowering) {
+      await this.powerOn();
+    }
+
+    await this.waitPowering();
+    return this.frame.setArtMode(value);
+  }
+
   public async sendCommand(commands: string | string[]): Promise<void> {
     await this.waitPowering();
 
@@ -227,7 +238,9 @@ export class DeviceController {
       throw new TvAlreadyOffError();
     }
 
-    await this.power.withPowerLatch(false, () => this.ws.click('KEY_POWER'));
+    const action = this.device.isFrame ? () => this.ws.hold('KEY_POWER', 4000) : () => this.ws.click('KEY_POWER');
+
+    await this.power.withPowerLatch(false, action);
   }
 
   private waitPowering(): Promise<void> {
@@ -237,5 +250,6 @@ export class DeviceController {
   public destroy(): void {
     this.ws.destroy();
     this.upnp.destroy();
+    this.frame.destroy();
   }
 }

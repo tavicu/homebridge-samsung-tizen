@@ -4,9 +4,14 @@
 
 This is a full rewrite of the plugin in TypeScript. It is backwards compatible: your existing TVs stay in Home, you don't have to add them again. A few settings changed, SmartThings has to be authorized again, and inputs or custom switches may need their Home names and scenes set up once more.
 
-**Not available yet**
+**Frame TVs**
 
-- Support for Frame TVs is not implemented in this version and it will come back in a later release.
+Support for The Frame is back: the plugin detects a Frame automatically and controls Art Mode on the local network.
+
+Samsung does not allow turning a Frame off through the local API. Right now the only way to control real power is through SmartThings. We will look into how to bring that into the plugin in a way that is easy to understand. Until then, the plugin does not expose Power or Art Mode switches, and there is no real-power option.
+
+- The TV tile follows Art Mode: ON means you are watching TV, OFF means Art Mode is active. Turning the tile off switches Art Mode on. It does not cut power. Turning the tile on switches Art Mode off. If the TV is fully off, it is turned on first.
+- You can add an Art Mode input if you want to switch Art Mode on from the TV's input list. In Home it shows as the active input while Art Mode is on. The input type is now `artmode`. If you still have `type: art` from an older config, change it to `artmode`. Until you do, that input will not work.
 
 **Requirements**
 

@@ -109,7 +109,7 @@ function buildInputData() {
     value = form.commands.map((item) => item.value.trim()).filter(Boolean);
   } else if (form.type === 'app') {
     value = form.valueApp.trim();
-  } else {
+  } else if (form.type === 'input') {
     value = form.valueInput.trim();
   }
 
@@ -240,8 +240,10 @@ watch(
           <option value="input">Input</option>
           <option value="app">Application</option>
           <option value="command">Command</option>
+          <option value="artmode">Art Mode</option>
         </select>
         <div class="invalid-feedback">Please choose an input type.</div>
+        <small v-if="form.type === 'artmode'" class="form-text text-muted">This input type is only useful on Frame TVs. It does not need a value.</small>
       </div>
 
       <div v-if="form.type === 'input'">

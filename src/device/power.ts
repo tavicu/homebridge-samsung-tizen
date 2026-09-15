@@ -1,5 +1,5 @@
-import { retry, sleep } from '../lib/tools.js';
-import { SsdpEvent, TizenDeviceInfo } from '../types/index.js';
+import { debounce, retry, sleep } from '../lib/tools.js';
+import { FrameEvent, SsdpEvent, TizenDeviceInfo } from '../types/index.js';
 import { Device } from './device.js';
 
 export type PowerProbe = {
@@ -7,12 +7,13 @@ export type PowerProbe = {
   getInfo(): Promise<TizenDeviceInfo>;
 };
 
-type Source = 'ssdp' | 'ping' | 'command';
+type Source = 'ssdp' | 'ping' | 'command' | 'frame';
 type Trigger = 'poll' | 'powering' | 'upnp';
 
 const POLL_INTERVAL = 1000 * 45;
 const SSDP_FRESH_LIMIT = 1000 * 90;
 const POWERING_TIMEOUT = 1000 * 3;
+const FRAME_PRIORITY = 1000 * 2;
 
 // A TV that went off keeps answering on port 8001 while in standby, around 17 seconds.
 // Without PowerState there is nothing to tell standby apart from on, so we wait it out.
@@ -20,20 +21,27 @@ const STANDBY_TIMEOUT = 1000 * 20;
 
 export class PowerMonitor {
   private skipPingUntil = 0;
+  private framePriorityUntil = 0;
   private latch: { value: boolean; expiresAt: number; timer: NodeJS.Timeout } | null = null;
 
   constructor(
     private readonly device: Device,
     private readonly probe: PowerProbe,
   ) {
-    setInterval(() => void this.confirmViaPing('poll'), POLL_INTERVAL);
-
     this.device.on('ssdp:update', (event, maxAgeSeconds) => {
+      if (Date.now() < this.framePriorityUntil) {
+        return;
+      }
+
       if (event === SsdpEvent.ALIVE) {
         void this.handleSsdpAlive(maxAgeSeconds);
       } else if (event === SsdpEvent.BYEBYE) {
         this.handleSsdpByebye();
       }
+    });
+
+    this.device.on('frame:power', (event) => {
+      this.handleFramePower(event);
     });
 
     this.device.on('upnp:update', () => {
@@ -43,6 +51,8 @@ export class PowerMonitor {
 
       void this.confirmViaPing('upnp');
     });
+
+    setInterval(() => void this.confirmViaPing('poll'), POLL_INTERVAL);
   }
 
   public get isPowering(): boolean {
@@ -77,6 +87,18 @@ export class PowerMonitor {
   private handleSsdpByebye(): void {
     this.skipPingUntil = this.device.storage.powerStateSupport ? 0 : Date.now() + STANDBY_TIMEOUT;
     this.reconcile(false, 'ssdp');
+  }
+
+  private handleFramePower(event: FrameEvent): void {
+    if (event === FrameEvent.STANDBY) {
+      this.framePriorityUntil = Date.now() + FRAME_PRIORITY;
+      this.skipPingUntil = Date.now() + (this.device.storage.powerStateSupport ? FRAME_PRIORITY : STANDBY_TIMEOUT);
+      this.reconcile(false, 'frame');
+    } else if (event === FrameEvent.WAKEUP) {
+      this.framePriorityUntil = Date.now() + FRAME_PRIORITY;
+      this.skipPingUntil = Date.now() + SSDP_FRESH_LIMIT;
+      this.reconcile(true, 'frame');
+    }
   }
 
   private async confirmViaPing(trigger: Trigger): Promise<void> {
@@ -146,9 +168,9 @@ export class PowerMonitor {
     this.applyPower(revertTo, 'command');
   }
 
-  private applyPower(value: boolean, _source: Source): void {
+  private applyPower = debounce((value: boolean, _source: Source) => {
     this.device.power = value;
-  }
+  }, 500);
 
   private clearLatch(): void {
     if (this.latch) {

@@ -38,13 +38,19 @@ export class SwitchAccessory {
     };
 
     this.getServices().forEach((service) => {
-      if (!this.platformAccessory.services.includes(service)) {
-        this.platformAccessory.addService(service);
+      if (this.platformAccessory.services.includes(service)) {
+        return;
       }
+
+      this.platformAccessory.addService(service);
     });
   }
 
   private getServices(): LinkedService[] {
     return Object.values(this.services).map((wrapper) => wrapper.service);
+  }
+
+  public getAttachedServices(): LinkedService[] {
+    return [this.services.main.service];
   }
 }

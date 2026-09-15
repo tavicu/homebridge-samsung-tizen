@@ -48,20 +48,17 @@ export class SamsungPlatform implements IndependentPlatformPlugin {
       }
 
       try {
-        let mainAccessory: TelevisionAccessory;
         const device = new Device(deviceConfig, this);
 
         this.devices.push(device);
 
         device.accessories.forEach((accessory: TelevisionAccessory | SwitchAccessory) => {
-          if (accessory instanceof TelevisionAccessory) {
-            mainAccessory = accessory;
-          } else if (mainAccessory) {
-            mainAccessory.addAccessory(accessory);
+          if (accessory instanceof SwitchAccessory) {
+            device.mainAccessory.addAccessory(accessory);
           }
         });
 
-        this.api.publishExternalAccessories(PLUGIN_NAME, [mainAccessory!.platformAccessory]);
+        this.api.publishExternalAccessories(PLUGIN_NAME, [device.mainAccessory.platformAccessory]);
       } catch (error) {
         this.log.error(error.message);
         this.log.debug(error.stack);

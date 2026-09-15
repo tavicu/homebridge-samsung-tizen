@@ -7,15 +7,25 @@ export type DeviceState = {
   power: boolean;
   mute: boolean;
   volume: number;
+  artmode: boolean;
 };
 
 export type DevicePairedEvent = {
   token?: string;
 };
 
+export const FrameEvent = {
+  STANDBY: 'standby',
+  WAKEUP: 'wakeup',
+} as const;
+
+export type FrameEvent = (typeof FrameEvent)[keyof typeof FrameEvent];
+
 export type DeviceEvents = {
   'ssdp:update': [event: SsdpEvent, maxAgeSeconds?: number];
   'upnp:update': [data: UPnPData];
+  'frame:artmode': [value: boolean];
+  'frame:power': [event: FrameEvent];
   'state:update': [prop: keyof DeviceState, value: DeviceState[keyof DeviceState]];
   paired: [data: DevicePairedEvent];
 };

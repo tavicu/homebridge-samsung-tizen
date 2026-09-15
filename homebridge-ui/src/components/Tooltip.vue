@@ -2,15 +2,16 @@
 defineProps({
   text: {
     type: String,
-    required: true,
+    default: '',
   },
 });
 </script>
 
 <template>
-  <span class="tooltip-wrapper" :data-tooltip="text">
+  <span v-if="text" class="tooltip-wrapper" :data-tooltip="text">
     <slot />
   </span>
+  <slot v-else />
 </template>
 
 <style scoped>

@@ -60,13 +60,29 @@ export class TelevisionAccessory {
     return [...Object.values(this.services).map((wrapper) => wrapper.service), ...this.inputs.map((input) => input.service)];
   }
 
-  public addAccessory(accessory: SwitchAccessory) {
-    const service = accessory.services.main.service;
-
-    if (service.subtype && this.platformAccessory.getServiceById(this.platform.api.hap.Service.Switch, service.subtype)) {
-      return;
+  public getMain(): boolean {
+    if (this.device.isFrame) {
+      return this.device.power && !this.device.artmode;
     }
 
-    this.platformAccessory.addService(service);
+    return this.device.power;
+  }
+
+  public setMain(value: boolean): Promise<void> {
+    if (this.device.isFrame) {
+      return this.device.setArtMode(!value);
+    }
+
+    return this.device.setPower(value);
+  }
+
+  public addAccessory(accessory: SwitchAccessory) {
+    accessory.getAttachedServices().forEach((service) => {
+      if (service.subtype && this.platformAccessory.getServiceById(this.platform.api.hap.Service.Switch, service.subtype)) {
+        return;
+      }
+
+      this.platformAccessory.addService(service);
+    });
   }
 }

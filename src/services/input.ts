@@ -7,6 +7,7 @@ import { InputConfig, LinkedService } from '../types/index.js';
 export class InputService {
   public service: LinkedService;
   public stateless: boolean;
+  public valueless: boolean;
   private device: Device;
   private platform: SamsungPlatform;
   private characteristic: typeof Characteristic;
@@ -23,7 +24,8 @@ export class InputService {
       throw new Error(`Input name is required for ${this.device.config.name}`);
     }
 
-    this.stateless = !['input', 'app'].includes(config.type);
+    this.stateless = !['input', 'app', 'artmode'].includes(config.type);
+    this.valueless = config.type === 'artmode';
 
     this.service = new this.platform.api.hap.Service.InputSource(config.name, `input_${config.identifier}`)
       .setCharacteristic(this.characteristic.Identifier, config.identifier)
@@ -65,21 +67,21 @@ export class InputService {
   public async getInput(): Promise<boolean> {
     const { type, value } = this.config;
 
-    if (!value || typeof value !== 'string') {
+    if (!this.valueless && (!value || typeof value !== 'string')) {
       return false;
     }
 
-    if (type === 'app') {
-      try {
-        const application = await this.device.getApplication(value);
+    try {
+      if (type === 'artmode') {
+        return this.device.artmode;
+      } else if (type === 'app') {
+        const application = await this.device.getApplication(value as string);
         return (application?.visible as boolean) ?? false;
-      } catch {}
-    } else if (type === 'input') {
-      try {
+      } else if (type === 'input') {
         const inputSource = await this.device.getInputSource();
         return inputSource === value;
-      } catch {}
-    }
+      }
+    } catch {}
 
     return false;
   }
@@ -87,11 +89,15 @@ export class InputService {
   public async setInput() {
     const { value, type } = this.config;
 
-    if (!value) {
+    if (!this.valueless && !value) {
       throw new Error(`No value is set for input "${this.config.name}" in config.`);
     }
 
     switch (type) {
+      case 'artmode':
+        await this.device.setArtMode(true);
+        break;
+
       case 'app':
         await this.device.startApplication(value as string);
         break;
@@ -101,7 +107,7 @@ export class InputService {
         break;
 
       case 'command':
-        await this.device.sendCommand(value);
+        await this.device.sendCommand(value as string | string[]);
         break;
     }
   }
