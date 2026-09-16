@@ -114,6 +114,8 @@ export class WebSocket {
         try {
           const response = JSON.parse(data.toString());
 
+          this.device.log.debug(`[WebSocket] response: ${JSON.stringify(response)}`);
+
           if (response.event === 'ms.channel.connect') {
             this.ws = socket;
             resolve();

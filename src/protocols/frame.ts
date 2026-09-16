@@ -1,10 +1,10 @@
 import WsClient, { RawData } from 'ws';
 import { Device } from '../device/index.js';
-import { sleep } from '../lib/tools.js';
+import { sleep, throttle } from '../lib/tools.js';
 import { FrameEvent } from '../types/index.js';
 
-// Heartbeat timeout, 8 seconds (6 ping + 2 for safety)
-const HEARTBEAT_TIMEOUT = 8 * 1000;
+const HEARTBEAT_TIMEOUT = 8 * 1000; // 6 ping + 2 for safety
+const CONNECTION_TIMEOUT = 30 * 1000;
 
 export class FrameSocket {
   private ws: WsClient | null = null;
@@ -25,6 +25,7 @@ export class FrameSocket {
 
       this.start();
 
+      this.device.on('main:get', () => this.refreshArtMode());
       this.device.on('state:update', (prop, value) => prop === 'power' && value && this.start());
     });
   }
@@ -38,18 +39,22 @@ export class FrameSocket {
       return;
     }
 
-    this.refreshArtMode().catch(() => {});
+    this.ensureConnected().catch(() => {});
   }
 
   public setArtMode(value: boolean): Promise<void> {
     return this.send('set_artmode_status', { value: value ? 'on' : 'off' });
   }
 
-  public refreshArtMode(): Promise<void> {
-    return this.send('get_artmode_status');
-  }
+  private refreshArtMode = throttle(() => {
+    this.send('get_artmode_status').catch(() => {});
+  }, 250);
 
   private async send(request: string, params: Record<string, any> = {}): Promise<void> {
+    if (!this.isSupported) {
+      throw new Error('Frame is not supported for this device');
+    }
+
     await this.ensureConnected();
 
     clearTimeout(this.heartbeatTimeout);
@@ -74,13 +79,7 @@ export class FrameSocket {
         },
       });
 
-      this.ws.send(payload, (error) => {
-        if (error) {
-          return reject(new Error(error.message));
-        }
-
-        resolve();
-      });
+      this.ws.send(payload, () => resolve());
     });
   }
 
@@ -105,50 +104,69 @@ export class FrameSocket {
   }
 
   private connect(): Promise<void> {
-    const token = this.device.storage.token || '';
+    this.disconnect();
+
+    const socket = new WsClient(`${this.url}&token=${this.device.storage.token || ''}`, {
+      servername: '',
+      handshakeTimeout: 1000,
+      rejectUnauthorized: false,
+    } as WsClient.ClientOptions);
 
     return new Promise((resolve, reject) => {
-      this.disconnect();
+      let settled = false;
+      let timer: NodeJS.Timeout | undefined = undefined;
 
-      const socket = new WsClient(`${this.url}&token=${token}`, {
-        servername: '',
-        handshakeTimeout: 2000,
-        rejectUnauthorized: false,
-      } as WsClient.ClientOptions);
-
-      socket.on('close', () => {
+      const fail = (error: Error) => {
         this.forgetSocket(socket);
-        reject(new Error('Socket closed during connection'));
-      });
 
-      socket.on('ping', () => {
-        this.startHeartbeat();
-      });
+        if (settled) {
+          return;
+        }
 
-      socket.on('error', (error) => {
-        this.forgetSocket(socket);
+        settled = true;
+        clearTimeout(timer);
+        socket.terminate();
         reject(error);
-      });
+      };
+
+      const succeed = () => {
+        if (settled) {
+          return;
+        }
+
+        settled = true;
+        clearTimeout(timer);
+        this.ws = socket;
+        resolve();
+      };
+
+      timer = setTimeout(() => {
+        fail(new Error('Timeout: TV accepted socket but never sent ready event'));
+      }, CONNECTION_TIMEOUT);
+
+      socket.on('close', () => fail(new Error('Socket closed during connection')));
+      socket.on('error', fail);
+      socket.on('ping', () => this.startHeartbeat());
 
       socket.on('message', (data: RawData) => {
+        this.startHeartbeat();
+
         try {
           const response = JSON.parse(data.toString());
 
-          if (response.event === 'ms.channel.connect') {
-            this.id = response.data?.id || null;
-          } else if (response.event === 'ms.channel.ready') {
-            this.ws = socket;
-            resolve();
+          this.device.log.debug(`[Frame] response: ${JSON.stringify(response)}`);
+
+          if (response.event === 'ms.channel.connect' || response.event === 'ms.channel.ready') {
+            this.id = response.data?.id || this.id || null;
+            succeed();
+            this.refreshArtMode();
           } else if (response.event === 'd2d_service_message') {
             this.handleMessage(response.data);
           } else if (response.event === 'ms.error') {
             this.device.log.debug(`[Frame] TV Error: ${response.data?.message}`);
-          } else {
-            if (response.event === 'ms.channel.unauthorized') {
-              this.device.log.error('[Frame] TV rejected the WebSocket connection (unauthorized)');
-            }
-
-            reject(new Error(`Failed to open socket (${response.event})`));
+          } else if (response.event === 'ms.channel.unauthorized') {
+            this.device.log.error('[Frame] TV rejected the WebSocket connection (unauthorized)');
+            fail(new Error(`Failed to open socket (${response.event})`));
           }
         } catch (e) {
           // Ignore JSON parsing errors for irrelevant messages

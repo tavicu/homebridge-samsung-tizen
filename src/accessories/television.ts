@@ -61,6 +61,8 @@ export class TelevisionAccessory {
   }
 
   public getMain(): boolean {
+    this.device.emit('main:get');
+
     if (this.device.isFrame) {
       return this.device.power && !this.device.artmode;
     }

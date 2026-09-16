@@ -52,6 +52,8 @@ Samsung does not allow turning a Frame off through the local API. Right now the 
 
 **Fixed**
 
+- On Frame TVs, Art Mode is refreshed when Home asks for the TV tile, so the tile stays in sync if Art Mode was changed with the remote.
+- Opening the Frame art socket no longer hangs if the TV never sends a ready event. The plugin continues after the channel connects, and gives up after 30 seconds if nothing arrives.
 - Turning the TV on or off when it is already in that state, or while it is still switching, no longer makes Home app show "No Response". The command is ignored instead.
 - The power switch in Home app no longer jumps back to off right after you turn the TV on, while the TV is still starting.
 - A TV that is unplugged, or loses power without sending a goodbye announcement, is no longer stuck on "on" forever.

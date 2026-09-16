@@ -37,6 +37,21 @@ export const debounce = <T extends (...args: any[]) => void>(callback: T, timeou
   };
 };
 
+export const throttle = <T extends (...args: any[]) => void>(callback: T, timeout = 250) => {
+  let lastCall = 0;
+
+  return function (this: any, ...args: Parameters<T>) {
+    const now = Date.now();
+
+    if (now - lastCall < timeout) {
+      return;
+    }
+
+    lastCall = now;
+    callback.apply(this, args);
+  };
+};
+
 export const isPortReachable = async (port: number, host: string, timeout = 1000): Promise<boolean> => {
   try {
     await new Promise<void>((resolve, reject) => {
