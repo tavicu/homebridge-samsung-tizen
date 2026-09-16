@@ -5,12 +5,14 @@ import { FrameEvent } from '../types/index.js';
 
 const HEARTBEAT_TIMEOUT = 8 * 1000; // 6 ping + 2 for safety
 const CONNECTION_TIMEOUT = 30 * 1000;
+const ART_MODE_TTL = 2500;
 
 export class FrameSocket {
   private ws: WsClient | null = null;
   private url: string;
   private name: string;
   private id: string | null = null;
+  private lastArtModeUpdate = 0;
   private heartbeatTimeout?: NodeJS.Timeout;
   private connectionPromise: Promise<void> | null = null;
 
@@ -47,8 +49,12 @@ export class FrameSocket {
   }
 
   private refreshArtMode = throttle(() => {
+    if (Date.now() - this.lastArtModeUpdate < ART_MODE_TTL) {
+      return;
+    }
+
     this.send('get_artmode_status').catch(() => {});
-  }, 250);
+  }, ART_MODE_TTL);
 
   private async send(request: string, params: Record<string, any> = {}): Promise<void> {
     if (!this.isSupported) {
@@ -180,8 +186,10 @@ export class FrameSocket {
       const data = JSON.parse(payload);
 
       if (data.event === 'get_artmode_status') {
+        this.lastArtModeUpdate = Date.now();
         this.device.emit('frame:artmode', data.value === 'on');
       } else if (data.event === 'art_mode_changed') {
+        this.lastArtModeUpdate = Date.now();
         this.device.emit('frame:artmode', data.status === 'on');
       } else if (data.event === 'go_to_standby') {
         this.device.emit('frame:power', FrameEvent.STANDBY);
