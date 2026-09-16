@@ -141,7 +141,7 @@ export class WebSocket {
           } else if (response.event === 'ms.error') {
             this.device.log.debug(`[WS] TV Error: ${response.data?.message}`);
           } else if (response.event === 'ed.installedApp.get') {
-            this.device.storage.apps = parseInstalledApps(response.data?.data);
+            this.device.emit('apps:update', parseInstalledApps(response.data?.data));
           } else {
             if (response.event === 'ms.channel.unauthorized') {
               this.device.log.error('[WS] TV rejected the WebSocket connection (unauthorized)');

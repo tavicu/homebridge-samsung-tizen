@@ -6,15 +6,21 @@ import { retry } from './tools.js';
 
 export class Storage {
   private filePath: string;
+  private appsPath: string;
   private accessories: Record<string, any> = {};
+  private apps: Record<string, unknown[]> = {};
   private saveTimeout: NodeJS.Timeout | null = null;
+  private appsSaveTimeout: NodeJS.Timeout | null = null;
   private lastKnownMtime: number = 0;
 
   constructor(
     api: API,
     private log: Logging,
   ) {
-    this.filePath = path.join(api.user.cachedAccessoryPath(), 'samsung-tizen.json');
+    const cachePath = api.user.cachedAccessoryPath();
+
+    this.filePath = path.join(cachePath, 'samsung-tizen.json');
+    this.appsPath = path.join(cachePath, 'samsung-tizen-apps.json');
   }
 
   async initialize(): Promise<void> {
@@ -31,9 +37,11 @@ export class Storage {
         },
         { retries: 1, delay: 500 },
       );
-    } catch {
-      this.accessories = {};
-    }
+    } catch {}
+
+    try {
+      this.apps = JSON.parse(await fs.readFile(this.appsPath, 'utf-8'));
+    } catch {}
   }
 
   /**
@@ -122,6 +130,24 @@ export class Storage {
       );
     } catch (error) {
       this.log.error('[Storage] Could not save cache file:', error);
+    }
+  }
+
+  saveApps(mac: string, apps: unknown[]): void {
+    this.apps[mac.trim().toLowerCase()] = apps;
+
+    if (this.appsSaveTimeout) {
+      clearTimeout(this.appsSaveTimeout);
+    }
+
+    this.appsSaveTimeout = setTimeout(() => this.writeApps(), 100);
+  }
+
+  private async writeApps(): Promise<void> {
+    try {
+      await retry(() => fs.writeFile(this.appsPath, JSON.stringify(this.apps), 'utf-8'), { retries: 1, delay: 100 });
+    } catch (error) {
+      this.log.error('[Storage] Could not save apps file:', error);
     }
   }
 }

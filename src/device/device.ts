@@ -115,6 +115,10 @@ export class Device extends EventEmitter<DeviceEvents> {
       this.log.debug(`Device paired with success (token: ${token})`);
       this.poller.sync();
     });
+
+    this.on('apps:update', (apps) => {
+      platform.storage.saveApps(this.config.mac, apps);
+    });
   }
 
   public get power(): boolean {

@@ -27,6 +27,7 @@ export type DeviceEvents = {
   'frame:artmode': [value: boolean];
   'frame:power': [event: FrameEvent];
   'state:update': [prop: keyof DeviceState, value: DeviceState[keyof DeviceState]];
+  'apps:update': [apps: StoredApplication[]];
   paired: [data: DevicePairedEvent];
 };
 
@@ -60,7 +61,6 @@ export type DeviceStorage = {
   frameSupport?: boolean;
   tokenSupport?: boolean;
   powerStateSupport?: boolean;
-  apps?: StoredApplication[];
   clear(): void;
 };
 
