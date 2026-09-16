@@ -1,5 +1,11 @@
 import { XMLParser } from 'fast-xml-parser';
-import { UPnPData } from '../types/index.js';
+import { StoredApplication, UPnPData } from '../types/index.js';
+
+type InstalledAppEntry = {
+  appId: string;
+  app_type: number;
+  name: string;
+};
 
 type ParsedCommand = string | { key: string; time: number };
 
@@ -61,4 +67,8 @@ export function parseCommands(commands: string | string[]): ParsedCommand[] {
 
     return [cmd];
   });
+}
+
+export function parseInstalledApps(apps: InstalledAppEntry[] = []): StoredApplication[] {
+  return apps.filter((app) => app.app_type === 2 && app.appId).map((app) => ({ id: app.appId, name: app.name }));
 }

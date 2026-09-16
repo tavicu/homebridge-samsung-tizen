@@ -48,6 +48,11 @@ export type TizenApplication = {
   visible?: boolean;
 };
 
+export type StoredApplication = {
+  id: string;
+  name: string;
+};
+
 export type DeviceStorage = {
   token?: string;
   model?: string;
@@ -55,6 +60,7 @@ export type DeviceStorage = {
   frameSupport?: boolean;
   tokenSupport?: boolean;
   powerStateSupport?: boolean;
+  apps?: StoredApplication[];
   clear(): void;
 };
 
