@@ -348,6 +348,10 @@ export class SmartThingsClient {
     return tvChannel;
   }
 
+  public setPower(value: boolean): Promise<void> {
+    return this.command({ capability: 'switch', command: value ? 'on' : 'off' });
+  }
+
   public setInputSource(value: string): Promise<void> {
     const capability = ['USB-C', 'Display Port'].includes(value) ? 'samsungvd.mediaInputSource' : 'mediaInputSource';
 

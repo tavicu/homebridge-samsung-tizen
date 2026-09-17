@@ -8,10 +8,11 @@ This is a full rewrite of the plugin in TypeScript. It is backwards compatible: 
 
 Support for The Frame is back: the plugin detects a Frame automatically and controls Art Mode on the local network.
 
-Samsung does not allow turning a Frame off through the local API. Right now the only way to control real power is through SmartThings. We will look into how to bring that into the plugin in a way that is easy to understand. Until then, the plugin does not expose Power or Art Mode switches, and there is no real-power option.
+Samsung does not allow turning a Frame fully off through the local API. When SmartThings is connected, turning the Frame TV off uses SmartThings instead.
 
-- The TV tile follows Art Mode: ON means you are watching TV, OFF means Art Mode is active. Turning the tile off switches Art Mode on. It does not cut power. Turning the tile on switches Art Mode off. If the TV is fully off, it is turned on first.
-- You can add an Art Mode input if you want to switch Art Mode on from the TV's input list. In Home it shows as the active input while Art Mode is on. The input type is now `artmode`. If you still have `type: art` from an older config, change it to `artmode`. Until you do, that input will not work.
+- By default the TV tile follows Art Mode: ON means you are watching TV, OFF means Art Mode is active. Turning the tile off switches Art Mode on. It does not cut power. Turning the tile on switches Art Mode off. If the TV is fully off, it is turned on first.
+- Enable `Frame.RealPowerMode` on the device if you want the tile to turn the Frame fully on and off. ON means the TV has power, including while Art Mode is on. OFF cuts power. This needs SmartThings (authorization and a Device ID). Without SmartThings the plugin falls back to a long press of the power key, which newer Frame TVs no longer honor, so a full power off may not work.
+- You can add an Art Mode input if you want to switch Art Mode on from the TV's input list. In Home it shows as the active input while Art Mode is on, and it is updated as soon as Art Mode changes on the TV. The input type is now `artmode`. If you still have `type: art` from an older config, change it to `artmode`. Until you do, that input will not work.
 
 **Requirements**
 

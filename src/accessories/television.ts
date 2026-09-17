@@ -63,7 +63,7 @@ export class TelevisionAccessory {
   public getMain(): boolean {
     this.device.emit('main:get');
 
-    if (this.device.isFrame) {
+    if (this.device.isFrame && !this.device.hasOption('Frame.RealPowerMode')) {
       return this.device.power && !this.device.artmode;
     }
 
@@ -71,7 +71,7 @@ export class TelevisionAccessory {
   }
 
   public setMain(value: boolean): Promise<void> {
-    if (this.device.isFrame) {
+    if (this.device.isFrame && !this.device.hasOption('Frame.RealPowerMode')) {
       return this.device.setArtMode(!value);
     }
 

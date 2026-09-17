@@ -238,7 +238,17 @@ export class DeviceController {
       throw new TvAlreadyOffError();
     }
 
-    const action = this.device.isFrame ? () => this.ws.hold('KEY_POWER', 4000) : () => this.ws.click('KEY_POWER');
+    const action = () => {
+      if (this.device.isFrame && this.smartthings.isAvailable) {
+        return this.smartthings.setPower(false);
+      }
+
+      if (this.device.isFrame) {
+        return this.ws.hold('KEY_POWER', 3500);
+      }
+
+      return this.ws.click('KEY_POWER');
+    };
 
     await this.power.withPowerLatch(false, action);
   }

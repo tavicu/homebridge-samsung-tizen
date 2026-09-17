@@ -156,7 +156,7 @@
               "type": "array",
               "items": {
                 "type": "string",
-                "enum": ["Device.Disable", "Switch.DeviceName.Disable"]
+                "enum": ["Device.Disable", "Switch.DeviceName.Disable", "Frame.RealPowerMode"]
               }
             },
             "inputs": {
@@ -223,7 +223,8 @@
               "title": "Options",
               "titleMap": {
                 "Device.Disable": "Disable this device without deleting it",
-                "Switch.DeviceName.Disable": "Disable prepending the device name on custom switches"
+                "Switch.DeviceName.Disable": "Disable prepending the device name on custom switches",
+                "Frame.RealPowerMode": "Use the TV tile to turn a Frame fully on and off"
               }
             }
           ]

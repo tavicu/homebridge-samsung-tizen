@@ -343,6 +343,12 @@ watch(
             <input id="option.Switch.DeviceName.Disable" v-model="form.options" class="form-check-input" type="checkbox" role="switch" value="Switch.DeviceName.Disable" />
             <label class="form-check-label" for="option.Switch.DeviceName.Disable">Disable prepending device name on custom switches</label>
           </div>
+
+          <div class="form-check form-switch">
+            <input id="option.Frame.RealPowerMode" v-model="form.options" class="form-check-input" type="checkbox" role="switch" value="Frame.RealPowerMode" />
+            <label class="form-check-label" for="option.Frame.RealPowerMode">Use the TV tile to turn a Frame fully on and off</label>
+            <small class="form-text text-muted d-block">Requires SmartThings. Without this option the tile follows Art Mode.</small>
+          </div>
         </div>
       </template>
     </div>

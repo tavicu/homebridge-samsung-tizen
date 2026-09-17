@@ -27,6 +27,8 @@ export class TelevisionService extends ServiceWrapper {
     this.service.getCharacteristic(this.characteristic.Active).onGet(this.getActive.bind(this)).onSet(this.setActive.bind(this));
     this.service.getCharacteristic(this.characteristic.ActiveIdentifier).onGet(this.getInput.bind(this)).onSet(this.setInput.bind(this));
     this.service.getCharacteristic(this.characteristic.RemoteKey).onSet(this.setRemoteKey.bind(this));
+
+    this.device.on('state:update', (prop) => prop === 'artmode' && this.runAsyncInputUpdate().catch(() => {}));
   }
 
   public addLinkedService(newLinkedService: LinkedService) {
@@ -91,8 +93,12 @@ export class TelevisionService extends ServiceWrapper {
 
       const currentIdentifier = (this.service.getCharacteristic(this.characteristic.ActiveIdentifier).value as number) || 0;
 
-      // Stop at the first match, so check cheapest-first: current input, then non-app sources, then apps (each app hits the TV).
+      // Stop at the first match, so check cheapest-first: Art Mode, then current input, then non-app sources, then apps.
       const inputPriority = (input: InputService): number => {
+        if (input.config.type === 'artmode') {
+          return -1;
+        }
+
         if (currentIdentifier && input.config.identifier === currentIdentifier) {
           return 0;
         }

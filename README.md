@@ -27,10 +27,6 @@ This release is a full rewrite in TypeScript. Existing TVs stay in Home, so you 
 
 You can see the [changelog](CHANGELOG.md) for the full list of changes.
 
-**Not in this version yet:**
-
-- Separate Power and Art Mode switches for Frame TVs, and a real-power option. Samsung does not allow turning a Frame off through the local API.
-
 ## Requirements
 
 - A Samsung TV with Tizen OS, 2017 or newer, on the **same subnet** as Homebridge (Samsung blocks WebSocket access across VLANs)

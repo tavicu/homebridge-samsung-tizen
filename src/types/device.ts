@@ -82,4 +82,4 @@ export type DeviceConfig = {
   device_id?: string;
 };
 
-export type DeviceOptions = 'Device.Disable' | 'Switch.DeviceName.Disable';
+export type DeviceOptions = 'Device.Disable' | 'Switch.DeviceName.Disable' | 'Frame.RealPowerMode';
