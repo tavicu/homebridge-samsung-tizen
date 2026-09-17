@@ -38,6 +38,7 @@ Samsung does not allow turning a Frame off through the local API. Right now the 
 
 **Improved**
 
+- SmartThings values for the active input, picture mode, sound mode and TV channel are ignored if they have not been updated in more than a day, so Home does not keep showing the last known source after the TV has been off or has lost its SmartThings connection.
 - Storage backups: When you change plugin storage from the configuration interface, `samsung-tizen.json` is backed up first to `backups/samsung-tizen/`, keeping the last 10 backups. Saves made by the plugin itself (pairing tokens, cached device info) do not create a backup.
 
 **Changed**

@@ -2,11 +2,35 @@ import axios from 'axios';
 import { Device } from '../device/index.js';
 import { SmartThingsNotAvailable } from '../errors.js';
 import { SamsungPlatform } from '../platform.js';
-import { SmartThingsClientState, SmartThingsCommand, SmartThingsDeviceStatus, SmartThingsModeMap, SmartThingsRequestConfig, SmartThingsStorage } from '../types/index.js';
+import {
+  SmartThingsAttribute,
+  SmartThingsClientState,
+  SmartThingsCommand,
+  SmartThingsDeviceStatus,
+  SmartThingsModeMap,
+  SmartThingsRequestConfig,
+  SmartThingsStorage,
+} from '../types/index.js';
 
 const STORAGE_KEY = 'smartthings';
 
 const OAUTH_TOKEN_URL = 'https://api.smartthings.com/oauth/token';
+const MAX_STATE_AGE = 24 * 60 * 60 * 1000;
+
+function parseStateValue(attr?: SmartThingsAttribute): string | null {
+  const value = attr?.value || null;
+
+  if (!value || !attr?.timestamp) {
+    return value;
+  }
+
+  const updatedAt = Date.parse(attr.timestamp);
+  if (Number.isNaN(updatedAt) || Date.now() - updatedAt > MAX_STATE_AGE) {
+    return null;
+  }
+
+  return value;
+}
 
 export class SmartThingsManager {
   private storage!: SmartThingsStorage;
@@ -240,11 +264,11 @@ export class SmartThingsClient {
         this.soundModes = Array.isArray(soundModes) ? soundModes : [];
 
         this.state = {
-          tvChannel: main?.tvChannel?.tvChannel?.value || null,
-          tvChannelName: main?.tvChannel?.tvChannelName?.value || null,
-          inputSource: mediaInputSource?.inputSource?.value || null,
-          pictureMode: pictureModeSource?.pictureMode?.value || null,
-          soundMode: soundModeSource?.soundMode?.value || null,
+          tvChannel: parseStateValue(main?.tvChannel?.tvChannel),
+          tvChannelName: parseStateValue(main?.tvChannel?.tvChannelName),
+          inputSource: parseStateValue(mediaInputSource?.inputSource),
+          pictureMode: parseStateValue(pictureModeSource?.pictureMode),
+          soundMode: parseStateValue(soundModeSource?.soundMode),
         };
       } catch (error) {
         this.device.log.error(`[SmartThings] Error updating status for device ${this.device.config.name}`, error);
