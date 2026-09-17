@@ -24,6 +24,7 @@ Samsung does not allow turning a Frame off through the local API. Right now the 
 - The plugin is now written in TypeScript and shipped as an ES module.
 - Brand new interactive configuration interface for Config UI X.
 - When SmartThings is connected, the configuration interface loads your TVs from SmartThings so you can pick the Device ID, and loads that TV's picture modes, sound modes and input sources for custom switches and inputs.
+- When the plugin has a list of installed apps for a TV, the configuration interface shows them in a dropdown when you set an application on an input or a custom switch. You can still type an ID by choosing Other.
 - Custom switches can set a sound mode through SmartThings.
 - The state of the TV is now updated in real time through SSDP announcements. If those announcements never arrive or stop without a goodbye, the plugin falls back to checking whether the TV is reachable.
 - Volume and mute are read in real time from the TV through DMR (UPnP) events, so the values in Home app follow the physical remote.
@@ -68,6 +69,8 @@ The plugin now has its own interface in Config UI X. You add, edit and delete de
 Before you add a TV, you can test the connection. If the connection is successful and the TV returns a MAC address, it is filled in automatically.
 
 SmartThings is authorized from a step by step wizard in the same screen. Once it is connected, Device ID, picture modes and sound modes are loaded from SmartThings as described above.
+
+If the plugin has already fetched the installed apps for a TV, those appear as a dropdown when you set an application on an input or a custom switch. You can still type an ID by choosing Other.
 
 **SmartThings uses a new authorization flow**
 

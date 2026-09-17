@@ -5,12 +5,14 @@ import { HomebridgePluginUiServer } from '@homebridge/plugin-ui-utils';
 
 class PluginUiServer extends HomebridgePluginUiServer {
   #storagePath;
+  #appsPath;
   #backupDir;
 
   constructor() {
     super();
 
     this.#storagePath = path.join(this.homebridgeStoragePath, 'accessories', 'samsung-tizen.json');
+    this.#appsPath = path.join(this.homebridgeStoragePath, 'accessories', 'samsung-tizen-apps.json');
     this.#backupDir = path.join(this.homebridgeStoragePath, 'backups', 'samsung-tizen');
 
     this.onRequest('/smartthings/auth-url', this.stAuthUrl.bind(this));
@@ -21,6 +23,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
     this.onRequest('/smartthings/get-devices', this.stGetDevices.bind(this));
     this.onRequest('/smartthings/get-device-status', this.stGetDeviceStatus.bind(this));
     this.onRequest('/device/get-info', this.deviceGetInfo.bind(this));
+    this.onRequest('/device/get-apps', this.deviceGetApps.bind(this));
 
     this.ready();
   }
@@ -165,6 +168,17 @@ class PluginUiServer extends HomebridgePluginUiServer {
     }
   }
 
+  async deviceGetApps({ mac } = {}) {
+    try {
+      const data = await this.#readStoredData(this.#appsPath);
+      const apps = data[mac.trim().toLowerCase()];
+
+      return Array.isArray(apps) ? apps.toSorted((a, b) => a.name.localeCompare(b.name)) : [];
+    } catch {
+      return [];
+    }
+  }
+
   #resolveRedirectUrl(redirectUrl) {
     if (typeof redirectUrl === 'string' && redirectUrl.trim()) {
       return redirectUrl.trim();
@@ -173,11 +187,11 @@ class PluginUiServer extends HomebridgePluginUiServer {
     return 'https://tavicu.github.io/homebridge-samsung-tizen/token.html';
   }
 
-  async #readStoredData() {
+  async #readStoredData(filePath = this.#storagePath) {
     let raw;
 
     try {
-      raw = await fs.readFile(this.#storagePath, 'utf-8');
+      raw = await fs.readFile(filePath, 'utf-8');
     } catch (error) {
       if (error.code === 'ENOENT') {
         return {};

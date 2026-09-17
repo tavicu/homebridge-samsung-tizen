@@ -9,11 +9,19 @@ export function useDevice() {
     return !isTesting.value && ipInput?.validity.valid === true;
   }
 
+  async function getInfo(ip) {
+    return serverRequest('/device/get-info', { ip });
+  }
+
+  async function getApps(mac) {
+    return serverRequest('/device/get-apps', { mac });
+  }
+
   async function testConnection(ip) {
     isTesting.value = true;
 
     try {
-      const result = await serverRequest('/device/get-info', { ip });
+      const result = await getInfo(ip);
 
       if (result?.reachable) {
         if (result.tokenSupport === false) {
@@ -47,5 +55,7 @@ export function useDevice() {
     canTest,
     isTesting,
     testConnection,
+    getInfo,
+    getApps,
   };
 }

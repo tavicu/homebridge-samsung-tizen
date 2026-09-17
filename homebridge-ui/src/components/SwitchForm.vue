@@ -2,6 +2,7 @@
 import { computed, ref, watch } from 'vue';
 import SwitchesIcon from '../assets/icons/switches.svg';
 import { useConfig } from '../composables/useConfig';
+import { useDevice } from '../composables/useDevice';
 import { useForm } from '../composables/useForm';
 import { useRouter } from '../composables/useRouter';
 import { useSmartThings } from '../composables/useSmartThings';
@@ -25,6 +26,7 @@ const props = defineProps({
 });
 
 const { config, updateConfig, cleanConfig } = useConfig();
+const { getApps } = useDevice();
 const { navigateTo, navigateBack } = useRouter();
 const { getInputSources, getPictureModes, getSoundModes } = useSmartThings();
 const toast = useToast();
@@ -49,6 +51,7 @@ function toCommands(value) {
 const isEdit = computed(() => props.action === 'edit');
 const device = computed(() => (props.deviceIndex === undefined ? undefined : config.value.devices?.[props.deviceIndex]));
 const deviceId = computed(() => device.value?.deviceId || device.value?.device_id);
+const deviceApps = ref([]);
 const pictureModes = ref(DEFAULT_PICTURE_MODES);
 const soundModes = ref(DEFAULT_SOUND_MODES);
 const inputSources = ref({ available: [], other: DEFAULT_INPUT_SOURCES });
@@ -65,6 +68,15 @@ const form = createForm({
   picture_mode: '',
   sound_mode: '',
   commands: [createCommand()],
+});
+
+const appSelect = computed({
+  get() {
+    return deviceApps.value.some((app) => String(app.id) === form.app) ? form.app : 'other';
+  },
+  set(value) {
+    form.app = value === 'other' ? '' : value;
+  },
 });
 
 function hasAnyAction() {
@@ -142,6 +154,10 @@ async function loadInputSources() {
   form.input = grouped.value;
 }
 
+async function loadDeviceApps() {
+  deviceApps.value = await getApps(device.value?.mac);
+}
+
 function init() {
   validated.value = false;
 
@@ -162,6 +178,7 @@ function init() {
   loadPictureModes();
   loadSoundModes();
   loadInputSources();
+  loadDeviceApps();
 }
 
 function buildSwitchData() {
@@ -211,6 +228,7 @@ function handleReset() {
   validated.value = false;
   fillForm(switchItem);
   loadInputSources();
+  loadDeviceApps();
 }
 
 async function handleSubmit() {
@@ -351,7 +369,20 @@ watch(
       <div class="row mb-3">
         <div class="col-md-6">
           <label for="app" class="form-label">Application ID</label>
-          <input id="app" v-model="form.app" type="text" class="form-control" placeholder="e.g. 111299001912" pattern="^[0-9]+$" inputmode="numeric" />
+
+          <select v-if="deviceApps.length" id="app" v-model="appSelect" class="form-select mb-2">
+            <option v-for="app in deviceApps" :key="app.id" :value="String(app.id)">{{ app.name }} ({{ app.id }})</option>
+            <option value="other">Other</option>
+          </select>
+
+          <input
+            v-if="!deviceApps.length || appSelect === 'other'"
+            :id="deviceApps.length ? undefined : 'app'"
+            v-model="form.app"
+            type="text"
+            class="form-control"
+            placeholder="e.g. 111299001912"
+          />
           <small class="form-text text-muted">
             Opens the selected application. See the
             <a href="https://tavicu.github.io/homebridge-samsung-tizen/extra/applications.html" target="_blank" rel="noopener noreferrer">application IDs list</a>.

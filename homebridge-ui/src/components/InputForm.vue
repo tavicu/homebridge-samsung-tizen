@@ -2,6 +2,7 @@
 import { computed, ref, watch } from 'vue';
 import InputsIcon from '../assets/icons/inputs.svg';
 import { useConfig } from '../composables/useConfig';
+import { useDevice } from '../composables/useDevice';
 import { useForm } from '../composables/useForm';
 import { useRouter } from '../composables/useRouter';
 import { useSmartThings } from '../composables/useSmartThings';
@@ -24,6 +25,7 @@ const props = defineProps({
 });
 
 const { config, updateConfig, cleanConfig } = useConfig();
+const { getApps } = useDevice();
 const { navigateTo, navigateBack } = useRouter();
 const { getInputSources } = useSmartThings();
 const toast = useToast();
@@ -48,6 +50,7 @@ function toCommands(value) {
 const isEdit = computed(() => props.action === 'edit');
 const device = computed(() => (props.deviceIndex === undefined ? undefined : config.value.devices?.[props.deviceIndex]));
 const deviceId = computed(() => device.value?.deviceId || device.value?.device_id);
+const deviceApps = ref([]);
 const inputSources = ref({ available: [], other: DEFAULT_INPUT_SOURCES });
 
 const form = createForm({
@@ -56,6 +59,15 @@ const form = createForm({
   valueInput: '',
   valueApp: '',
   commands: [createCommand()],
+});
+
+const appSelect = computed({
+  get() {
+    return deviceApps.value.some((app) => String(app.id) === form.valueApp) ? form.valueApp : 'other';
+  },
+  set(value) {
+    form.valueApp = value === 'other' ? '' : value;
+  },
 });
 
 function fillForm(input = {}) {
@@ -82,6 +94,10 @@ async function loadInputSources() {
   form.valueInput = grouped.value;
 }
 
+async function loadDeviceApps() {
+  deviceApps.value = await getApps(device.value?.mac);
+}
+
 function init() {
   validated.value = false;
 
@@ -100,6 +116,7 @@ function init() {
   }
 
   loadInputSources();
+  loadDeviceApps();
 }
 
 function buildInputData() {
@@ -149,6 +166,7 @@ function handleReset() {
   validated.value = false;
   fillForm(input);
   loadInputSources();
+  loadDeviceApps();
 }
 
 async function handleSubmit() {
@@ -268,7 +286,21 @@ watch(
 
       <div v-if="form.type === 'app'">
         <label for="value-app" class="form-label">Application ID</label>
-        <input id="value-app" v-model="form.valueApp" type="text" class="form-control" placeholder="e.g. 111299001912" pattern="^[0-9]+$" inputmode="numeric" required />
+
+        <select v-if="deviceApps.length" id="value-app" v-model="appSelect" class="form-select mb-2">
+          <option v-for="app in deviceApps" :key="app.id" :value="String(app.id)">{{ app.name }} ({{ app.id }})</option>
+          <option value="other">Other</option>
+        </select>
+
+        <input
+          v-if="!deviceApps.length || appSelect === 'other'"
+          :id="deviceApps.length ? undefined : 'value-app'"
+          v-model="form.valueApp"
+          type="text"
+          class="form-control"
+          placeholder="e.g. 111299001912"
+          required
+        />
         <div class="invalid-feedback">Please enter a valid application ID.</div>
         <small class="form-text text-muted">
           You can find a list of available application IDs in the
