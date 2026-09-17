@@ -160,8 +160,6 @@ export class FrameSocket {
         try {
           const response = JSON.parse(data.toString());
 
-          this.device.log.debug(`[Frame] response: ${JSON.stringify(response)}`);
-
           if (response.event === 'ms.channel.connect' || response.event === 'ms.channel.ready') {
             this.id = response.data?.id || this.id || null;
             succeed();
