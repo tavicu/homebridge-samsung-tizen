@@ -175,9 +175,7 @@ export class FrameSocket {
             this.device.log.error('[Frame] TV rejected the WebSocket connection (unauthorized)');
             fail(new Error(`Failed to open socket (${response.event})`));
           }
-        } catch (e) {
-          // Ignore JSON parsing errors for irrelevant messages
-        }
+        } catch {}
       });
     });
   }

@@ -45,9 +45,10 @@ export class Device extends EventEmitter<DeviceEvents> {
 
     this.state = new Proxy(this.state, {
       set: (target, prop, value) => {
+        // An unchanged value must not emit: state:update re-syncs every accessory.
         if (Reflect.get(target, prop) === value) {
           return true;
-        } // Do nothing if value is identical
+        }
 
         Reflect.set(target, prop, value);
         this.emit('state:update', prop as keyof DeviceState, value);
@@ -71,7 +72,7 @@ export class Device extends EventEmitter<DeviceEvents> {
     // Create UUID for device
     this.UUID = platform.api.hap.uuid.generate(this.config.mac + (this.config.uuid || ''));
 
-    // Setup dependencies for this device, order is important
+    // Storage and cache must exist before the controller, which reads both on startup.
     this.storage = platform.storage.get(this.UUID);
     this.cache = new Cache(this);
     this.controller = new DeviceController(this, platform);
@@ -84,7 +85,6 @@ export class Device extends EventEmitter<DeviceEvents> {
     this.mainAccessory = new TelevisionAccessory(this, platform);
     this.accessories = [this.mainAccessory];
 
-    // Switches
     withSwitchIdentifiers(this.config.switches).forEach((switchConfig) => {
       try {
         this.accessories.push(new SwitchAccessory(switchConfig, this, platform));

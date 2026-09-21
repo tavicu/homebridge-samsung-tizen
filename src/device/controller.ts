@@ -28,7 +28,6 @@ export class DeviceController {
     this.power = new PowerMonitor(this.device, this);
     this.frame = new FrameSocket(this.device);
 
-    // Get device info on startup
     this.getInfo().catch(() => {});
   }
 
@@ -40,7 +39,6 @@ export class DeviceController {
     const fetchInfo = async () => {
       const { data } = await axios.get<TizenDeviceInfo>(`http://${this.device.config.ip}:8001/api/v2/`, { timeout: 1500 });
 
-      // Update device storage
       if (data?.device) {
         const storage = this.device.storage;
 

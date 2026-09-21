@@ -93,16 +93,14 @@ export class SSDP {
   private onNotify(headers: Headers, address: Address) {
     const tracked = this.devices.get(address.address);
 
-    // Filter response to devices
     if (headers.NT !== 'upnp:rootdevice' || !tracked) {
       return;
     }
 
-    // Send received event
     if (headers.NTS === SsdpEvent.ALIVE) {
       tracked.emit(SsdpEvent.ALIVE, parseMaxAge(headers['CACHE-CONTROL']));
     } else if (headers.NTS === SsdpEvent.BYEBYE) {
-      // byebye has no CACHE-CONTROL;
+      // byebye has no CACHE-CONTROL
       tracked.emit(SsdpEvent.BYEBYE);
     }
   }
@@ -110,12 +108,10 @@ export class SSDP {
   private onFound(headers: Headers, address: Address) {
     const tracked = this.devices.get(address.address);
 
-    // Filter response to devices already known as on
     if (headers.ST !== 'upnp:rootdevice' || !tracked || tracked.device.power) {
       return;
     }
 
-    // Send alive event
     tracked.emit(SsdpEvent.ALIVE, parseMaxAge(headers['CACHE-CONTROL']));
   }
 

@@ -76,6 +76,7 @@ export class TelevisionService extends ServiceWrapper {
 
     await this.handleSet(targetInput.setInput(), { errorMessage: `Failed to set input to ${targetInput.config.name}` });
 
+    // A command has no lasting source. ActiveIdentifier 0 means nothing is selected.
     if (targetInput.stateless) {
       setTimeout(() => this.updateValue(this.characteristic.ActiveIdentifier, 0), 500);
     }

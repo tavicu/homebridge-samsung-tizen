@@ -3,9 +3,6 @@ import { isIPv4, isIPv6 } from 'net';
 import { networkInterfaces } from 'os';
 import { WolOptions } from '../types/index.js';
 
-/**
- * Creates a standard Wake-on-LAN Magic Packet buffer.
- */
 function createWOLPacket(mac: string): Buffer {
   const cleanMac = mac.replace(/[^a-fA-F0-9]/g, '');
 
@@ -24,9 +21,6 @@ function createWOLPacket(mac: string): Buffer {
   return magicPacket;
 }
 
-/**
- * Calculates the directed subnet broadcast address (e.g., 192.168.1.255).
- */
 function getBroadcastAddr(ip: string, netmask: string): string {
   const ipOctets = ip.split('.').map(Number);
   const maskOctets = netmask.split('.').map(Number);
@@ -39,15 +33,11 @@ function getBroadcastAddr(ip: string, netmask: string): string {
   return broadcast.join('.');
 }
 
-/**
- * Sends a Wake-on-LAN (Magic Packet) to all local subnet broadcast targets.
- */
 /* eslint-disable @typescript-eslint/no-use-before-define */
 async function sendToAll(macAddress: string, options: WolOptions = {}): Promise<void> {
   const promises: Promise<void>[] = [];
   const interfaces = networkInterfaces();
 
-  // 1. Gather all local subnet broadcast targets
   for (const name of Object.keys(interfaces)) {
     for (const netIf of interfaces[name] || []) {
       if (netIf.internal || !isIPv4(netIf.address) || !netIf.netmask) {
@@ -64,7 +54,7 @@ async function sendToAll(macAddress: string, options: WolOptions = {}): Promise<
     }
   }
 
-  // 2. Add the direct unicast IP target if provided (bypasses router broadcast filters)
+  // Unicast to the TV IP bypasses router broadcast filters.
   if (options.ip) {
     promises.push(
       wol(macAddress, {
@@ -75,10 +65,8 @@ async function sendToAll(macAddress: string, options: WolOptions = {}): Promise<
     );
   }
 
-  // 3. Wait for all transmission bursts to settle independently
   const results = await Promise.allSettled(promises);
 
-  // 4. Verify if absolutely all routes failed
   const allFailed = results.every((result) => result.status === 'rejected');
 
   if (allFailed) {
@@ -86,10 +74,6 @@ async function sendToAll(macAddress: string, options: WolOptions = {}): Promise<
   }
 }
 
-/**
- * Sends a Wake-on-LAN (Magic Packet) to the specified MAC address.
- * Discovers and fires down all network paths simultaneously without explicit socket binding.
- */
 export function wol(macAddress: string, options: WolOptions = {}): Promise<void> {
   if (!options.from) {
     return sendToAll(macAddress, options);

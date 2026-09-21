@@ -82,9 +82,6 @@ export class Storage {
     }) as unknown as T & { clear(): void };
   }
 
-  /**
-   * Debounces consecutive calls within 100ms and runs writes one at a time.
-   */
   private save(): void {
     if (this.saveTimeout) {
       clearTimeout(this.saveTimeout);
@@ -114,9 +111,6 @@ export class Storage {
     } catch {}
   }
 
-  /**
-   * Performs the actual file write with a recursive retry mechanism.
-   */
   private async write(): Promise<void> {
     try {
       await retry(

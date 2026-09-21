@@ -300,6 +300,7 @@ export class SmartThingsClient {
       return null;
     }
 
+    // A tuner with no channel is not a selectable input.
     if (!tvChannel && (inputSource === 'dtv' || inputSource === 'digitalTv')) {
       return null;
     }

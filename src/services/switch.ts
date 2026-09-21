@@ -77,6 +77,7 @@ export class SwitchService extends ServiceWrapper {
 
   private async runSwitch(value: boolean): Promise<void> {
     for (const [i, option] of this.options.entries()) {
+      // OFF is a no-op for app, input, and command: there is no matching TV action.
       if (!value && !option.offable) {
         continue;
       }
@@ -88,6 +89,7 @@ export class SwitchService extends ServiceWrapper {
       }
     }
 
+    // Nothing to read back, so the switch snaps off after the command.
     if (value && this.stateless) {
       setTimeout(() => this.updateValue(false), 500);
     }
