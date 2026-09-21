@@ -1,3 +1,4 @@
+export * from './frame.js';
 export * from './input.js';
 export * from './switch.js';
 export * from './speaker.js';

@@ -13,6 +13,7 @@ Samsung does not allow turning a Frame fully off through the local API. When Sma
 - By default the TV tile follows Art Mode: ON means you are watching TV, OFF means Art Mode is active. Turning the tile off switches Art Mode on. It does not cut power. Turning the tile on switches Art Mode off. If the TV is fully off, it is turned on first.
 - Enable `Frame.RealPowerMode` on the device if you want the tile to turn the Frame fully on and off. ON means the TV has power, including while Art Mode is on. OFF cuts power. This needs SmartThings (authorization and a Device ID). Without SmartThings the plugin falls back to a long press of the power key, which newer Frame TVs no longer honor, so a full power off may not work.
 - You can add an Art Mode input if you want to switch Art Mode on from the TV's input list. In Home it shows as the active input while Art Mode is on, and it is updated as soon as Art Mode changes on the TV. The input type is now `artmode`. If you still have `type: art` from an older config, change it to `artmode`. Until you do, that input will not work.
+- Frame TVs also get two switches on the TV accessory, same as before: Art Mode and Power. Art Mode turns Art Mode on and off. Power turns the TV fully on and off, including while Art Mode is on. Hide either one with `Frame.ArtSwitch.Disable` or `Frame.PowerSwitch.Disable`.
 
 **Requirements**
 

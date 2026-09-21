@@ -4,7 +4,6 @@ import { withInputIdentifiers } from '../lib/identifiers.js';
 import { SamsungPlatform } from '../platform.js';
 import { InformationService, InputService, SpeakerService, TelevisionService } from '../services/index.js';
 import { LinkedService } from '../types/index.js';
-import { SwitchAccessory } from './switch.js';
 
 export type TelevisionServices = {
   main: TelevisionService;
@@ -78,7 +77,7 @@ export class TelevisionAccessory {
     return this.device.setPower(value);
   }
 
-  public addAccessory(accessory: SwitchAccessory): void {
+  public addAccessory(accessory: { getAttachedServices(): LinkedService[] }): void {
     accessory.getAttachedServices().forEach((service) => {
       if (service.subtype && this.platformAccessory.getServiceById(this.platform.api.hap.Service.Switch, service.subtype)) {
         return;

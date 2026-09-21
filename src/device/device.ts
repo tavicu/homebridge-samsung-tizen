@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events';
 import { deepmerge } from 'deepmerge-ts';
 import { Logging } from 'homebridge';
-import { SwitchAccessory, TelevisionAccessory } from '../accessories/index.js';
+import { FrameAccessory, SwitchAccessory, TelevisionAccessory } from '../accessories/index.js';
 import { Cache } from '../lib/cache.js';
 import { withSwitchIdentifiers } from '../lib/identifiers.js';
 import { createDeviceLogger } from '../lib/logger.js';
@@ -21,7 +21,7 @@ export class Device extends EventEmitter<DeviceEvents> {
   public UUID: string;
   public config: DeviceConfig;
   public mainAccessory: TelevisionAccessory;
-  public accessories: Array<TelevisionAccessory | SwitchAccessory>;
+  public accessories: Array<TelevisionAccessory | SwitchAccessory | FrameAccessory>;
 
   private state: DeviceState = {
     power: false,
@@ -92,6 +92,8 @@ export class Device extends EventEmitter<DeviceEvents> {
         this.log.error(error.message);
       }
     });
+
+    this.accessories.push(new FrameAccessory(this, platform));
 
     // Events
     this.on('upnp:update', ({ volume, mute }) => {
