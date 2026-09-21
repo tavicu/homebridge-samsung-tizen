@@ -115,6 +115,7 @@ export class Device extends EventEmitter<DeviceEvents> {
 
     this.once('paired', ({ token }) => {
       this.log.debug(`Device paired with success (token: ${token})`);
+      this.log.debug(`Device storage: ${JSON.stringify(this.storage)}`);
       this.poller.sync();
     });
 
