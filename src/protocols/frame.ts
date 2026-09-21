@@ -170,7 +170,7 @@ export class FrameSocket {
           } else if (response.event === 'd2d_service_message') {
             this.handleMessage(response.data);
           } else if (response.event === 'ms.error') {
-            this.device.log.debug(`[Frame] TV Error: ${response.data?.message}`);
+            this.device.log.debug(`[Frame] Error: ${response.data?.message}`);
           } else if (response.event === 'ms.channel.unauthorized') {
             this.device.log.error('[Frame] TV rejected the WebSocket connection (unauthorized)');
             fail(new Error(`Failed to open socket (${response.event})`));

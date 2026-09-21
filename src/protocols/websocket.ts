@@ -5,6 +5,7 @@ import { retry, sleep } from '../lib/tools.js';
 
 // Heartbeat timeout, 8 seconds (6 ping + 2 for safety)
 const HEARTBEAT_TIMEOUT = 8 * 1000;
+const CONNECTION_TIMEOUT = 30 * 1000;
 
 export class WebSocket {
   private ws: WsClient | null = null;
@@ -101,51 +102,73 @@ export class WebSocket {
     const token = this.token || this.device.storage.token || '';
     const connectionUrl = token ? `${this.url}&token=${token}` : this.url;
 
+    this.disconnect();
+
+    const socket = new WsClient(connectionUrl, {
+      servername: '',
+      handshakeTimeout: 750,
+      rejectUnauthorized: false,
+    } as WsClient.ClientOptions);
+
     return new Promise((resolve, reject) => {
-      this.disconnect();
+      let settled = false;
+      let timer: NodeJS.Timeout | undefined = undefined;
 
-      const socket = new WsClient(connectionUrl, {
-        servername: '',
-        handshakeTimeout: 750,
-        rejectUnauthorized: false,
-      } as WsClient.ClientOptions);
-
-      socket.on('close', () => {
+      const fail = (error: Error) => {
         this.forgetSocket(socket);
-        reject(new Error('Socket closed during connection'));
-      });
 
-      socket.on('ping', () => {
-        this.startHeartbeat();
-      });
+        if (settled) {
+          return;
+        }
 
-      socket.on('error', (error) => {
-        this.forgetSocket(socket);
+        settled = true;
+        clearTimeout(timer);
+        socket.terminate();
         reject(error);
-      });
+      };
+
+      const succeed = () => {
+        if (settled) {
+          return;
+        }
+
+        settled = true;
+        clearTimeout(timer);
+        this.ws = socket;
+        resolve();
+      };
+
+      timer = setTimeout(() => {
+        fail(new Error('Timeout: TV accepted socket but never sent ready event'));
+      }, CONNECTION_TIMEOUT);
+
+      socket.on('close', () => fail(new Error('Socket closed during connection')));
+      socket.on('error', fail);
+      socket.on('ping', () => this.startHeartbeat());
 
       socket.on('message', (data: RawData) => {
+        this.startHeartbeat();
+
         try {
           const response = JSON.parse(data.toString());
 
           if (response.event === 'ms.channel.connect') {
-            this.ws = socket;
-            resolve();
-
             if (response.data?.token) {
               this.token = response.data.token;
               this.device.storage.token = this.token || undefined;
             }
+
+            succeed();
           } else if (response.event === 'ms.error') {
-            this.device.log.debug(`[WS] TV Error: ${response.data?.message}`);
+            this.device.log.debug(`[WS] Error: ${response.data?.message}`);
           } else if (response.event === 'ed.installedApp.get') {
             this.device.emit('apps:update', parseInstalledApps(response.data?.data));
-          } else {
+          } else if (!settled) {
             if (response.event === 'ms.channel.unauthorized') {
               this.device.log.error('[WS] TV rejected the WebSocket connection (unauthorized)');
             }
 
-            reject(new Error(`Failed to open socket (${response.event})`));
+            fail(new Error(`Failed to open socket (${response.event})`));
           }
         } catch (e) {
           // Ignore JSON parsing errors for irrelevant messages
