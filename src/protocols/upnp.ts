@@ -2,13 +2,15 @@ import * as http from 'http';
 import { isIPv4 } from 'net';
 import { networkInterfaces } from 'os';
 import { Device } from '../device/index.js';
-import { parseUPnPChange, UPnPparser } from '../lib/parsers.js';
+import { parseUPnPChange, parseXmlText, UPnPparser } from '../lib/parsers.js';
 import { SamsungPlatform } from '../platform.js';
 import { UPnPConfig } from '../types/index.js';
 
+const MAX_NOTIFY_BODY = 64 * 1024;
+
 export class UPnPManager {
   private server: http.Server | null = null;
-  private devices = new Map<string, Device>();
+  private subscriptions = new Map<string, Device>();
   private config: UPnPConfig;
   private localIp: string;
   private localPort: number = 0;
@@ -28,45 +30,72 @@ export class UPnPManager {
     });
   }
 
+  public registerSubscription(sid: string, device: Device) {
+    this.subscriptions.set(sid, device);
+  }
+
+  public unregisterSubscription(sid: string) {
+    this.subscriptions.delete(sid);
+  }
+
   public start() {
-    this.platform.devices.forEach((device) => {
-      this.devices.set(device.config.ip, device);
-    });
-
     this.server = http.createServer((req, res) => {
-      if (req.method === 'NOTIFY') {
-        const urlObj = new URL(req.url || '', `http://${this.localIp}`);
-        const deviceIp = urlObj.searchParams.get('ip');
-
-        let body = '';
-
-        req.on('data', (chunk) => {
-          body += chunk;
-        });
-
-        req.on('end', () => {
-          if (deviceIp && this.devices.has(deviceIp)) {
-            try {
-              const parsedBody = UPnPparser.parse(body);
-              const lastChange = parsedBody.propertyset?.property?.LastChange;
-
-              if (lastChange) {
-                const eventData = parseUPnPChange(lastChange);
-
-                this.devices.get(deviceIp)?.emit('upnp:update', eventData);
-              }
-            } catch (error: any) {
-              this.platform.log.debug(`[UPnP] Failed to parse NOTIFY from ${deviceIp}: ${error.message || error}`);
-            }
-          }
-
-          res.writeHead(200, { 'Content-Type': 'text/plain' });
-          res.end('OK');
-        });
-      } else {
+      if (req.method !== 'NOTIFY') {
         res.writeHead(405);
         res.end();
+        return;
       }
+
+      const sidHeader = req.headers.sid;
+      const sid = Array.isArray(sidHeader) ? sidHeader[0] : sidHeader;
+      const device = sid ? this.subscriptions.get(sid) : undefined;
+
+      if (!device) {
+        res.writeHead(412);
+        res.end();
+        req.resume();
+        return;
+      }
+
+      let body = '';
+      let received = 0;
+
+      req.on('data', (chunk) => {
+        if (res.writableEnded) {
+          return;
+        }
+
+        received += chunk.length;
+        if (received > MAX_NOTIFY_BODY) {
+          body = '';
+          res.writeHead(413);
+          res.end();
+          req.destroy();
+          return;
+        }
+
+        body += chunk;
+      });
+
+      req.on('end', () => {
+        if (res.writableEnded) {
+          return;
+        }
+
+        try {
+          const parsedBody = UPnPparser.parse(body);
+          const lastChange = parsedBody.propertyset?.property?.LastChange;
+
+          if (lastChange) {
+            device.emit('upnp:update', parseUPnPChange(lastChange));
+          }
+        } catch (error: any) {
+          this.platform.log.debug(`[UPnP] Failed to parse NOTIFY from ${device.config.ip}: ${error.message || error}`);
+        }
+
+        res.writeHead(200, { 'Content-Type': 'text/plain' });
+        res.end('OK');
+      });
     });
 
     this.server.listen(this.config.port, () => {
@@ -177,7 +206,18 @@ export class UPnPClient {
         throw new Error(`HTTP ${response.status}`);
       }
 
-      this.sid = response.headers.get('sid');
+      const nextSid = response.headers.get('sid');
+      if (!nextSid) {
+        throw new Error('SUBSCRIBE response missing SID');
+      }
+
+      if (this.sid && this.sid !== nextSid) {
+        this.manager.unregisterSubscription(this.sid);
+        this.unsubscribe();
+      }
+
+      this.sid = nextSid;
+      this.manager.registerSubscription(nextSid, this.device);
 
       this.syncCurrentState();
 
@@ -189,8 +229,7 @@ export class UPnPClient {
       this.subscriptionTimer = setTimeout(() => {
         this.subscribeWithRetry();
       }, refreshTimeoutMs);
-    } catch (err: any) {
-      this.sid = null;
+    } catch {
       this.isSubscribing = false;
       this.subscriptionTimer = setTimeout(() => this.subscribeWithRetry(), 15000);
     }
@@ -198,7 +237,7 @@ export class UPnPClient {
 
   private async sendSoapAction(action: string, args: Record<string, any>): Promise<any> {
     const argsXml = Object.entries(args)
-      .map(([k, v]) => `<${k}>${v}</${k}>`)
+      .map(([k, v]) => `<${k}>${parseXmlText(v)}</${k}>`)
       .join('');
 
     const xmlBody = `<?xml version="1.0" encoding="utf-8"?>
@@ -259,15 +298,15 @@ export class UPnPClient {
     await this.sendSoapAction('SetMute', { InstanceID: 0, Channel: 'Master', DesiredMute: mute ? 1 : 0 });
   }
 
-  public destroy(): void {
-    if (!this.sid) {
+  private unsubscribe(sid: string | null = this.sid): void {
+    if (!sid) {
       return;
     }
 
     fetch(this.eventUrl, {
       method: 'UNSUBSCRIBE',
       headers: {
-        SID: this.sid,
+        SID: sid,
       },
       signal: AbortSignal.timeout(300),
     }).catch(() => void 0);

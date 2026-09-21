@@ -72,3 +72,7 @@ export function parseCommands(commands: string | string[]): ParsedCommand[] {
 export function parseInstalledApps(apps: InstalledAppEntry[] = []): StoredApplication[] {
   return apps.filter((app) => app.app_type === 2 && app.appId).map((app) => ({ id: app.appId, name: app.name }));
 }
+
+export function parseXmlText(value: unknown): string {
+  return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+}

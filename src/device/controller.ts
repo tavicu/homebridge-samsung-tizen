@@ -259,7 +259,6 @@ export class DeviceController {
 
   public destroy(): void {
     this.ws.destroy();
-    this.upnp.destroy();
     this.frame.destroy();
   }
 }
