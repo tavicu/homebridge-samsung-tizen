@@ -81,7 +81,12 @@ export class PowerMonitor {
     const maxAge = maxAgeSeconds && Number.isFinite(maxAgeSeconds) ? maxAgeSeconds * 1000 : SSDP_FRESH_LIMIT;
 
     this.skipPingUntil = Date.now() + Math.min(maxAge, SSDP_FRESH_LIMIT);
-    this.reconcile(await this.isOn(), 'ssdp');
+
+    try {
+      this.reconcile(await this.isOn(), 'ssdp');
+    } catch (error: any) {
+      this.device.log.debug(`[Power] SSDP check failed: ${error.message || error}`);
+    }
   }
 
   private handleSsdpByebye(): void {
@@ -129,12 +134,8 @@ export class PowerMonitor {
       return true;
     }
 
-    try {
-      const { device = {} } = await this.probe.getInfo();
-      return device.PowerState === 'on';
-    } catch {
-      return true;
-    }
+    const { device = {} } = await this.probe.getInfo();
+    return device.PowerState === 'on';
   }
 
   private reconcile(candidate: boolean, source: Source): void {
@@ -160,17 +161,17 @@ export class PowerMonitor {
       }, timeout),
     };
 
-    this.applyPower(value, 'command');
+    this.applyPower.immediate(value, 'command');
   }
 
   private abortLatch(revertTo: boolean): void {
     this.clearLatch();
-    this.applyPower(revertTo, 'command');
+    this.applyPower.immediate(revertTo, 'command');
   }
 
   private applyPower = debounce((value: boolean, _source: Source) => {
     this.device.power = value;
-  }, 500);
+  }, 300);
 
   private clearLatch(): void {
     if (this.latch) {

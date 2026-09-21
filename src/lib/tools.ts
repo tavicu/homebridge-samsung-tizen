@@ -25,18 +25,6 @@ export const race = <T>(promise: Promise<T>, timeout = 2500): Promise<T | void> 
   return Promise.race([promise, timeoutPromise]);
 };
 
-export const debounce = <T extends (...args: any[]) => void>(callback: T, timeout = 250) => {
-  let timer: NodeJS.Timeout;
-
-  return function (this: any, ...args: Parameters<T>) {
-    clearTimeout(timer);
-
-    timer = setTimeout(() => {
-      callback.apply(this, args);
-    }, timeout);
-  };
-};
-
 export const throttle = <T extends (...args: any[]) => void>(callback: T, timeout = 250) => {
   let lastCall = 0;
 
@@ -50,6 +38,23 @@ export const throttle = <T extends (...args: any[]) => void>(callback: T, timeou
     lastCall = now;
     callback.apply(this, args);
   };
+};
+
+export const debounce = <T extends (...args: any[]) => void>(callback: T, timeout = 250) => {
+  let timer: NodeJS.Timeout | undefined;
+
+  const debounced = (...args: Parameters<T>) => {
+    clearTimeout(timer);
+
+    timer = setTimeout(() => callback(...args), timeout);
+  };
+
+  const immediate = (...args: Parameters<T>) => {
+    clearTimeout(timer);
+    callback(...args);
+  };
+
+  return Object.assign(debounced, { immediate });
 };
 
 export const isPortReachable = async (port: number, host: string, timeout = 1000): Promise<boolean> => {
