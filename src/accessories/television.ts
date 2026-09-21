@@ -78,7 +78,7 @@ export class TelevisionAccessory {
     return this.device.setPower(value);
   }
 
-  public addAccessory(accessory: SwitchAccessory) {
+  public addAccessory(accessory: SwitchAccessory): void {
     accessory.getAttachedServices().forEach((service) => {
       if (service.subtype && this.platformAccessory.getServiceById(this.platform.api.hap.Service.Switch, service.subtype)) {
         return;

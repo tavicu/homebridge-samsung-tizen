@@ -1,11 +1,11 @@
-import { SwitchAccessory, TelevisionAccessory } from '../accessories/index.js';
+import { TelevisionAccessory } from '../accessories/index.js';
 import { LinkedService } from '../types/index.js';
 import { ServiceWrapper } from './wrapper.js';
 
 export class InformationService extends ServiceWrapper {
   public service: LinkedService;
 
-  constructor(accessory: TelevisionAccessory | SwitchAccessory) {
+  constructor(accessory: TelevisionAccessory) {
     super(accessory);
 
     this.service = accessory.platformAccessory.getService(this.hap.Service.AccessoryInformation)!;
