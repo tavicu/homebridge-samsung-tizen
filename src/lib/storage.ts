@@ -11,6 +11,8 @@ export class Storage {
   private apps: Record<string, unknown[]> = {};
   private saveTimeout: NodeJS.Timeout | null = null;
   private appsSaveTimeout: NodeJS.Timeout | null = null;
+  private writeQueue: Promise<void> = Promise.resolve();
+  private appsWriteQueue: Promise<void> = Promise.resolve();
   private lastKnownMtime: number = 0;
 
   constructor(
@@ -81,8 +83,7 @@ export class Storage {
   }
 
   /**
-   * Schedules an asynchronous write operation.
-   * Debounces consecutive calls within 50ms to prevent file corruption from multiple devices.
+   * Debounces consecutive calls within 100ms and runs writes one at a time.
    */
   private save(): void {
     if (this.saveTimeout) {
@@ -90,7 +91,7 @@ export class Storage {
     }
 
     this.saveTimeout = setTimeout(() => {
-      this.write();
+      this.writeQueue = this.writeQueue.then(() => this.write());
     }, 100);
   }
 
@@ -140,7 +141,9 @@ export class Storage {
       clearTimeout(this.appsSaveTimeout);
     }
 
-    this.appsSaveTimeout = setTimeout(() => this.writeApps(), 100);
+    this.appsSaveTimeout = setTimeout(() => {
+      this.appsWriteQueue = this.appsWriteQueue.then(() => this.writeApps());
+    }, 100);
   }
 
   private async writeApps(): Promise<void> {
