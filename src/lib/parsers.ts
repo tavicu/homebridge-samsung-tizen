@@ -29,16 +29,23 @@ export function parseUPnPChange(lastChangeXml: string): UPnPData {
     const result: UPnPData = {};
 
     if (instance.Volume) {
-      result.volume = parseInt(instance.Volume['@_val'], 10);
+      const volumeVal = instance.Volume['@_val'];
+
+      if (volumeVal !== undefined) {
+        result.volume = parseInt(volumeVal, 10);
+      }
     }
 
     if (instance.Mute) {
       const muteVal = instance.Mute['@_val'];
-      result.mute = muteVal === 1 || muteVal === '1' || muteVal === true || muteVal === 'true';
+
+      if (muteVal !== undefined) {
+        result.mute = muteVal === 1 || muteVal === '1' || muteVal === true || muteVal === 'true';
+      }
     }
 
     return result;
-  } catch (err) {
+  } catch {
     return {};
   }
 }
