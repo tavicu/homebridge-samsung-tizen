@@ -6,6 +6,7 @@ import { FrameEvent } from '../types/index.js';
 const HEARTBEAT_TIMEOUT = 8 * 1000; // 6 ping + 2 for safety
 const CONNECTION_TIMEOUT = 30 * 1000;
 const ART_MODE_TTL = 2500;
+const DEBUG_EVENTS = new Set(['ms.channel.connect', 'ms.channel.ready', 'ms.channel.unauthorized', 'get_artmode_status', 'art_mode_changed', 'go_to_standby', 'wakeup']);
 
 export class FrameSocket {
   private ws: WsClient | null = null;
@@ -160,6 +161,8 @@ export class FrameSocket {
         try {
           const response = JSON.parse(data.toString());
 
+          this.handleDebug(response);
+
           if (response.event === 'ms.channel.connect' || response.event === 'ms.channel.ready') {
             this.id = response.data?.id || this.id || null;
             succeed();
@@ -177,6 +180,20 @@ export class FrameSocket {
         }
       });
     });
+  }
+
+  private handleDebug(response: any): void {
+    let data = response?.data;
+
+    try {
+      data = JSON.parse(data);
+    } catch {}
+
+    const payload = DEBUG_EVENTS.has(data?.event) ? data : response;
+
+    if (DEBUG_EVENTS.has(payload.event)) {
+      this.device.log.debug('[Frame]', JSON.stringify(payload));
+    }
   }
 
   private handleMessage(payload: string): void {
