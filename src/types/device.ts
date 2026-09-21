@@ -1,5 +1,6 @@
+import { InputConfig } from './input.js';
 import { SsdpEvent } from './ssdp.js';
-import { InputConfig, SwitchConfig } from './types.js';
+import { SwitchConfig } from './switch.js';
 import { UPnPData } from './upnp.js';
 import { WolOptions } from './wol.js';
 
