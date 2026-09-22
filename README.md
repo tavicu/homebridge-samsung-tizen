@@ -23,7 +23,7 @@ This release is a full rewrite in TypeScript. Existing TVs stay in Home, so you 
 - Live volume and mute through DMR (UPnP), including absolute volume without SmartThings
 - Plugin-level defaults for keys, inputs, switches and Wake on LAN, inherited by every TV
 - SmartThings OAuth instead of personal access tokens that no longer expire
-- Frame TVs: Art Mode is controlled on the local network. The TV tile is ON while you watch TV and OFF while Art Mode is on
+- Frame TVs: Art Mode is controlled on the local network. The TV tile is ON while you watch TV and OFF while Art Mode is on. The TV also gets Art Mode and Power switches
 
 You can see the [changelog](CHANGELOG.md) for the full list of changes.
 
