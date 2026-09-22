@@ -2,13 +2,14 @@ import { Categories, PlatformAccessory } from 'homebridge';
 import { Device } from '../device/index.js';
 import { withInputIdentifiers } from '../lib/identifiers.js';
 import { SamsungPlatform } from '../platform.js';
-import { InformationService, InputService, SpeakerService, TelevisionService } from '../services/index.js';
+import { InformationService, InputService, SpeakerService, TelevisionService, VolumeService } from '../services/index.js';
 import { LinkedService } from '../types/index.js';
 
 export type TelevisionServices = {
   main: TelevisionService;
   speaker: SpeakerService;
   information: InformationService;
+  volume?: VolumeService;
 };
 
 export class TelevisionAccessory {
@@ -43,6 +44,10 @@ export class TelevisionAccessory {
       speaker: new SpeakerService(this),
       information: new InformationService(this),
     };
+
+    if (this.device.hasOption('Volume.Slider.Enable')) {
+      this.services.volume = new VolumeService(this);
+    }
 
     this.getServices().forEach((service) => {
       if (!this.platformAccessory.services.includes(service)) {

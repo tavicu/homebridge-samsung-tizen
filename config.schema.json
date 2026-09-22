@@ -156,7 +156,7 @@
               "type": "array",
               "items": {
                 "type": "string",
-                "enum": ["Device.Disable", "Switch.DeviceName.Disable", "Frame.RealPowerMode", "Frame.ArtSwitch.Disable", "Frame.PowerSwitch.Disable"]
+                "enum": ["Device.Disable", "Volume.Slider.Enable", "Switch.DeviceName.Disable", "Frame.RealPowerMode", "Frame.ArtSwitch.Disable", "Frame.PowerSwitch.Disable"]
               }
             },
             "inputs": {
@@ -223,6 +223,7 @@
               "title": "Options",
               "titleMap": {
                 "Device.Disable": "Disable this device without deleting it",
+                "Volume.Slider.Enable": "Create a slider that controls the TV volume",
                 "Switch.DeviceName.Disable": "Disable prepending the device name on custom switches",
                 "Frame.RealPowerMode": "Use the TV tile to turn a Frame fully on and off",
                 "Frame.ArtSwitch.Disable": "Hide the Art Mode switch",

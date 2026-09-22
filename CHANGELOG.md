@@ -31,6 +31,7 @@ Samsung does not allow turning a Frame fully off through the local API. When Sma
 - The state of the TV is now updated in real time through SSDP announcements. If those announcements never arrive or stop without a goodbye, the plugin falls back to checking whether the TV is reachable.
 - Volume and mute are read in real time from the TV through DMR (UPnP) events, so the values in Home app follow the physical remote.
 - Absolute volume control is now available without SmartThings.
+- New option to add a slider that controls the TV volume. Brightness sets the volume from 0 to 100, so it can be used in scenes and automations. Turning the light off mutes the TV, and turning it on unmutes it. The slider stays off while the TV is off. Enable it with `Volume.Slider.Enable`.
 - The speaker now reports the same on/off state as the TV, so the volume buttons in the iOS Remote widget stay enabled when the TV is on.
 - New option to disable a device from the plugin without removing it from the configuration.
 - Only TVs that support token authentication are officially supported. If a TV does not, a warning is written to the log at startup, and the configuration interface reports this when you test the connection.

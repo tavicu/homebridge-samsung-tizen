@@ -340,26 +340,34 @@ watch(
           </div>
 
           <div class="form-check form-switch">
+            <input id="option.Volume.Slider.Enable" v-model="form.options" class="form-check-input" type="checkbox" role="switch" value="Volume.Slider.Enable" />
+            <label class="form-check-label" for="option.Volume.Slider.Enable">Create a slider that controls the TV volume</label>
+          </div>
+
+          <div class="form-check form-switch">
             <input id="option.Switch.DeviceName.Disable" v-model="form.options" class="form-check-input" type="checkbox" role="switch" value="Switch.DeviceName.Disable" />
             <label class="form-check-label" for="option.Switch.DeviceName.Disable">Disable prepending device name on custom switches</label>
           </div>
+        </div>
+
+        <hr class="my-4" />
+
+        <div>
+          <p class="small text-muted mb-2">These settings are for Frame TVs.</p>
 
           <div class="form-check form-switch">
             <input id="option.Frame.RealPowerMode" v-model="form.options" class="form-check-input" type="checkbox" role="switch" value="Frame.RealPowerMode" />
             <label class="form-check-label" for="option.Frame.RealPowerMode">Use the TV tile to turn a Frame fully on and off</label>
-            <small class="form-text text-muted d-block">Requires SmartThings. Without this option the tile follows Art Mode.</small>
           </div>
 
           <div class="form-check form-switch">
             <input id="option.Frame.ArtSwitch.Disable" v-model="form.options" class="form-check-input" type="checkbox" role="switch" value="Frame.ArtSwitch.Disable" />
             <label class="form-check-label" for="option.Frame.ArtSwitch.Disable">Hide the Art Mode switch</label>
-            <small class="form-text text-muted d-block">Frame TVs only. This switch turns Art Mode on and off.</small>
           </div>
 
           <div class="form-check form-switch">
             <input id="option.Frame.PowerSwitch.Disable" v-model="form.options" class="form-check-input" type="checkbox" role="switch" value="Frame.PowerSwitch.Disable" />
             <label class="form-check-label" for="option.Frame.PowerSwitch.Disable">Hide the Power switch</label>
-            <small class="form-text text-muted d-block">Frame TVs only. This switch turns the TV fully on and off.</small>
           </div>
         </div>
       </template>
