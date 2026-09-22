@@ -36,10 +36,14 @@ export class TelevisionService extends ServiceWrapper {
   }
 
   public async updateValue(characteristic?: CharacteristicRef, value?: CharacteristicValue): Promise<void> {
-    this.handleUpdateValue(characteristic ?? this.characteristic.Active, value !== undefined ? value : await this.getActive());
+    this.handleUpdateValue(characteristic ?? this.characteristic.Active, value !== undefined ? value : await this.getActive(false));
   }
 
-  private async getActive(): Promise<CharacteristicValue> {
+  private async getActive(emitEvent = true): Promise<CharacteristicValue> {
+    if (emitEvent) {
+      this.device.emit('main:get');
+    }
+
     return this.accessory.getMain() ? this.characteristic.Active.ACTIVE : this.characteristic.Active.INACTIVE;
   }
 

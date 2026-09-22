@@ -50,7 +50,7 @@ export class FrameSocket {
   }
 
   private refreshArtMode = throttle(() => {
-    if (Date.now() - this.lastArtModeUpdate < ART_MODE_TTL) {
+    if (!this.device.power || Date.now() - this.lastArtModeUpdate < ART_MODE_TTL) {
       return;
     }
 
@@ -60,6 +60,10 @@ export class FrameSocket {
   private async send(request: string, params: Record<string, any> = {}): Promise<void> {
     if (!this.isSupported) {
       throw new Error('Frame is not supported for this device');
+    }
+
+    if (!this.device.power) {
+      throw new Error('TV is not powered on');
     }
 
     await this.ensureConnected();
