@@ -3,7 +3,6 @@ import App from './App.vue';
 import { useConfig } from './composables/useConfig';
 import { useHomebridge } from './composables/useHomebridge';
 import { isConfigUiXSupported } from './lib/homebridge';
-import { setupI18n } from './lib/i18n';
 import './assets/main.css';
 
 async function startApp() {
@@ -24,7 +23,7 @@ async function startApp() {
 
     const { getConfig } = useConfig();
 
-    await Promise.all([getConfig(), setupI18n(app)]);
+    await getConfig();
 
     moveModalPadding(root);
     app.mount(root);
