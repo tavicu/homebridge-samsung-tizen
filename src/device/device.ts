@@ -169,6 +169,10 @@ export class Device extends EventEmitter<DeviceEvents> {
     return this.controller.setArtMode(value);
   }
 
+  public refreshArtMode(): void {
+    this.controller.refreshArtMode();
+  }
+
   public getInputSource(): Promise<string | null> {
     return this.controller.getInputSource();
   }

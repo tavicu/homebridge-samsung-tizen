@@ -28,7 +28,6 @@ export class FrameSocket {
 
       this.start();
 
-      this.device.on('main:get', () => this.refreshArtMode());
       this.device.on('state:update', (prop, value) => prop === 'power' && value && this.start());
     });
   }
@@ -49,7 +48,7 @@ export class FrameSocket {
     return this.send('set_artmode_status', { value: value ? 'on' : 'off' });
   }
 
-  private refreshArtMode = throttle(() => {
+  public refreshArtMode = throttle(() => {
     if (!this.device.power || Date.now() - this.lastArtModeUpdate < ART_MODE_TTL) {
       return;
     }

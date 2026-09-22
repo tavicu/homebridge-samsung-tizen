@@ -187,6 +187,10 @@ export class DeviceController {
     return this.frame.setArtMode(value);
   }
 
+  public refreshArtMode(): void {
+    this.frame.refreshArtMode();
+  }
+
   public async sendCommand(commands: string | string[]): Promise<void> {
     await this.waitPowering();
 
