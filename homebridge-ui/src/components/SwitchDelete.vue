@@ -57,7 +57,7 @@ async function confirmDelete() {
       await updateConfig({ switches: updatedSwitches });
     }
 
-    toast.success('Switch deleted successfully. Restart Homebridge for the change to take effect.');
+    toast.success('Switch deleted successfully.');
     goBack();
   } catch {
     toast.error('Failed to delete switch');

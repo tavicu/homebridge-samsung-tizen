@@ -58,6 +58,10 @@ const props = defineProps({
   line-height: 1.5;
 }
 
+.callout-sm .callout-icon {
+  font-size: 1.2rem;
+}
+
 .callout-text {
   font-size: 0.825rem;
 }

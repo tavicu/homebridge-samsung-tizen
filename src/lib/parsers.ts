@@ -62,7 +62,7 @@ export function parseCommands(commands: string | string[]): ParsedCommand[] {
     }
 
     // Hold syntax: KEY*2.5s
-    if (/^.*\*[0-9]*[.]?[0-9]+s$/.test(cmd)) {
+    if (/^.*\*[0-9]*[.]?[0-9]+[sS]$/.test(cmd)) {
       return [{ key: split[0], time: parseFloat(split[1]) }];
     }
 

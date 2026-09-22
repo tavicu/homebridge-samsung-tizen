@@ -7,6 +7,7 @@ import { useForm } from '../composables/useForm';
 import { useRouter } from '../composables/useRouter';
 import { useSmartThings } from '../composables/useSmartThings';
 import { useToast } from '../composables/useToast';
+import { normalizeCommand } from '../lib/command';
 import { DEFAULT_INPUT_SOURCES, DEFAULT_PICTURE_MODES, DEFAULT_SOUND_MODES, groupInputSources } from '../lib/device';
 import Callout from './Callout.vue';
 
@@ -182,7 +183,7 @@ function init() {
 }
 
 function buildSwitchData() {
-  const commands = form.commands.map((item) => item.value.trim()).filter(Boolean);
+  const commands = form.commands.map((item) => normalizeCommand(item.value)).filter(Boolean);
 
   return cleanConfig({
     name: form.name,
@@ -249,11 +250,11 @@ async function handleSubmit() {
       const updatedSwitches = getCurrentSwitches().map((item, index) => (index === props.switchIndex ? switchData : item));
       await persistSwitches(updatedSwitches);
 
-      toast.success('Switch updated successfully. Restart Homebridge for the change to take effect.');
+      toast.success('Switch updated successfully.');
     } else {
       await persistSwitches([...getCurrentSwitches(), switchData]);
 
-      toast.success('Switch added successfully. Restart Homebridge for the change to take effect.');
+      toast.success('Switch added successfully.');
     }
 
     navigateBack('dashboard', { tab: 'switches' });

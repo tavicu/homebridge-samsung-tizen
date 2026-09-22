@@ -3,10 +3,15 @@ import { useHomebridge } from './useHomebridge';
 import { useToast } from './useToast';
 
 const config = ref({ platform: 'SamsungTizen' });
+const restartRequired = ref(false);
 
 export function useConfig() {
   const { hb } = useHomebridge();
   const toast = useToast();
+
+  function markRestartRequired() {
+    restartRequired.value = true;
+  }
 
   function cleanConfig(data) {
     if (data === null || data === undefined) {
@@ -49,6 +54,7 @@ export function useConfig() {
 
   async function saveConfig() {
     await hb.savePluginConfig();
+    markRestartRequired();
   }
 
   async function updateConfig(partialConfig, save = true) {
@@ -63,7 +69,7 @@ export function useConfig() {
       await hb.updatePluginConfig([updatedConfig]);
 
       if (save) {
-        await hb.savePluginConfig();
+        await saveConfig();
       }
 
       config.value = updatedConfig;
@@ -76,6 +82,8 @@ export function useConfig() {
 
   return {
     config,
+    restartRequired,
+    markRestartRequired,
     getConfig,
     saveConfig,
     cleanConfig,

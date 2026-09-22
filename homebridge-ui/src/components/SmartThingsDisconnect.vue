@@ -1,10 +1,12 @@
 <script setup>
+import { useConfig } from '../composables/useConfig';
 import { useHomebridge } from '../composables/useHomebridge';
 import { useRouter } from '../composables/useRouter';
 import { useSmartThings } from '../composables/useSmartThings';
 import { useToast } from '../composables/useToast';
 import Confirm from './Confirm.vue';
 
+const { markRestartRequired } = useConfig();
 const { showSpinner, hideSpinner } = useHomebridge();
 const { navigateTo } = useRouter();
 const { disconnect } = useSmartThings();
@@ -16,7 +18,8 @@ async function confirmDisconnect() {
   try {
     await disconnect();
 
-    toast.success('SmartThings disconnected. Restart Homebridge so the plugin drops the in-memory token.');
+    toast.success('SmartThings disconnected.');
+    markRestartRequired();
     navigateTo('dashboard');
   } catch {
     toast.error('Failed to disconnect SmartThings');

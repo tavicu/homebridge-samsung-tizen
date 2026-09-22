@@ -7,6 +7,7 @@ import { useForm } from '../composables/useForm';
 import { useRouter } from '../composables/useRouter';
 import { useSmartThings } from '../composables/useSmartThings';
 import { useToast } from '../composables/useToast';
+import { normalizeCommand } from '../lib/command';
 import { DEFAULT_INPUT_SOURCES, groupInputSources } from '../lib/device';
 
 const props = defineProps({
@@ -123,7 +124,7 @@ function buildInputData() {
   let value;
 
   if (form.type === 'command') {
-    value = form.commands.map((item) => item.value.trim()).filter(Boolean);
+    value = form.commands.map((item) => normalizeCommand(item.value)).filter(Boolean);
   } else if (form.type === 'app') {
     value = form.valueApp.trim();
   } else if (form.type === 'input') {
@@ -181,11 +182,11 @@ async function handleSubmit() {
       const updatedInputs = getCurrentInputs().map((input, index) => (index === props.inputIndex ? inputData : input));
       await persistInputs(updatedInputs);
 
-      toast.success('Input updated successfully. Restart Homebridge for the change to take effect.');
+      toast.success('Input updated successfully.');
     } else {
       await persistInputs([...getCurrentInputs(), inputData]);
 
-      toast.success('Input added successfully. Restart Homebridge for the change to take effect.');
+      toast.success('Input added successfully.');
     }
 
     navigateBack('dashboard', { tab: 'inputs' });
