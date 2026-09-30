@@ -86,17 +86,12 @@ const OPTION_DEFINITIONS: Array<SwitchOptionDefinition> = [
   {
     key: 'app',
     polled: true,
-    build: ({ config, device, service }) => ({
+    build: ({ config, device }) => ({
       get: async () => {
         const application = await device.getApplication(config.app as string | number);
         return application?.visible ?? false;
       },
-      set: async (switchValue: boolean) => {
-        if (!switchValue) {
-          setTimeout(() => service.updateValue(), 100);
-          return;
-        }
-
+      set: async (_switchValue: boolean) => {
         await device.startApplication(config.app as string | number);
       },
     }),
