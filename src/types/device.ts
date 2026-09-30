@@ -77,11 +77,6 @@ export type DeviceConfig = {
   switches?: Array<SwitchConfig>;
   options?: Array<DeviceOptions>;
   keys?: Record<string, string>;
-
-  /**
-   * @deprecated Use `deviceId` instead. Kept for backwards compatibility with older versions.
-   */
-  device_id?: string;
 };
 
 export type DeviceOptions =

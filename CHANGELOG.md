@@ -2,7 +2,7 @@
 
 ## 6.0.0
 
-This is a full rewrite of the plugin in TypeScript. It is backwards compatible: your existing TVs stay in Home, you don't have to add them again. A few settings changed, SmartThings has to be authorized again, and inputs or custom switches may need their Home names and scenes set up once more.
+This is a full rewrite of the plugin in TypeScript. It is backwards compatible: your existing TVs stay in Home, you don't have to add them again. A few settings changed, SmartThings has to be authorized again, and inputs or custom switches may need their Home names and scenes set up once more. See the [upgrade guide](https://tavicu.github.io/homebridge-samsung-tizen/extra/upgrading.html) for the steps.
 
 **Frame TVs**
 
@@ -12,7 +12,7 @@ Samsung does not allow turning a Frame fully off through the local API. When Sma
 
 - By default the TV tile follows Art Mode: ON means you are watching TV, OFF means Art Mode is active. Turning the tile off switches Art Mode on. It does not cut power. Turning the tile on switches Art Mode off. If the TV is fully off, it is turned on first.
 - Enable `Frame.RealPowerMode` on the device if you want the tile to turn the Frame fully on and off. ON means the TV has power, including while Art Mode is on. OFF cuts power. This needs SmartThings (authorization and a Device ID). Without SmartThings the plugin falls back to a long press of the power key, which newer Frame TVs no longer honor, so a full power off may not work.
-- You can add an Art Mode input if you want to switch Art Mode on from the TV's input list. In Home it shows as the active input while Art Mode is on, and it is updated as soon as Art Mode changes on the TV. The input type is now `artmode`. If you still have `type: art` from an older config, change it to `artmode`. Until you do, that input will not work.
+- You can add an Art Mode input if you want to switch Art Mode on from the TV's input list. In Home it shows as the active input while Art Mode is on, and it is updated as soon as Art Mode changes on the TV. The input type is now `artmode`. An input with `type: art` from an older config still works for now, but change it to `artmode`.
 - Frame TVs also get two switches on the TV accessory, same as before: Art Mode and Power. Art Mode turns Art Mode on and off. Power turns the TV fully on and off, including while Art Mode is on. Hide either one with `Frame.ArtSwitch.Disable` or `Frame.PowerSwitch.Disable`.
 
 **Requirements**
@@ -56,9 +56,10 @@ Samsung does not allow turning a Frame fully off through the local API. When Sma
 - A custom switch that has more than one option with a state, for example `sleep` together with `mute`, now shows as ON when any of those options is active. Before, all of them had to be active at the same time.
 - Custom switches that launch an app, select an input source, set a picture mode, a sound mode or a TV channel now stay ON in Home while that app, source, picture mode, sound mode or channel is active on the TV. They are checked automatically while the TV is on. Command and volume switches still turn off after a short delay.
 - Using a switch while the TV is off, when that switch is not set to turn the TV on, no longer looks like a failure in Home. The switch turns back off and a warning is written to the log.
-- `device_id` was renamed to `deviceId`. The old name still works for now.
+- `device_id` was renamed to `deviceId`. The old name still works for now, but change it in your config.
 - Custom switches that set a picture mode now store the SmartThings mode id (e.g. `modeMovie`) instead of its English display name, so the correct value is sent regardless of the TV's language. Existing switches with the old English names (`Dynamic`, `Standard`, `Natural`, `Movie`) keep working automatically.
-- Digital TV now uses the SmartThings id `dtv` instead of `digitalTv`. If you still have `digitalTv` in the config, open the input or switch in the configuration interface and save it again as `dtv`. Until you do, it will not show as the active source in Home.
+- Digital TV now uses the SmartThings id `dtv` instead of `digitalTv`. `digitalTv` from an older config still works for now. To update it, open the input or switch in the configuration interface and save it again as `dtv`.
+- At startup the plugin writes a warning to the log for every v5 setting still in your config: `api_key`, settings that are no longer used, and old values it still accepts for now (`device_id`, `type: art`, `digitalTv`). Each warning says what to change and links to the [upgrade guide](https://tavicu.github.io/homebridge-samsung-tizen/extra/upgrading.html).
 - Inputs and custom switches are identified in Home by what they do (source, app, commands, switch actions), not by their position in the config. Reordering the list only changes the order they appear in Home. Renaming a switch no longer creates a new accessory. An input or switch without a name is skipped and logged, instead of taking down the whole TV.
 
 **Fixed**
@@ -97,7 +98,7 @@ There is a step by step wizard in the new configuration interface. Until you go 
 
 **Settings that are no longer used**
 
-These were removed and are ignored if they are still present in your configuration:
+These were removed and are ignored if they are still present in your configuration. The plugin lists the ones it finds in the log at startup, so you know what to remove:
 
 - `refresh` - there is no configurable poll interval anymore. Power state arrives through SSDP, with a built-in fallback check when announcements are missing. Volume and mute arrive through DMR events. Switches that track an app, an input source, a picture mode, a sound mode or a TV channel are checked on a fixed internal interval, only while the TV is on.
 - `delay`, `timeout` and `wait_time` - these timings are now handled internally.

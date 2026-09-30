@@ -260,7 +260,7 @@ export class SmartThingsClient {
   ) {
     this.manager = platform.smartthingsManager;
 
-    this.deviceId = this.device.config.deviceId || this.device.config.device_id;
+    this.deviceId = this.device.config.deviceId;
 
     const apiBaseUrl = `https://api.smartthings.com/v1/devices/${this.deviceId}`;
     this.apiStatusUrl = `${apiBaseUrl}/status`;
