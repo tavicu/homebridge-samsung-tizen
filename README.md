@@ -21,8 +21,9 @@ This release is a full rewrite in TypeScript. Existing TVs stay in Home, so you 
 - Configuration UI in Homebridge Config UI X (v5.27.0 or newer): add, edit and delete devices, inputs and switches without editing JSON
 - Live power state through SSDP, with a fallback when announcements are missing
 - Live volume and mute through DMR (UPnP), including absolute volume without SmartThings
-- Plugin-level defaults for keys, inputs and switches, inherited by every TV
-- SmartThings OAuth instead of personal access tokens that no longer expire
+- Keys, inputs and switches set once at plugin level and shared by every TV
+- Optional volume slider, so scenes and automations can set the TV volume
+- SmartThings OAuth instead of the old personal access tokens, with automatic token refresh
 - Frame TVs: Art Mode is controlled on the local network. The TV tile is ON while you watch TV and OFF while Art Mode is on. The TV also gets Art Mode and Power switches
 
 You can see the [changelog](CHANGELOG.md) for the full list of changes.
@@ -33,6 +34,8 @@ You can see the [changelog](CHANGELOG.md) for the full list of changes.
 - [Homebridge](https://github.com/homebridge/homebridge) 1.8 or newer (Homebridge 2.0 is recommended)
 - Node.js 22.10+, 24, or 26
 - A static IP for each TV on your router
+- Homebridge Config UI X v5.27.0 or newer, for the configuration interface
+- For live volume and mute, the TV must be able to reach Homebridge. If Homebridge runs in Docker, use host networking
 
 ## Install
 
@@ -46,13 +49,13 @@ hb-service add homebridge-samsung-tizen
 
 ## Setup
 
-1. Open the plugin settings in Homebridge UI and add a TV (name, IP, MAC). There is a **Test connection** button on the device form.
-2. Restart Homebridge. Allow the pairing prompt on the TV the first time it appears.
+1. Open the plugin settings in Homebridge UI and add a TV (name, IP, MAC). There is a **Test connection** button on the device form, which also fills in the MAC address.
+2. Restart Homebridge and turn the TV on. Allow the pairing prompt that appears on the TV. If the TV was off when Homebridge started, the prompt appears as soon as you turn it on, without another restart.
 3. In the Home app, add the TV as a new accessory using the QR code Homebridge shows for that TV.
 
-If you clicked Deny on the pairing prompt, on the TV go to **Settings → General → External Device Manager → Device Connection Manager → Device List** and allow the plugin (or remove the entry and restart Homebridge).
+If you clicked Deny on the pairing prompt, on the TV go to **Settings → General → External Device Manager → Device Connection Manager → Device List** and allow the plugin. You can also remove the entry, and the prompt appears again the next time the TV turns on.
 
-SmartThings, if you want it, has a wizard in the same settings screen. You create a SmartThings app once, paste the client ID and secret, and the plugin refreshes the access token on its own.
+SmartThings, if you want it, has a wizard in the same settings screen. You create a SmartThings app once, paste the client ID and secret, and the plugin refreshes the access token on its own. If the authorization ever expires, the plugin writes it in the log and the settings screen shows it as expired. Go through the wizard again and the plugin picks up the new authorization.
 
 ## Help
 

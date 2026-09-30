@@ -34,6 +34,7 @@ Samsung does not allow turning a Frame fully off through the local API. When Sma
 - New option to add a slider that controls the TV volume. Brightness sets the volume from 0 to 100, so it can be used in scenes and automations. Turning the light off mutes the TV, and turning it on unmutes it. The slider stays off while the TV is off. Enable it with `Volume.Slider.Enable`.
 - The speaker now reports the same on/off state as the TV, so the volume buttons in the iOS Remote widget stay enabled when the TV is on.
 - New option to disable a device from the plugin without removing it from the configuration.
+- Pairing no longer needs the TV to be on when Homebridge starts. If the TV is off, the plugin waits and opens the pairing prompt as soon as the TV turns on. If you deny it, it asks again the next time the TV turns on.
 - Only TVs that support token authentication are officially supported. If a TV does not, a warning is written to the log at startup, and the configuration interface reports this when you test the connection.
 - `keys`, `inputs` and `switches` can now be configured once at plugin level and are used by every device. Inputs and switches set on a device are added to the plugin-level ones. For `keys`, a value set on a device overrides the plugin-level one.
 - Remote `keys` now map every iOS Remote button Home shows for a TV.
@@ -42,6 +43,10 @@ Samsung does not allow turning a Frame fully off through the local API. When Sma
 **Improved**
 
 - SmartThings values for the active input, picture mode, sound mode and TV channel are ignored if they have not been updated in more than a day, so Home does not keep showing the last known source after the TV has been off or has lost its SmartThings connection.
+- SmartThings recovers on its own when the internet connection or the SmartThings servers are down. The access token refresh is retried after 1, 5, 15 and 30 minutes, then every hour, until it succeeds. Requests to SmartThings give up after 5 seconds, so a slow response no longer holds up Home.
+- If SmartThings rejects the access token before it expires, the plugin refreshes it and repeats the request once.
+- If SmartThings rejects the authorization itself, the plugin stops retrying, writes it in the log, and the configuration interface shows the authorization as expired. After you go through the wizard again, the plugin picks up the new authorization without a Homebridge restart.
+- The plugin no longer overwrites a SmartThings authorization or a disconnect made from the configuration interface while Homebridge is running. It also saves its storage file only when a value actually changes.
 - Storage backups: When you change plugin storage from the configuration interface, `samsung-tizen.json` is backed up first to `backups/samsung-tizen/`, keeping the last 10 backups. Saves made by the plugin itself (pairing tokens, cached device info) do not create a backup.
 
 **Changed**
@@ -68,6 +73,7 @@ Samsung does not allow turning a Frame fully off through the local API. When Sma
 - A TV that is unplugged, or loses power without sending a goodbye announcement, is no longer stuck on "on" forever.
 - TVs that keep announcing themselves while in standby are reported as off, not on.
 - Custom remote key mappings no longer leak between TVs. Each TV keeps its own `keys`.
+- A network error during TV discovery, or a port that is already in use for volume and mute events, is written to the log instead of stopping Homebridge.
 - Custom switches now honor `mute: false` and unmute the TV. Until v5 they always sent `KEY_MUTE`, so the value in the config had no effect. The configuration interface lets you pick None, Mute or Unmute.
 
 **Interactive configuration interface**
@@ -75,6 +81,8 @@ Samsung does not allow turning a Frame fully off through the local API. When Sma
 The plugin now has its own interface in Config UI X. You add, edit and delete devices, inputs and switches from there, without touching the JSON config.
 
 Before you add a TV, you can test the connection. If the connection is successful and the TV returns a MAC address, it is filled in automatically.
+
+Editing a TV keeps its MAC address exactly as it is written in the config. The TV's identity in Home is based on it, so an existing TV is never added to Home again because of a saved form.
 
 SmartThings is authorized from a step by step wizard in the same screen. Once it is connected, Device ID, picture modes and sound modes are loaded from SmartThings as described above.
 

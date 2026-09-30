@@ -16,7 +16,7 @@ const STORAGE_KEY = 'smartthings';
 
 const OAUTH_TOKEN_URL = 'https://api.smartthings.com/oauth/token';
 const MAX_STATE_AGE = 24 * 60 * 60 * 1000;
-const REQUEST_TIMEOUT = 10 * 1000;
+const REQUEST_TIMEOUT = 5 * 1000;
 const RETRY_DELAYS = [60 * 1000, 5 * 60 * 1000, 15 * 60 * 1000, 30 * 60 * 1000, 60 * 60 * 1000];
 
 function parseStateValue(attr?: SmartThingsAttribute): string | null {
