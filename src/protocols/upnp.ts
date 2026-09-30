@@ -1,6 +1,5 @@
+import { createSocket } from 'dgram';
 import * as http from 'http';
-import { isIPv4 } from 'net';
-import { networkInterfaces } from 'os';
 import { Device } from '../device/index.js';
 import { parseUPnPChange, parseXmlText, UPnPparser } from '../lib/parsers.js';
 import { SamsungPlatform } from '../platform.js';
@@ -12,7 +11,6 @@ export class UPnPManager {
   private server: http.Server | null = null;
   private subscriptions = new Map<string, Device>();
   private config: UPnPConfig;
-  private localIp: string;
   private localPort: number = 0;
 
   private isServerReady: Promise<void>;
@@ -24,7 +22,6 @@ export class UPnPManager {
       port: 0,
       ...platform.config.upnp,
     };
-    this.localIp = this.detectLocalIp();
 
     this.isServerReady = new Promise((resolve, reject) => {
       this.resolveServerReady = resolve;
@@ -118,42 +115,34 @@ export class UPnPManager {
     this.server.listen(this.config.port, () => {
       const addr = this.server?.address();
       this.localPort = addr && typeof addr !== 'string' ? addr.port : 0;
-      this.platform.log.debug(`UPnP Manager server started on http://${this.localIp}:${this.localPort}`);
+      this.platform.log.debug(`UPnP Manager server started on port ${this.localPort}`);
 
       this.resolveServerReady();
     });
   }
 
-  public async getServerAddress(): Promise<{ ip: string; port: number }> {
+  public async getServerAddress(targetIp: string): Promise<{ ip: string; port: number }> {
     await this.isServerReady;
-    return { ip: this.localIp, port: this.localPort };
+    const ip = this.config.address || (await this.detectLocalIp(targetIp));
+    return { ip, port: this.localPort };
   }
 
-  private detectLocalIp(): string {
-    const interfaces = networkInterfaces();
+  // Connecting a UDP socket sends nothing, but makes the OS pick the interface that routes to the TV.
+  private detectLocalIp(targetIp: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const socket = createSocket('udp4');
 
-    for (const name of Object.keys(interfaces)) {
-      const iface = interfaces[name];
-      if (!iface) {
-        continue;
-      }
+      socket.once('error', (error) => {
+        socket.close();
+        reject(error);
+      });
 
-      for (const config of iface) {
-        if (isIPv4(config.address) && !config.internal) {
-          const ip = config.address;
-
-          const isClassC = ip.startsWith('192.168.');
-          const isClassA = ip.startsWith('10.');
-          const isClassB = /^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(ip); // 172.16.0.0 - 172.31.255.255
-
-          if (isClassC || isClassA || isClassB) {
-            return ip;
-          }
-        }
-      }
-    }
-
-    return '127.0.0.1';
+      socket.connect(9, targetIp, () => {
+        const { address } = socket.address();
+        socket.close();
+        resolve(address);
+      });
+    });
   }
 
   public destroy() {
@@ -206,7 +195,7 @@ export class UPnPClient {
     this.isSubscribing = true;
 
     try {
-      const serverAddr = await this.manager.getServerAddress();
+      const serverAddr = await this.manager.getServerAddress(this.device.config.ip);
       const callbackUrl = `<http://${serverAddr.ip}:${serverAddr.port}/?ip=${this.device.config.ip}>`;
 
       const response = await fetch(this.eventUrl, {

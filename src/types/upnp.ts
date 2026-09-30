@@ -5,4 +5,5 @@ export type UPnPData = {
 
 export type UPnPConfig = {
   port?: number;
+  address?: string;
 };

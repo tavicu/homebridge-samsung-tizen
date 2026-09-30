@@ -47,6 +47,7 @@ Samsung does not allow turning a Frame fully off through the local API. When Sma
 - If SmartThings rejects the access token before it expires, the plugin refreshes it and repeats the request once.
 - If SmartThings rejects the authorization itself, the plugin stops retrying, writes it in the log, and the configuration interface shows the authorization as expired. After you go through the wizard again, the plugin picks up the new authorization without a Homebridge restart.
 - The plugin no longer overwrites a SmartThings authorization or a disconnect made from the configuration interface while Homebridge is running. It also saves its storage file only when a value actually changes.
+- DMR (UPnP) events are sent to the Homebridge address that actually reaches each TV, instead of the first private address found. This fixes live volume and mute on hosts with Docker, WireGuard or several network cards. If the TV still cannot reach Homebridge, set `upnp.address` in the config to the address it should use.
 - Storage backups: When you change plugin storage from the configuration interface, `samsung-tizen.json` is backed up first to `backups/samsung-tizen/`, keeping the last 10 backups. Saves made by the plugin itself (pairing tokens, cached device info) do not create a backup.
 
 **Changed**

@@ -110,6 +110,10 @@
             "type": "integer",
             "minimum": 0,
             "maximum": 65535
+          },
+          "address": {
+            "type": "string",
+            "format": "ipv4"
           }
         }
       }
