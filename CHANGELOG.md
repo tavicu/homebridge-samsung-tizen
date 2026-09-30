@@ -35,7 +35,7 @@ Samsung does not allow turning a Frame fully off through the local API. When Sma
 - The speaker now reports the same on/off state as the TV, so the volume buttons in the iOS Remote widget stay enabled when the TV is on.
 - New option to disable a device from the plugin without removing it from the configuration.
 - Only TVs that support token authentication are officially supported. If a TV does not, a warning is written to the log at startup, and the configuration interface reports this when you test the connection.
-- `keys`, `inputs`, `switches` and `wol` can now be configured once at plugin level and are inherited by every device. Anything set on a device still wins.
+- `keys`, `inputs` and `switches` can now be configured once at plugin level and are used by every device. Inputs and switches set on a device are added to the plugin-level ones. For `keys`, a value set on a device overrides the plugin-level one.
 - Remote `keys` now map every iOS Remote button Home shows for a TV.
 - All dependencies were updated to their latest versions.
 

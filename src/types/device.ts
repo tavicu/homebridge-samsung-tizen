@@ -63,6 +63,7 @@ export type DeviceStorage = {
   tokenSupport?: boolean;
   powerStateSupport?: boolean;
   clear(): void;
+  reload(): Promise<void>;
 };
 
 export type DeviceConfig = {

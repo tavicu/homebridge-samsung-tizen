@@ -17,6 +17,7 @@ export class UPnPManager {
 
   private isServerReady: Promise<void>;
   private resolveServerReady!: () => void;
+  private rejectServerReady!: (error: Error) => void;
 
   constructor(private readonly platform: SamsungPlatform) {
     this.config = {
@@ -25,9 +26,13 @@ export class UPnPManager {
     };
     this.localIp = this.detectLocalIp();
 
-    this.isServerReady = new Promise((resolve) => {
+    this.isServerReady = new Promise((resolve, reject) => {
       this.resolveServerReady = resolve;
+      this.rejectServerReady = reject;
     });
+
+    // Callers handle the rejection themselves; this only keeps it from being reported as unhandled.
+    this.isServerReady.catch(() => {});
   }
 
   public registerSubscription(sid: string, device: Device) {
@@ -96,6 +101,18 @@ export class UPnPManager {
         res.writeHead(200, { 'Content-Type': 'text/plain' });
         res.end('OK');
       });
+    });
+
+    // Without a listener an 'error' event (e.g. the port is already in use) would crash Homebridge.
+    this.server.on('error', (error: NodeJS.ErrnoException) => {
+      if (this.server?.listening) {
+        this.platform.log.debug(`[UPnP] Server error: ${error.message}`);
+        return;
+      }
+
+      this.platform.log.error(`[UPnP] Server could not start on port ${this.config.port}: ${error.message}. Volume and mute will not update in real time.`);
+
+      this.rejectServerReady(error);
     });
 
     this.server.listen(this.config.port, () => {

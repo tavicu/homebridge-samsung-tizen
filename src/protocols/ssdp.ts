@@ -43,6 +43,11 @@ export class SSDP {
     });
     this.peer.on('notify', this.onNotify.bind(this));
     this.peer.on('found', this.onFound.bind(this));
+
+    // Without a listener an 'error' event from a socket would crash Homebridge.
+    this.peer.on('error', (error: Error) => {
+      this.platform.log.debug(`[SSDP] Socket error: ${error?.message || error}`);
+    });
   }
 
   public start() {
@@ -63,7 +68,12 @@ export class SSDP {
       });
     });
 
-    this.peer.start();
+    try {
+      this.peer.start();
+    } catch (error: any) {
+      this.platform.log.error(`[SSDP] Failed to start: ${error.message || error}`);
+    }
+
     this.syncSearchInterval();
   }
 

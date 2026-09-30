@@ -7,7 +7,7 @@ import { withSwitchIdentifiers } from '../lib/identifiers.js';
 import { createDeviceLogger } from '../lib/logger.js';
 import { debounce } from '../lib/tools.js';
 import { SamsungPlatform } from '../platform.js';
-import { DeviceConfig, DeviceEvents, DeviceOptions, DeviceState, DeviceStorage, TizenApplication } from '../types/index.js';
+import { DeviceConfig, DeviceEvents, DeviceOptions, DeviceState, DeviceStorage, TizenApplication, TizenDeviceInfo } from '../types/index.js';
 import { DeviceController } from './controller.js';
 import { AccessoryPoller } from './poller.js';
 
@@ -113,15 +113,30 @@ export class Device extends EventEmitter<DeviceEvents> {
       this.syncAccessories();
     });
 
+    this.on('apps:update', (apps) => {
+      platform.storage.saveApps(this.config.mac, apps);
+    });
+
     this.once('paired', ({ token }) => {
       this.log.debug(`Device paired with success (token: ${token})`);
       this.log.debug(`Device storage: ${JSON.stringify(this.storage)}`);
       this.poller.sync();
     });
 
-    this.on('apps:update', (apps) => {
-      platform.storage.saveApps(this.config.mac, apps);
-    });
+    // Must stay last: start depends on the events above being attached.
+    this.controller.start();
+  }
+
+  public get isFrame(): boolean {
+    return !!this.storage.frameSupport;
+  }
+
+  public getInfo(): Promise<TizenDeviceInfo> {
+    return this.controller.getInfo();
+  }
+
+  public hasOption(key: DeviceOptions): boolean {
+    return !!(key && this.config.options?.includes(key));
   }
 
   public get power(): boolean {
@@ -219,14 +234,6 @@ export class Device extends EventEmitter<DeviceEvents> {
 
   public sendCommand(commands: string | string[]): Promise<void> {
     return this.controller.sendCommand(commands);
-  }
-
-  public hasOption(key: DeviceOptions): boolean {
-    return !!(key && this.config.options?.includes(key));
-  }
-
-  public get isFrame(): boolean {
-    return !!this.storage.frameSupport;
   }
 
   public destroy(): void {

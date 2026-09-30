@@ -15,11 +15,11 @@ export class FrameAccessory {
     public device: Device,
     public platform: SamsungPlatform,
   ) {
-    device.once('paired', () => device.isFrame && this.createServices());
+    device.on('paired', () => this.createServices());
   }
 
   private createServices() {
-    if (Object.keys(this.services).length) {
+    if (!this.device.isFrame || Object.keys(this.services).length) {
       return;
     }
 

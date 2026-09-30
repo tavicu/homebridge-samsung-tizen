@@ -2,6 +2,7 @@ import WsClient, { RawData } from 'ws';
 import { Device } from '../device/index.js';
 import { parseInstalledApps } from '../lib/parsers.js';
 import { retry, sleep } from '../lib/tools.js';
+import { DeviceState } from '../types/index.js';
 
 // Heartbeat timeout, 8 seconds (6 ping + 2 for safety)
 const HEARTBEAT_TIMEOUT = 8 * 1000;
@@ -14,20 +15,21 @@ export class WebSocket {
   private token: string | null = null;
   private heartbeatTimeout?: NodeJS.Timeout;
   private connectionPromise: Promise<void> | null = null;
+  private pairingPromise: Promise<void> | null = null;
 
   constructor(private readonly device: Device) {
     this.name = Buffer.from('Homebridge').toString('base64');
     this.url = `wss://${this.device.config.ip}:8002/api/v2/channels/samsung.remote.control?name=${this.name}`;
+  }
 
-    this.startPairing()
-      .then(() => {
-        this.device.emit('paired', { token: this.token || this.device.storage.token });
-        this.getInstalledApps();
-      })
-      .catch((error) => {
-        this.device.log.error(error.message);
-        this.device.log.debug(error.stack);
-      });
+  public start(): void {
+    // Until paired, retry every time the TV turns on
+    const onPowerOn = (prop: keyof DeviceState, value: unknown) => prop === 'power' && value && this.pair();
+
+    this.device.on('state:update', onPowerOn);
+    this.device.once('paired', () => this.device.off('state:update', onPowerOn));
+
+    this.pair();
   }
 
   public async click(key: string, action: 'Click' | 'Press' | 'Release' = 'Click') {
@@ -175,23 +177,43 @@ export class WebSocket {
     });
   }
 
-  private async startPairing(): Promise<void> {
-    if (this.device.storage.token) {
+  private pair(): void {
+    if (this.pairingPromise) {
       return;
     }
 
-    await retry(() => this.pair(), { retries: 3, delay: 3000 });
-  }
-
-  private async pair() {
-    if (!this.device.power) {
-      throw new Error('TV is not powered on');
+    if (this.device.storage.token) {
+      void this.emitPaired();
+      return;
     }
 
-    this.disconnect();
+    if (!this.device.power) {
+      this.device.log.info('Waiting for the TV to turn on to pair...');
+      return;
+    }
 
-    await sleep(1000);
-    await this.connect();
+    this.pairingPromise = retry(() => this.ensureConnected(), { retries: 3, delay: 3000 })
+      .then(() => {
+        if (this.token) {
+          return this.emitPaired();
+        }
+      })
+      .catch((error) => {
+        this.device.log.error('Pairing failed, it will be retried the next time the TV turns on');
+        this.device.log.debug(error.stack);
+      })
+      .finally(() => {
+        this.pairingPromise = null;
+      });
+  }
+
+  private async emitPaired(): Promise<void> {
+    if (!this.device.storage.model) {
+      await this.device.getInfo().catch(() => {});
+    }
+
+    this.device.emit('paired', { token: this.token || this.device.storage.token });
+    this.getInstalledApps();
   }
 
   private forgetSocket(socket: WsClient) {

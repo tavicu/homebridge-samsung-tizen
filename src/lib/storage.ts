@@ -1,8 +1,18 @@
 import { promises as fs } from 'fs';
 import path from 'path';
-import { deepmerge } from 'deepmerge-ts';
 import { API, Logging } from 'homebridge';
 import { retry } from './tools.js';
+
+// Entries written by the configuration interface (SmartThings authorization). The copy on disk wins for these.
+const UI_OWNED_KEYS = ['smartthings'];
+
+const replaceContents = (target: Record<string, any>, source: Record<string, any> = {}): void => {
+  for (const key of Object.keys(target)) {
+    delete target[key];
+  }
+
+  Object.assign(target, source);
+};
 
 export class Storage {
   private filePath: string;
@@ -50,7 +60,7 @@ export class Storage {
    * Returns a proxied storage object for a specific device ID.
    * Any property mutation will automatically schedule a debounced save operation.
    */
-  get<T = any>(id: string): T & { clear(): void } {
+  get<T = any>(id: string): T & { clear(): void; reload(): Promise<void> } {
     if (!this.accessories[id]) {
       this.accessories[id] = {};
     }
@@ -67,19 +77,28 @@ export class Storage {
           };
         }
 
+        // Picks up changes written by the configuration interface.
+        if (prop === 'reload') {
+          return () => this.syncChanges();
+        }
+
         return obj[prop];
       },
 
       set: (obj, prop, value) => {
-        if (prop === 'clear') {
+        if (prop === 'clear' || prop === 'reload') {
           return false;
+        }
+
+        if (obj[prop] === value) {
+          return true;
         }
 
         obj[prop] = value;
         this.save();
         return true;
       },
-    }) as unknown as T & { clear(): void };
+    }) as unknown as T & { clear(): void; reload(): Promise<void> };
   }
 
   private save(): void {
@@ -93,7 +112,7 @@ export class Storage {
   }
 
   /**
-   * Checks if the file has been modified by the UI and makes a deep merge if needed.
+   * Checks if the file has been modified by the UI and merges it into memory if needed.
    * Any errors (e.g. file not found on first run) are caught silently.
    */
   private async syncChanges(): Promise<void> {
@@ -104,11 +123,25 @@ export class Storage {
         const diskData = await fs.readFile(this.filePath, 'utf-8');
         const parsedData = JSON.parse(diskData);
 
-        this.accessories = deepmerge(parsedData, this.accessories);
+        this.mergeFromDisk(parsedData);
 
         this.lastKnownMtime = currentStats.mtimeMs;
       }
     } catch {}
+  }
+
+  /**
+   * The configuration interface only writes the UI-owned entries (SmartThings authorization),
+   * so those are taken from disk. Merged in place so the proxies from get() stay attached.
+   */
+  private mergeFromDisk(diskData: Record<string, any>): void {
+    for (const id of UI_OWNED_KEYS) {
+      if (this.accessories[id]) {
+        replaceContents(this.accessories[id], diskData[id]);
+      } else if (diskData[id]) {
+        this.accessories[id] = diskData[id];
+      }
+    }
   }
 
   private async write(): Promise<void> {

@@ -3,6 +3,7 @@ export type SmartThingsStorage = {
   refreshToken: string;
   expiresAt: number;
   clear(): void;
+  reload(): Promise<void>;
 };
 
 export type SmartThingsCommand = {

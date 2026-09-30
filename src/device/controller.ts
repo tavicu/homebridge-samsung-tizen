@@ -27,8 +27,13 @@ export class DeviceController {
     this.smartthings = new SmartThingsClient(this.device, platform);
     this.power = new PowerMonitor(this.device, this);
     this.frame = new FrameSocket(this.device);
+  }
 
-    this.getInfo().catch(() => {});
+  /**
+   * Called by the Device once all its listeners are attached.
+   */
+  public start(): void {
+    this.ws.start();
   }
 
   public ping(): Promise<boolean> {

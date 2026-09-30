@@ -16,6 +16,8 @@ const STORAGE_KEY = 'smartthings';
 
 const OAUTH_TOKEN_URL = 'https://api.smartthings.com/oauth/token';
 const MAX_STATE_AGE = 24 * 60 * 60 * 1000;
+const REQUEST_TIMEOUT = 10 * 1000;
+const RETRY_DELAYS = [60 * 1000, 5 * 60 * 1000, 15 * 60 * 1000, 30 * 60 * 1000, 60 * 60 * 1000];
 
 function parseStateValue(attr?: SmartThingsAttribute): string | null {
   const value = attr?.value || null;
@@ -32,19 +34,35 @@ function parseStateValue(attr?: SmartThingsAttribute): string | null {
   return value;
 }
 
+// The token endpoint answering 400/401 means the refresh token was rejected; retrying will not fix it.
+function isAuthorizationRejected(error: any): boolean {
+  const status = error?.response?.status;
+  return status === 400 || status === 401;
+}
+
 export class SmartThingsManager {
   private storage!: SmartThingsStorage;
   private clientId: string | undefined;
   private clientSecret: string | undefined;
 
-  public isAvailable: boolean = false;
+  private available = false;
 
   private refreshPromise: Promise<void> | null = null;
   private refreshTimer: NodeJS.Timeout | null = null;
+  private retryAttempt = 0;
 
   constructor(private platform: SamsungPlatform) {
     this.clientId = platform.config.clientId;
     this.clientSecret = platform.config.clientSecret;
+  }
+
+  public get isAvailable(): boolean {
+    // A new authorization from the configuration interface comes with a valid token
+    if (!this.available && this.storage) {
+      void this.storage.reload().then(() => this.hasValidToken() && this.authenticate());
+    }
+
+    return this.available;
   }
 
   public async start(): Promise<void> {
@@ -58,39 +76,65 @@ export class SmartThingsManager {
       return;
     }
 
+    if (await this.authenticate()) {
+      this.platform.log.info('[SmartThings] Successfully initialized and authenticated.');
+    }
+  }
+
+  private async authenticate(): Promise<boolean> {
     try {
       await this.ensureValidToken();
+
+      this.retryAttempt = 0;
       this.scheduleRefresh();
 
-      this.platform.log.info('[SmartThings] Successfully initialized and authenticated.');
-    } catch (error: any) {
-      this.platform.log.error(`[SmartThings] Failed initialization check: ${error.message}`);
-      this.platform.log.info('[SmartThings] Please follow the authorization flow again...');
+      return true;
+    } catch {
+      return false;
     }
   }
 
   private async ensureValidToken(): Promise<void> {
-    const now = Date.now();
-
-    // Refresh token if it's expiring in the next 30 minutes
-    if (this.storage.expiresAt - now >= 30 * 60 * 1000) {
-      this.isAvailable = true;
+    if (this.hasValidToken()) {
+      this.available = true;
       return;
     }
 
+    this.platform.log.debug('[SmartThings] Token is expiring soon or expired. Refreshing token...');
+
+    return this.refreshToken();
+  }
+
+  // Refresh token if it's expiring in the next 30 minutes
+  private hasValidToken(): boolean {
+    return this.storage.expiresAt - Date.now() >= 30 * 60 * 1000;
+  }
+
+  private refreshToken(): Promise<void> {
     if (this.refreshPromise) {
       return this.refreshPromise;
     }
-
-    this.platform.log.debug('[SmartThings] Token is expiring soon or expired. Refreshing token...');
 
     this.refreshPromise = (async () => {
       try {
         await this.refreshAccessToken();
 
-        this.isAvailable = true;
+        this.available = true;
       } catch (error: any) {
-        this.isAvailable = false;
+        this.available = false;
+
+        // A rejected refresh token needs a new authorization; anything else (network, timeout) is retried.
+        if (isAuthorizationRejected(error)) {
+          // Marked as expired, so only a new authorization makes SmartThings available again.
+          this.storage.expiresAt = 0;
+          clearTimeout(this.refreshTimer || undefined);
+          this.platform.log.error(`[SmartThings] Authorization was rejected: ${error.message}`);
+          this.platform.log.info('[SmartThings] Please follow the authorization flow again...');
+        } else {
+          this.platform.log.error(`[SmartThings] Could not refresh the access token: ${error.message}`);
+          this.scheduleRetry();
+        }
+
         throw error;
       } finally {
         this.refreshPromise = null;
@@ -101,24 +145,27 @@ export class SmartThingsManager {
   }
 
   private scheduleRefresh(): void {
-    const now = Date.now();
+    // Calculate exact time until the next 15 minutes before token expiration
+    const delay = Math.max(this.storage.expiresAt - Date.now() - 15 * 60 * 1000, 0);
 
+    this.setTimer(delay);
+  }
+
+  private scheduleRetry(): void {
+    const delay = RETRY_DELAYS[Math.min(this.retryAttempt, RETRY_DELAYS.length - 1)];
+
+    this.retryAttempt++;
+    this.platform.log.info(`[SmartThings] Retrying in ${Math.round(delay / 60000)} minute(s)...`);
+
+    this.setTimer(delay);
+  }
+
+  private setTimer(delay: number): void {
     if (this.refreshTimer) {
       clearTimeout(this.refreshTimer);
     }
 
-    // Calculate exact time until the next 15 minutes before token expiration
-    const delay = Math.max(this.storage.expiresAt - now - 15 * 60 * 1000, 0);
-
-    this.refreshTimer = setTimeout(async () => {
-      try {
-        await this.ensureValidToken();
-        this.scheduleRefresh();
-      } catch (error: any) {
-        this.isAvailable = false;
-        this.platform.log.error(`[SmartThings] Background refresh token failed: ${error.message}`);
-      }
-    }, delay);
+    this.refreshTimer = setTimeout(() => void this.authenticate(), delay);
   }
 
   private async refreshAccessToken(): Promise<void> {
@@ -137,6 +184,7 @@ export class SmartThingsManager {
       }).toString(),
       {
         headers,
+        timeout: REQUEST_TIMEOUT,
       },
     );
 
@@ -147,7 +195,7 @@ export class SmartThingsManager {
     this.platform.log.debug('[SmartThings] Access token refreshed successfully');
   }
 
-  public async send<T>(config: SmartThingsRequestConfig): Promise<T> {
+  public async send<T>(config: SmartThingsRequestConfig, isRetry = false): Promise<T> {
     if (!this.isAvailable) {
       throw new SmartThingsNotAvailable();
     }
@@ -167,6 +215,7 @@ export class SmartThingsManager {
         method,
         headers,
         data,
+        timeout: REQUEST_TIMEOUT,
       });
 
       if (response.data?.error) {
@@ -175,6 +224,12 @@ export class SmartThingsManager {
 
       return response.data as T;
     } catch (error: any) {
+      // The access token was revoked or expired early: refresh it once and repeat the request.
+      if (error.response?.status === 401 && !isRetry) {
+        await this.refreshToken();
+        return this.send<T>(config, true);
+      }
+
       throw new Error(error.message, { cause: error });
     }
   }

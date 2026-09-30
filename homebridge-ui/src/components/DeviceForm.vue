@@ -122,6 +122,13 @@ async function handleTestConnection() {
   }
 }
 
+// The accessory UUID is derived from the raw MAC string, so an unchanged address keeps its original format.
+function resolveMac(existingMac) {
+  const mac = normalizeMac(form.mac);
+
+  return existingMac && normalizeMac(existingMac) === mac ? existingMac : mac;
+}
+
 function buildDeviceData(existingDevice = {}) {
   const next = { ...existingDevice };
 
@@ -133,7 +140,7 @@ function buildDeviceData(existingDevice = {}) {
   const data = {
     name: form.name,
     ip: form.ip,
-    mac: normalizeMac(form.mac),
+    mac: resolveMac(existingDevice.mac),
     deviceId: form.deviceId,
     uuid: form.uuid,
     options: form.options,
