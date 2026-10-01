@@ -1,5 +1,5 @@
 <script setup>
-import { computed, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useConfig } from '../composables/useConfig';
 import { useRouter } from '../composables/useRouter';
 import { useToast } from '../composables/useToast';
@@ -21,6 +21,8 @@ const { navigateTo, navigateBack, parentRoute } = useRouter();
 const toast = useToast();
 
 const inputs = computed(() => (props.deviceIndex !== undefined ? config.value?.devices?.[props.deviceIndex]?.inputs : config.value?.inputs) || []);
+// Kept from when the screen opened: once the delete is saved, the index points at the next input.
+const inputName = ref('');
 const inputItem = computed(() => inputs.value[props.inputIndex]);
 
 function goBack() {
@@ -50,7 +52,10 @@ watch(
     if (!inputItem.value) {
       toast.error('Input not found');
       goBack();
+      return;
     }
+
+    inputName.value = inputItem.value.name;
   },
   { immediate: true },
 );
@@ -59,7 +64,7 @@ watch(
 <template>
   <Confirm title="Delete input" confirm-label="Delete Input" @cancel="navigateBack('input', { action: 'edit', inputIndex, deviceIndex })" @confirm="confirmDelete">
     <p>
-      Are you sure you want to delete the input <span class="fw-semibold">{{ inputItem?.name }}</span> from configuration?
+      Are you sure you want to delete the input <span class="fw-semibold">{{ inputName }}</span> from configuration?
     </p>
     <p>This action is irreversible. Confirming saves the plugin configuration immediately.</p>
   </Confirm>

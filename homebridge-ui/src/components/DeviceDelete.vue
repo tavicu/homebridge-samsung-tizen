@@ -1,5 +1,5 @@
 <script setup>
-import { computed, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useConfig } from '../composables/useConfig';
 import { useRouter } from '../composables/useRouter';
 import { useToast } from '../composables/useToast';
@@ -16,6 +16,8 @@ const { config, updateConfig } = useConfig();
 const { navigateTo, navigateBack } = useRouter();
 const toast = useToast();
 
+// Kept from when the screen opened: once the delete is saved, the index points at the next device.
+const deviceName = ref('');
 const device = computed(() => config.value?.devices?.[props.deviceIndex]);
 
 async function confirmDelete() {
@@ -32,11 +34,14 @@ async function confirmDelete() {
 
 watch(
   () => props.deviceIndex,
-  (index) => {
-    if (!config.value?.devices?.[index]) {
+  () => {
+    if (!device.value) {
       toast.error('Device not found');
       navigateTo('dashboard', { tab: 'devices' });
+      return;
     }
+
+    deviceName.value = device.value.name;
   },
   { immediate: true },
 );
@@ -45,7 +50,7 @@ watch(
 <template>
   <Confirm title="Delete device" confirm-label="Delete Device" @cancel="navigateBack('device', { action: 'edit', deviceIndex })" @confirm="confirmDelete">
     <p>
-      Are you sure you want to delete the device <span class="fw-semibold">{{ device?.name }}</span> from configuration?
+      Are you sure you want to delete the device <span class="fw-semibold">{{ deviceName }}</span> from configuration?
     </p>
     <p>This action is irreversible. Confirming saves the plugin configuration immediately.</p>
   </Confirm>
