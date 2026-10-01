@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import SwitchesIcon from '../assets/icons/switches.svg';
 import { useConfig } from '../composables/useConfig';
 import { useRouter } from '../composables/useRouter';
+import { DEFAULT_INPUT_SOURCES, DEFAULT_PICTURE_MODES, DEFAULT_SOUND_MODES } from '../lib/device';
 import DocsLink from './DocsLink.vue';
 import Dropdown from './Dropdown.vue';
 import EmptyState from './EmptyState.vue';
@@ -33,19 +34,28 @@ const switches = computed(() => {
   return config.value?.switches || [];
 });
 
-const VALID_KEYS = ['power', 'sleep', 'mute', 'volume', 'app', 'input', 'channel', 'picture_mode', 'sound_mode', 'command'];
+// Ids missing from the default lists (custom modes, other sources) are shown as they are.
+const findName = (items, id) => items.find((item) => item.id === id)?.name ?? id;
 
-const switchEntries = (switchItem) => Object.entries(switchItem).filter(([key]) => VALID_KEYS.includes(key));
-
-const formatAction = (key, value) => {
-  if (key === 'mute') {
-    return { label: value ? 'Mute' : 'Unmute' };
-  }
-
-  const formattedValue = Array.isArray(value) ? value.join(', ') : value === undefined || value === null || value === '' ? 'N/A' : value;
-
-  return { label: key.replace('_', ' '), value: formattedValue };
+// One summary line per action, in the order the switch form lists them.
+const ACTIONS = {
+  power: (value) => (value ? { label: 'Power on first' } : null),
+  mute: (value) => ({ label: value ? 'Mute' : 'Unmute' }),
+  sleep: (value) => ({ label: 'Sleep', value: `${value} min` }),
+  volume: (value) => ({ label: 'Volume', value }),
+  app: (value) => ({ label: 'App', value }),
+  channel: (value) => ({ label: 'Channel', value }),
+  input: (value) => ({ label: 'Input', value: findName(DEFAULT_INPUT_SOURCES, value) }),
+  picture_mode: (value) => ({ label: 'Picture', value: findName(DEFAULT_PICTURE_MODES, value) }),
+  sound_mode: (value) => ({ label: 'Sound', value: findName(DEFAULT_SOUND_MODES, value) }),
+  command: (value) => ({ label: 'Keys', value: Array.isArray(value) ? value.join(', ') : value }),
 };
+
+const switchActions = (switchItem) =>
+  Object.entries(ACTIONS)
+    .filter(([key]) => switchItem[key] !== undefined && switchItem[key] !== null && switchItem[key] !== '')
+    .map(([key, format]) => ({ key, ...format(switchItem[key]) }))
+    .filter((action) => action.label);
 </script>
 
 <template>
@@ -74,7 +84,7 @@ const formatAction = (key, value) => {
 
           <td class="d-xs-none">
             <ul class="mb-0 small">
-              <li v-for="action in switchEntries(switchItem).map(([key, value]) => ({ key, ...formatAction(key, value) }))" :key="action.key" class="text-capitalize">
+              <li v-for="action in switchActions(switchItem)" :key="action.key">
                 <span class="text-body">{{ action.label }}<template v-if="action.value != null">:</template></span>
                 <span v-if="action.value != null" class="fw-semibold ms-1">{{ action.value }}</span>
               </li>
