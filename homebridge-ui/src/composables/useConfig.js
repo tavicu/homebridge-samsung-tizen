@@ -1,13 +1,11 @@
 import { ref } from 'vue';
 import { useHomebridge } from './useHomebridge';
-import { useToast } from './useToast';
 
 const config = ref({ platform: 'SamsungTizen' });
 const restartRequired = ref(false);
 
 export function useConfig() {
   const { hb } = useHomebridge();
-  const toast = useToast();
 
   function markRestartRequired() {
     restartRequired.value = true;
@@ -57,27 +55,25 @@ export function useConfig() {
     markRestartRequired();
   }
 
+  // Errors are left to the caller, which shows its own message.
   async function updateConfig(partialConfig, save = true) {
-    try {
-      const updatedConfig = JSON.parse(
-        JSON.stringify({
-          ...config.value,
-          ...partialConfig,
-        }),
-      );
+    const updatedConfig = JSON.parse(
+      JSON.stringify({
+        ...config.value,
+        ...partialConfig,
+      }),
+    );
 
-      await hb.updatePluginConfig([updatedConfig]);
+    await hb.updatePluginConfig([updatedConfig]);
 
-      if (save) {
-        await saveConfig();
-      }
+    // Homebridge already holds the new config at this point, even if saving it to disk fails below.
+    config.value = updatedConfig;
 
-      config.value = updatedConfig;
-      return updatedConfig;
-    } catch (error) {
-      toast.error('An error occurred while updating the config.');
-      throw error;
+    if (save) {
+      await saveConfig();
     }
+
+    return updatedConfig;
   }
 
   return {
