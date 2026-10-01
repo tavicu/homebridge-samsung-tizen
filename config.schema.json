@@ -64,7 +64,7 @@
           },
           "picture_mode": { "type": "string" },
           "sound_mode": { "type": "string" },
-          "command": { "type": "string" }
+          "command": { "type": ["string", "array"] }
         }
       },
       "keys": {

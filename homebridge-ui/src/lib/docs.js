@@ -21,7 +21,6 @@ const DOCS = {
   smartthingsStatus: 'smartthings/#connection-status',
   smartthingsPickTv: 'smartthings/#pick-the-tv',
   smartthingsFeatures: 'smartthings/features.html',
-  smartthingsInputSource: 'smartthings/features.html#input-source',
   tvNotSupported: 'troubleshooting/common-issues.html#tv-is-not-supported',
 };
 
