@@ -28,7 +28,10 @@ async function startApp() {
     moveModalPadding(root);
     app.mount(root);
   } catch (err) {
-    root.innerHTML = `<div class="alert alert-danger">There was an error initializing the app: ${err.message}</div>`;
+    const alert = document.createElement('div');
+    alert.className = 'alert alert-danger';
+    alert.textContent = `There was an error initializing the app: ${err.message}`;
+    root.replaceChildren(alert);
   }
 }
 

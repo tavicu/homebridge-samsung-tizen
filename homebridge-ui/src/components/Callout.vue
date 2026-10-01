@@ -26,9 +26,7 @@ const props = defineProps({
       <div v-if="title" class="callout-title fw-semibold" :class="{ 'mb-1': text || $slots.default }">{{ title }}</div>
 
       <div v-if="text || $slots.default" class="callout-text">
-        <slot>
-          <div v-html="text" />
-        </slot>
+        <slot>{{ text }}</slot>
       </div>
     </div>
 
