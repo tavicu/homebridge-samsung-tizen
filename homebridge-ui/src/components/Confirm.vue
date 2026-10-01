@@ -23,9 +23,14 @@ const props = defineProps({
     type: String,
     default: 'Cancel',
   },
+  // Declared as a prop so `@confirm` handlers can be awaited: the buttons stay disabled until it settles.
+  onConfirm: {
+    type: Function,
+    default: undefined,
+  },
 });
 
-const emit = defineEmits(['cancel', 'confirm']);
+const emit = defineEmits(['cancel']);
 
 const isConfirming = ref(false);
 
@@ -38,13 +43,18 @@ const stateIcons = {
 
 const paragraphs = computed(() => (Array.isArray(props.text) ? props.text : [props.text]));
 
-function handleConfirm() {
+async function handleConfirm() {
   if (isConfirming.value) {
     return;
   }
 
   isConfirming.value = true;
-  emit('confirm');
+
+  try {
+    await props.onConfirm?.();
+  } finally {
+    isConfirming.value = false;
+  }
 }
 </script>
 
