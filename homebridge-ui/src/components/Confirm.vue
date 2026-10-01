@@ -77,7 +77,7 @@ async function handleConfirm() {
         {{ cancelLabel }}
       </button>
       <button type="button" class="btn" :class="`btn-${state}`" :disabled="isConfirming" @click="handleConfirm">
-        <span v-if="isConfirming" class="spinner-border spinner-border-sm me-1" />
+        <span v-if="isConfirming" class="spinner-border spinner-border-sm me-2" />
         {{ confirmLabel }}
       </button>
     </div>

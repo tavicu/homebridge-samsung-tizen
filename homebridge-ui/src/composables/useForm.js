@@ -31,6 +31,7 @@ function trimFormValues(form) {
 export function useForm() {
   const formEl = ref(null);
   const validated = ref(false);
+  const isSaving = ref(false);
 
   let trackedForm = null;
   const snapshot = ref(null);
@@ -59,6 +60,23 @@ export function useForm() {
     return trackedForm;
   }
 
+  // Wraps a submit handler so it runs once at a time: a double click does not save the same form twice.
+  function withSaving(handler) {
+    return async (...args) => {
+      if (isSaving.value) {
+        return;
+      }
+
+      isSaving.value = true;
+
+      try {
+        await handler(...args);
+      } finally {
+        isSaving.value = false;
+      }
+    };
+  }
+
   function createId() {
     return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 11)}`;
   }
@@ -70,6 +88,8 @@ export function useForm() {
     formEl,
     validated,
     isDirty,
+    isSaving,
+    withSaving,
     createId,
     createForm,
     markPristine,

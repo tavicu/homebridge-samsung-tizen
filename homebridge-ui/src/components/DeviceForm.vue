@@ -54,7 +54,7 @@ const currentTab = computed(() => {
   return 'settings';
 });
 
-const { formEl, validated, checkValidity, createForm, isDirty, markPristine } = useForm();
+const { formEl, validated, checkValidity, createForm, isDirty, isSaving, markPristine, withSaving } = useForm();
 const form = createForm({
   name: '',
   ip: '',
@@ -198,6 +198,8 @@ async function handleSubmit() {
   }
 }
 
+const submit = withSaving(handleSubmit);
+
 watch(
   () => [props.action, props.deviceIndex],
   () => init(),
@@ -245,7 +247,7 @@ watch(
 
   <Tabs v-if="isEdit" :tabs="tabs" />
 
-  <form v-show="!isEdit || currentTab === 'settings'" ref="formEl" class="card rounded" :class="{ 'was-validated': validated }" novalidate @submit.prevent="handleSubmit">
+  <form v-show="!isEdit || currentTab === 'settings'" ref="formEl" class="card rounded" :class="{ 'was-validated': validated }" novalidate @submit.prevent="submit">
     <div class="card-header">
       <h6 class="fw-semibold mb-0">Main Configuration <DocsLink path="addDevice" /></h6>
       <p class="small text-secondary mt-1">The name and network details used to control this TV</p>
@@ -394,7 +396,10 @@ watch(
 
       <div class="card-actions">
         <button v-if="isEdit" type="button" class="btn btn-outline-secondary" :disabled="!isDirty" @click="handleReset">Reset</button>
-        <button type="submit" class="btn btn-primary" :disabled="isEdit && !isDirty">{{ isEdit ? 'Update Device' : 'Add Device' }}</button>
+        <button type="submit" class="btn btn-primary" :disabled="isSaving || (isEdit && !isDirty)">
+          <span v-if="isSaving" class="spinner-border spinner-border-sm me-2" />
+          {{ isEdit ? 'Update Device' : 'Add Device' }}
+        </button>
       </div>
     </div>
   </form>

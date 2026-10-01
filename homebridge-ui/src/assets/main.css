@@ -78,6 +78,12 @@ p:last-child {
   line-height: 1.5;
 }
 
+/* Keeps a loading spinner vertically centered with the button label. */
+.btn:has(> .spinner-border) {
+  display: inline-flex;
+  align-items: center;
+}
+
 .btn-sm,
 .btn-group-sm .btn {
   font-size: 0.8rem;

@@ -32,7 +32,7 @@ const { getApps } = useDevice();
 const { navigateTo, navigateBack } = useRouter();
 const { getInputSources, getPictureModes, getSoundModes } = useSmartThings();
 const toast = useToast();
-const { formEl, validated, checkValidity, createForm, createId, isDirty, markPristine } = useForm();
+const { formEl, validated, checkValidity, createForm, createId, isDirty, isSaving, markPristine, withSaving } = useForm();
 
 function createCommand(value = '') {
   return { id: createId(), value };
@@ -264,6 +264,8 @@ async function handleSubmit() {
   }
 }
 
+const submit = withSaving(handleSubmit);
+
 function addCommand() {
   form.commands.push(createCommand());
 }
@@ -308,7 +310,7 @@ watch(
     </div>
   </div>
 
-  <form ref="formEl" class="card rounded" :class="{ 'was-validated': validated }" novalidate @submit.prevent="handleSubmit">
+  <form ref="formEl" class="card rounded" :class="{ 'was-validated': validated }" novalidate @submit.prevent="submit">
     <div class="card-header">
       <h6 class="fw-semibold mb-0">Switch Configuration <DocsLink path="switches" /></h6>
       <p class="small text-secondary mt-1">The name shown in HomeKit, and whether the TV should be turned on first</p>
@@ -471,7 +473,10 @@ watch(
 
       <div class="card-actions">
         <button v-if="isEdit" type="button" class="btn btn-outline-secondary" :disabled="!isDirty" @click="handleReset">Reset</button>
-        <button type="submit" class="btn btn-primary" :disabled="isEdit && !isDirty">{{ isEdit ? 'Save Switch' : 'Add Switch' }}</button>
+        <button type="submit" class="btn btn-primary" :disabled="isSaving || (isEdit && !isDirty)">
+          <span v-if="isSaving" class="spinner-border spinner-border-sm me-2" />
+          {{ isEdit ? 'Save Switch' : 'Add Switch' }}
+        </button>
       </div>
     </div>
   </form>

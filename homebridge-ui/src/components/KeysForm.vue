@@ -20,7 +20,7 @@ const isDeviceScoped = computed(() => props.deviceIndex !== undefined);
 const { config, updateConfig, cleanConfig } = useConfig();
 const { enableSaveButton, disableSaveButton } = useHomebridge();
 const toast = useToast();
-const { formEl, validated, checkValidity, createForm, isDirty, markPristine } = useForm();
+const { formEl, validated, checkValidity, createForm, isDirty, isSaving, markPristine, withSaving } = useForm();
 const { keyGroups, readKeys, toConfigKeys } = useKeys();
 
 const globalKeys = computed(() => readKeys(config.value.keys));
@@ -63,6 +63,8 @@ async function handleSubmit() {
   }
 }
 
+const submit = withSaving(handleSubmit);
+
 watch(isDirty, (dirty) => {
   if (isDeviceScoped.value) {
     return;
@@ -98,7 +100,7 @@ watch(
     <DocsLink path="keys">Learn more</DocsLink>
   </Callout>
 
-  <form ref="formEl" class="card rounded shadow" :class="{ 'was-validated': validated }" novalidate @submit.prevent="handleSubmit">
+  <form ref="formEl" class="card rounded shadow" :class="{ 'was-validated': validated }" novalidate @submit.prevent="submit">
     <template v-for="group in keyGroups" :key="group.id">
       <div class="card-header">
         <h6 class="fw-semibold mb-0">{{ group.title }}</h6>
@@ -124,7 +126,10 @@ watch(
 
       <div class="card-actions">
         <button type="button" class="btn btn-outline-secondary" :disabled="!isDirty" @click="fillForm">Reset</button>
-        <button type="submit" class="btn btn-primary" :disabled="!isDirty">Save Keys</button>
+        <button type="submit" class="btn btn-primary" :disabled="isSaving || !isDirty">
+          <span v-if="isSaving" class="spinner-border spinner-border-sm me-2" />
+          Save Keys
+        </button>
       </div>
     </div>
   </form>
