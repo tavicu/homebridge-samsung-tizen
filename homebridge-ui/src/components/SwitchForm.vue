@@ -29,7 +29,7 @@ const props = defineProps({
 
 const { config, updateConfig, cleanConfig } = useConfig();
 const { getApps } = useDevice();
-const { navigateTo, navigateBack } = useRouter();
+const { navigateTo, navigateBack, parentRoute } = useRouter();
 const { getInputSources, getPictureModes, getSoundModes } = useSmartThings();
 const toast = useToast();
 const { formEl, validated, checkValidity, createForm, createId, isDirty, isSaving, markPristine, withSaving } = useForm();
@@ -160,6 +160,10 @@ async function loadDeviceApps() {
   deviceApps.value = await getApps(device.value?.mac);
 }
 
+function goBack() {
+  navigateBack(...parentRoute('switches', props.deviceIndex));
+}
+
 function init() {
   validated.value = false;
 
@@ -168,7 +172,7 @@ function init() {
 
     if (!switchItem) {
       toast.error('Switch not found');
-      navigateBack('dashboard', { tab: 'switches' });
+      goBack();
       return;
     }
 
@@ -258,7 +262,7 @@ async function handleSubmit() {
       toast.success('Switch added successfully.');
     }
 
-    navigateBack('dashboard', { tab: 'switches' });
+    goBack();
   } catch {
     toast.error(isEdit.value ? 'Failed to edit switch' : 'Failed to add switch');
   }
@@ -305,7 +309,7 @@ watch(
     </div>
 
     <div v-if="isEdit" class="d-flex flex-column flex-sm-row gap-2 flex-shrink-0">
-      <button type="button" class="btn btn-outline-secondary" @click="navigateBack('dashboard', { tab: 'switches' })">Back</button>
+      <button type="button" class="btn btn-outline-secondary" @click="goBack">Back</button>
       <button type="button" class="btn btn-outline-danger" @click="navigateTo('switch', { action: 'delete', switchIndex, deviceIndex })">Delete Switch</button>
     </div>
   </div>
@@ -468,7 +472,7 @@ watch(
     </div>
 
     <div class="card-footer">
-      <button v-if="!isEdit" type="button" class="btn btn-outline-secondary" @click="navigateBack('dashboard', { tab: 'switches' })">Cancel</button>
+      <button v-if="!isEdit" type="button" class="btn btn-outline-secondary" @click="goBack">Cancel</button>
       <small v-else class="small text-muted">Changes are saved to your config file instantly.</small>
 
       <div class="card-actions">

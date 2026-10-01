@@ -28,7 +28,7 @@ const props = defineProps({
 
 const { config, updateConfig, cleanConfig } = useConfig();
 const { getApps } = useDevice();
-const { navigateTo, navigateBack } = useRouter();
+const { navigateTo, navigateBack, parentRoute } = useRouter();
 const { getInputSources } = useSmartThings();
 const toast = useToast();
 const { formEl, validated, checkValidity, createForm, createId, isDirty, isSaving, markPristine, withSaving } = useForm();
@@ -100,6 +100,10 @@ async function loadDeviceApps() {
   deviceApps.value = await getApps(device.value?.mac);
 }
 
+function goBack() {
+  navigateBack(...parentRoute('inputs', props.deviceIndex));
+}
+
 function init() {
   validated.value = false;
 
@@ -108,7 +112,7 @@ function init() {
 
     if (!input) {
       toast.error('Input not found');
-      navigateBack('dashboard', { tab: 'inputs' });
+      goBack();
       return;
     }
 
@@ -190,7 +194,7 @@ async function handleSubmit() {
       toast.success('Input added successfully.');
     }
 
-    navigateBack('dashboard', { tab: 'inputs' });
+    goBack();
   } catch {
     toast.error(isEdit.value ? 'Failed to edit input' : 'Failed to add input');
   }
@@ -237,7 +241,7 @@ watch(
     </div>
 
     <div v-if="isEdit" class="d-flex flex-column flex-sm-row gap-2 flex-shrink-0">
-      <button type="button" class="btn btn-outline-secondary" @click="navigateBack('dashboard', { tab: 'inputs' })">Back</button>
+      <button type="button" class="btn btn-outline-secondary" @click="goBack">Back</button>
       <button type="button" class="btn btn-outline-danger" @click="navigateTo('input', { action: 'delete', inputIndex, deviceIndex })">Delete Input</button>
     </div>
   </div>
@@ -337,7 +341,7 @@ watch(
     </div>
 
     <div class="card-footer">
-      <button v-if="!isEdit" type="button" class="btn btn-outline-secondary" @click="navigateBack('dashboard', { tab: 'inputs' })">Cancel</button>
+      <button v-if="!isEdit" type="button" class="btn btn-outline-secondary" @click="goBack">Cancel</button>
       <small v-else class="small text-muted">Changes are saved to your config file instantly.</small>
 
       <div class="card-actions">
