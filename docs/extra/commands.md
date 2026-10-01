@@ -1,26 +1,26 @@
 # Commands
 
-Commands represents buttons from phisical remotes and Samsung API allows us to send these commands to the TV.
+Commands are the buttons of the physical remote. The plugin sends them to the TV over the local network, from [inputs](/features/inputs.md#command), [switches](/features/switches.md#command) and the [Control Center remote](/features/keys.md).
 
-Example of sending a command
+Send one command:
 
 ``` json
 {"name": "Vol Up", "command": "KEY_VOLUP"}
 ```
 
-Example of sending multiple commands
+Send several commands, one after the other:
 
 ``` json
-{"name": "Multiple commands", "command": "KEY_LEFT,KEY_RIGHT,KEY_UP"}
+{"name": "Multiple commands", "command": ["KEY_LEFT", "KEY_RIGHT", "KEY_UP"]}
 ```
 
-Example of sending a command multiple times. This will send the command `KEY_VOLUP` **5 times**
+Send a command several times. This sends `KEY_VOLUP` **5 times**:
 
 ``` json
 {"name": "Vol Up", "command": "KEY_VOLUP*5"}
 ```
 
-Example of holding a key for 5 seconds. The time is in seconds, to hold for 2 minutes you need to use `120s`
+Hold a key for 5 seconds. The time is in seconds and can have decimals, so 2 minutes is `120s` and half a second is `0.5s`:
 
 ``` json
 {"name": "Vol Up", "command": "KEY_VOLUP*5s"}
@@ -28,7 +28,7 @@ Example of holding a key for 5 seconds. The time is in seconds, to hold for 2 mi
 
 ## List of commands
 
-Here you can find a list of commands that can be sent to TV. These commands are buttons that are found on phisical remote.
+These are the commands you can send to the TV. Each one is a button found on a physical remote.
 
 ::: tip
 This is not an official list from Samsung and some of the keys may not work with your TV.
@@ -186,7 +186,6 @@ KEY_RSURF
 KEY_ASPECT
 KEY_GAME
 KEY_LINK
-KEY_FF
 KEY_ANGLE
 KEY_RESERVED1
 KEY_ZOOM1

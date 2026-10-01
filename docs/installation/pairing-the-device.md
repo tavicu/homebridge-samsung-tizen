@@ -1,17 +1,23 @@
 # Pairing the device
 
-Once you set up your devices in the configuration file, you need to restart the Homebridge server to apply the changes and to pair each device for the first time.
+After you add a TV, restart Homebridge. The plugin connects to the TV and the TV asks for permission. When you allow it, the TV gives the plugin a token. The plugin saves it and uses it on every later connection, so you only allow it once.
 
-That start reaches the TV and asks for permission. After you allow the connection, the TV provides a token. The plugin saves it and uses it on later connections, so you will not have to allow the connection every time.
-
-The pairing process starts after the Homebridge server has started. If it fails, the plugin will retry the pairing three times. After that, if it wasn't able to pair the device, it will show an error in the console. To start the pairing process again you will have to restart the Homebridge server. The TV needs to be on, otherwise the prompt never appears.
-
-When the prompt appears, choose **Allow**.
+When the prompt appears on the TV, choose **Allow**.
 
 ![Pairing prompt on the TV](/images/install.pairing-device.jpg)
 
-### Clicked Deny by mistake
+The TV has to be on for the prompt to appear. If it is off when Homebridge starts, the log says `Waiting for the TV to turn on to pair...`. Turn the TV on and the prompt appears. You do not have to restart Homebridge.
 
-**Deny** is remembered by the TV, and later connections are rejected. On the TV open `Settings` → `General` → `External Device Manager` → `Device Connection Manager` → `Device List`, look for **Homebridge** in the list, and either change it to Allow or delete the entry. Restart Homebridge to show the prompt again.
+If the TV does not answer in time, the plugin tries again a few times. If it still fails, the log says `Pairing failed, it will be retried the next time the TV turns on`. Turn the TV off and on again to get a new prompt.
 
-![Setting device saving configuration](/images/install.pairing-device.jpg)
+With debug mode on, a successful pairing writes `Device paired with success` in the log.
+
+## Clicked Deny by mistake
+
+**Deny** is remembered by the TV, and later connections are rejected. The log then says `TV rejected the WebSocket connection (unauthorized)`.
+
+On the TV open `Settings` → `General` → `External Device Manager` → `Device Connection Manager` → `Device List`. On newer TVs the menu is `General & Privacy` instead of `General`. Look for **Homebridge** in the list, and either change it to Allow or delete the entry. If you delete it, the prompt appears again the next time the TV turns on.
+
+## Frame TVs
+
+A Frame is detected during pairing. Its Art Mode and Power switches appear once the TV is paired. See [Frame TVs](/configuration/frame-tvs.md).

@@ -1,36 +1,58 @@
 # Switches
 
-A custom switch is an extra accessory on the TV. One switch can run several actions.
+A custom switch is an extra switch on the TV accessory. One switch can run several actions, for example turn the TV on, set the volume and open an app.
 
-By default the switch name in Home is the TV name plus the name you set. `Switch.DeviceName.Disable` in the TV options uses only the switch name.
+Global switches, set on the **Switches** tab of the dashboard, are added to every TV. Switches on a TV's own **Switches** tab are added on top of them, for that TV only. See [Platform and device settings](/configuration/device-settings.md#platform-and-device-settings).
 
-Switches set on the plugin are created for every TV. A list on a device replaces that list for that TV. Home identifies a switch by its actions, not by its name or its place in the list. Renaming it does not create a new accessory. An unnamed switch is skipped and written to the log.
+By default the switch name in Home is the TV name followed by the name you set. With `Switch.DeviceName.Disable` in the TV options, only the switch name is used.
 
-This example sets a 60 minute sleep timer, mutes the TV, sends a remote key, and changes the channel:
+Home identifies a switch by its actions, not by its name or its place in the list. Renaming a switch keeps it the same in Home. Changing its actions makes it a new switch, so scenes that used it have to be set again. A switch with no name is skipped and written to the log.
+
+This example sets a 60 minute sleep timer, mutes the TV, and changes the channel:
 
 ```json
 {
   "name": "Movie night",
   "sleep": 60,
   "mute": true,
-  "command": "KEY_16_9",
   "channel": 13
 }
 ```
 
-The switch shows ON when **any** action that has a state is active. Sleep together with mute is ON if the timer is running or the TV is muted. It does not wait until both are active.
+## How a switch works
 
-These stay ON while they match the TV, and they are checked every 15 seconds while the TV is on:
+### Turning it on
 
-- application
-- input source
-- picture mode
-- sound mode
-- channel
+The actions run in this order, with a short pause between them: [power](#power), [sleep](#sleep), [mute](#mute), [app](#application), [input](#input), [channel](#channel), [picture mode](#picture-mode), [sound mode](#sound-mode), [volume](#volume), [command](#command). The order in your config does not matter.
 
-Mute follows the live mute state. Sleep stays ON until the timer ends or the TV turns off. Command and volume switches have no state to read, so they turn off about half a second after they run.
+If the TV is off and the switch does not have `power`, nothing runs. The switch goes back to OFF and a warning is written to the log. Home does not show it as a failed accessory.
 
-If the TV is off and the switch does not turn it on, the switch goes back to OFF and a warning is written to the log. Home does not show a failed accessory.
+### Turning it off
+
+Only two actions have an opposite:
+
+- **sleep** cancels the timer.
+- **mute** does the opposite of what the switch does. A mute switch unmutes, an unmute switch mutes.
+
+The other actions do nothing when the switch is turned off. The TV keeps the app, source, channel or mode it has. The switch then reads the TV again and shows the real state.
+
+### The state in Home
+
+The switch is ON when **any** of its actions that has a state matches the TV. A switch with sleep and mute is ON while the timer runs or while the TV is muted. It does not wait for both.
+
+| Action                       | The switch is ON while                     |
+| :--------------------------- | :----------------------------------------- |
+| sleep                        | the timer is running                       |
+| mute                         | the TV mute matches the switch             |
+| app                          | that app is in front                       |
+| input                        | that source is active                      |
+| channel                      | that channel is playing                    |
+| picture mode                 | that picture mode is active                |
+| sound mode                   | that sound mode is active                  |
+
+App, source, channel and modes are checked every 15 seconds while the TV is on. Mute follows the TV as soon as it changes, including from the physical remote.
+
+Power, volume and command have no state to read. A switch with only these actions turns off about half a second after it runs.
 
 ## Settings
 
@@ -42,11 +64,13 @@ If the TV is off and the switch does not turn it on, the switch goes back to OFF
 | [mute](#mute)                 | Mute or unmute                            |
 | [volume](#volume)             | Set the volume                            |
 | [app](#application)           | Open an application                       |
-| [input](#input)               | Select a source                           |
+| [input](#input)               | Select a source. Needs SmartThings.       |
 | [channel](#channel)           | Switch to a channel                       |
-| [picture_mode](#picture-mode) | Set the picture mode                      |
-| [sound_mode](#sound-mode)     | Set the sound mode                        |
+| [picture_mode](#picture-mode) | Set the picture mode. Needs SmartThings.  |
+| [sound_mode](#sound-mode)     | Set the sound mode. Needs SmartThings.    |
 | [command](#command)           | Send one or more remote keys              |
+
+A switch needs a name and at least one action.
 
 ### name
 
@@ -59,15 +83,17 @@ If the TV is off and the switch does not turn it on, the switch goes back to OFF
 
 ### power
 
-When this is `true`, the TV is turned on before the other actions. There is a short wait after power-on so the next command has a TV that is ready.
+When this is `true` and the TV is off, the TV is turned on first. The plugin then waits 3 seconds, so the next actions reach a TV that is ready. If the TV is already on, nothing is sent.
 
-If this is omitted or `false`, and the TV is off, the switch turns back off and nothing else runs.
+Turning the switch off does not turn the TV off. Use [sleep](#sleep) for that.
+
+In the settings screen this is **Power on TV before running actions**.
 
 - Type: `boolean`
 - Default: `false`
 
 ```json
-{ "name": "Volume up", "power": true, "command": "KEY_VOLUP" }
+{ "name": "Netflix", "power": true, "app": "11101200001" }
 ```
 
 ### sleep
@@ -84,11 +110,9 @@ Turns the TV off after the given number of minutes. The switch stays ON while th
 
 ### mute
 
-`true` mutes when the switch turns on. `false` unmutes. Leave the key out for no mute action.
+`true` mutes the TV when the switch turns on. `false` unmutes it. Leave the key out for no mute action. In the settings screen the options are **None**, **Mute** and **Unmute**.
 
-In version 5 this always sent `KEY_MUTE`, so the value did not matter. The settings screen offers **None**, **Mute**, and **Unmute**.
-
-Mute state comes from the TV, so the switch follows the physical remote.
+The switch follows the TV. A mute switch is ON while the TV is muted. An unmute switch is ON while the TV is not muted.
 
 - Type: `boolean`
 
@@ -102,7 +126,7 @@ Mute state comes from the TV, so the switch follows the physical remote.
 
 ### volume
 
-Sets the speaker volume from 0 to 100. This uses the local TV API and does not need SmartThings. The switch turns off shortly after it runs, because a volume level is not tracked as a switch state. For a slider that stays at the current level, see [Volume](/features/volume.md).
+Sets the speaker volume from 0 to 100. This uses the TV's local API and does not need SmartThings. The switch turns off shortly after it runs. For a slider that stays at the current level, see [Volume](/features/volume.md#volume-slider).
 
 - Type: `integer`
 - Minimum: `0`
@@ -115,10 +139,13 @@ Sets the speaker volume from 0 to 100. This uses the local TV API and does not n
 
 ### application
 
-Opens an installed app. Ids are on the [Applications](/extra/applications.md) page. When the plugin has already stored the apps for that TV, the settings screen lists them. **Other** lets you type an id.
+Opens an installed app. Some app ids are on the [Applications](/extra/applications.md) page.
+
+When you add the switch from a TV's own **Switches** tab, the settings screen lists the apps installed on that TV, if the TV has reported them. Choose **Other** to type an id.
 
 The switch stays ON while that app is in front.
 
+- Key: `app`
 - Type: `string`
 - Example: `11101200001`
 
@@ -129,16 +156,14 @@ The switch stays ON while that app is in front.
 ### input
 
 ::: warning
-This action needs [SmartThings](/configuration/smartthings-api.md) and a `deviceId` on the TV.
+This action needs [SmartThings](/smartthings/index.md) and a `deviceId` on the TV.
 :::
 
-Selects a source. The switch stays ON while that source is active.
-
-Digital TV is `dtv`. `digitalTv` from an older config has to be saved again as Digital TV.
+Selects a source. The switch stays ON while that source is active. The values are on the [SmartThings features](/smartthings/features.md#input-source) page.
 
 - Type: `string`
 - Example: `HDMI1`
-- Values: `dtv`, `USB`, `USB-C`, `Display Port`, `HDMI1`, `HDMI2`, `HDMI3`, `HDMI4`, `HDMI5`, `HDMI6`
+- Values: `dtv`, `HDMI1`, `HDMI2`, `HDMI3`, `HDMI4`, `HDMI5`, `HDMI6`, `USB`, `USB-C`, `Display Port`
 
 ```json
 { "name": "Xbox", "input": "HDMI1" }
@@ -146,9 +171,9 @@ Digital TV is `dtv`. `digitalTv` from an older config has to be saved again as D
 
 ### channel
 
-Changes to a channel number. The switch stays ON while that channel is playing.
+Changes to a channel number.
 
-With SmartThings, the channel is set through the API. Without it, the plugin sends the digit keys and then Enter.
+With SmartThings, the channel is set through the API, and the switch stays ON while the TV is on that channel. Without it, the plugin sends the digit keys followed by Enter. It cannot read the current channel, so the switch turns off again at the next check. See [SmartThings features](/smartthings/features.md#channel).
 
 - Type: `integer`
 - Minimum: `1`
@@ -161,15 +186,12 @@ With SmartThings, the channel is set through the API. Without it, the plugin sen
 ### picture mode
 
 ::: warning
-This action needs [SmartThings](/configuration/smartthings-api.md) and a `deviceId` on the TV.
+This action needs [SmartThings](/smartthings/index.md) and a `deviceId` on the TV.
 :::
 
-Sets the picture mode. Store the SmartThings mode id, for example `modeMovie`, so the command is right no matter which language the TV uses. The settings screen lists the modes that TV reports.
+Sets the picture mode, using the SmartThings mode id, for example `modeMovie`. The switch stays ON while that mode is active. The common ids, and how older configs are handled, are on the [SmartThings features](/smartthings/features.md#picture-mode) page.
 
-Older configs that used the English names `Dynamic`, `Standard`, `Natural`, and `Movie` still work. They are sent as `modeDynamic`, `modeStandard`, `modeNatural`, and `modeMovie`.
-
-The switch stays ON while that mode is active.
-
+- Key: `picture_mode`
 - Type: `string`
 - Example: `modeMovie`
 
@@ -180,11 +202,12 @@ The switch stays ON while that mode is active.
 ### sound mode
 
 ::: warning
-This action needs [SmartThings](/configuration/smartthings-api.md) and a `deviceId` on the TV.
+This action needs [SmartThings](/smartthings/index.md) and a `deviceId` on the TV.
 :::
 
-Sets the sound mode, using the SmartThings mode id. The settings screen lists the modes that TV reports. Common ids are `modeStandard`, `modeSmart`, and `modeAmplify`. The switch stays ON while that mode is active.
+Sets the sound mode, using the SmartThings mode id, for example `modeStandard`. The switch stays ON while that mode is active. See [SmartThings features](/smartthings/features.md#sound-mode).
 
+- Key: `sound_mode`
 - Type: `string`
 - Example: `modeStandard`
 
@@ -194,31 +217,31 @@ Sets the sound mode, using the SmartThings mode id. The settings screen lists th
 
 ### command
 
-Sends remote keys. The list is on the [Commands](/extra/commands.md) page. The switch turns off shortly after the keys are sent.
+Sends remote keys, after all the other actions. The list is on the [Commands](/extra/commands.md) page. A switch with only commands turns off shortly after the keys are sent.
 
-- Type: `string` or a list of strings
-- Example: `KEY_VOLUP`
+- Type: `array` of strings
+- Example: `["KEY_VOLUP"]`
 
 One key:
 
 ```json
-{ "name": "Volume up", "command": "KEY_VOLUP" }
+{ "name": "Info", "command": ["KEY_INFO"] }
 ```
 
-Several keys, as a string or a list:
+Several keys, sent one after the other. In the settings screen each key is a row:
 
 ```json
-{ "name": "Several keys", "command": "KEY_LEFT,KEY_RIGHT,KEY_UP" }
+{ "name": "Several keys", "command": ["KEY_LEFT", "KEY_RIGHT", "KEY_UP"] }
 ```
 
 Repeat a key. This sends `KEY_VOLUP` five times:
 
 ```json
-{ "name": "Volume up", "command": "KEY_VOLUP*5" }
+{ "name": "Volume up", "command": ["KEY_VOLUP*5"] }
 ```
 
-Hold a key. The number is seconds, so two minutes is `120s`:
+Hold a key. The number is seconds and can have decimals. This holds `KEY_VOLUP` for two and a half seconds:
 
 ```json
-{ "name": "Hold volume", "command": "KEY_VOLUP*5s" }
+{ "name": "Hold volume up", "command": ["KEY_VOLUP*2.5s"] }
 ```

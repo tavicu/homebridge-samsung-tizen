@@ -1,19 +1,21 @@
 # Applications
 
-When you set an application on an input or a custom switch, the settings screen can list the apps installed on that TV. Pick one from the list, or choose **Other** and type an id.
+When you set an application on an input or a custom switch from a TV's own tab, the settings screen can list the apps installed on that TV. Pick one from the list, or choose **Other** and type an id.
 
-The plugin tries to fetch that list when you pair the TV. Not every TV supports this request. If the dropdown is empty, type the id yourself.
+The list is available only on TVs that support it. The plugin asks the TV for its installed apps when it pairs, and each time Homebridge starts while the TV is on. Older TVs usually answer, so their apps are listed. Many newer TVs no longer support this request, so there is no list and you type the id yourself.
 
-If the app you want is not in the dropdown, use the [table below](#list-with-ids), the [Samsung website](#view-application-ids-on-samsung-website), or [Tizen Studio](#get-installed-applications).
+Global inputs and switches, added from the dashboard, apply to every TV, so there is no single TV to load the list from. For them you type the id.
+
+If the app you want is not in the list, use the [table below](#list-with-ids), the [Samsung website](#view-application-ids-on-samsung-website), or [Tizen Studio](#get-installed-applications).
 
 ## List with IDs
 
 Over the years we managed to gather a list of IDs for most used applications.
 
-Because the IDs change with each release we cannot guarantee that IDs from this list will work on your TV! If you can't find an application in the list or if the ID doesn't work, use the dropdown in the plugin settings, or follow the steps from [Get installed applications](#get-installed-applications).
+Because the IDs change with each release we cannot guarantee that IDs from this list will work on your TV! If you can't find an application in the list or if the ID doesn't work, use the list in the plugin settings, or follow the steps from [Get installed applications](#get-installed-applications).
 
 ::: tip Multiple IDs for one application
-Some applications have multiple IDs  because they may differ depending on what year your TV was released and what version of Tizen is using.
+Some applications have multiple IDs because they may differ depending on what year your TV was released and what version of Tizen is using.
 Most of the IDs changed starting with year 2020. If you know your TV model is from 2020 or newer then start and try the IDs from the right. If your TV is older than 2020 then try the IDs from the left.
 :::
 
@@ -153,7 +155,6 @@ Most of the IDs changed starting with year 2020. If you know your TV model is fr
 | iQIYI                    | `3202006020934`                                     |
 | iWantTFC                 | `3201910019513`                                     |
 | Viu                      | `3201807016555`                                     |
-| iQIYI                    | `3202006020934`                                     |
 | Nifty Gateway            | `3202201026324`                                     |
 | DStv                     | `3201804016109`                                     |
 | Showmax                  | `3201903018045`                                     |
@@ -186,7 +187,7 @@ Use this when the settings screen has no list yet, or the app you need is missin
 [https://developer.samsung.com/smarttv/develop/getting-started/using-sdk/tv-device.html](https://developer.samsung.com/smarttv/develop/getting-started/using-sdk/tv-device.html)
 
 3. In Tizen Studio Device Manager, right click on the entry with your TV and select `Installed Web App List` from the dropdown.
-If you can't see `Installed Web App List` in the dropdown, make sure you installed the TV Extenstion from the first step!
+If you can't see `Installed Web App List` in the dropdown, make sure you installed the TV Extension from the first step!
 ![Device Manager](/images/extra.app-device-manager.png)
 
 4. A list with all installed applications should appear

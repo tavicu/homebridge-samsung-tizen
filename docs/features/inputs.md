@@ -4,11 +4,11 @@
 After you add inputs, HomeKit can take a while to attach them to the TV. Force-quit the Home app and open it again. If they are still separate, wait. They attach on their own.
 :::
 
-You can add inputs that open an [application](#application), send [commands](#command), select a [source](#source) such as HDMI, or turn on [Art Mode](#art-mode) on a Frame.
+Inputs are the entries in the TV's input list in Home. An input can open an [application](#application), send [commands](#command), select a [source](#source) such as HDMI, or turn on [Art Mode](#art-mode) on a Frame.
 
-Inputs set on the plugin apply to every TV. A list on a device replaces that list for that TV. Home identifies an input by its type and value, not by its name or its position. Renaming it keeps the same input. Reordering only changes the order in Home. An input with no name is skipped and written to the log.
+Global inputs, set on the **Inputs** tab of the dashboard, are added to every TV. Inputs on a TV's own **Inputs** tab are added on top of them, for that TV only. See [Platform and device settings](/configuration/device-settings.md#platform-and-device-settings).
 
-When the plugin already has the installed apps for that TV, the application field is a dropdown. Choose **Other** to type an id that is not in the list. See [Applications](/extra/applications.md).
+Home identifies an input by its type and value, not by its name or its position. Renaming an input keeps it the same in Home. Reordering only changes the order in Home. An input with no name is skipped and written to the log.
 
 ## Settings
 
@@ -23,25 +23,33 @@ When the plugin already has the installed apps for that TV, the application fiel
 
 **(Required)** What the input does.
 
-- Type: `string`
-- Options: `app`, `command`, `input`, `artmode`
+| Type      | Settings screen | What it does                           |
+| :-------- | :-------------- | :------------------------------------- |
+| `app`     | Application     | Opens an installed app                 |
+| `command` | Command         | Sends one or more remote keys          |
+| `input`   | Input           | Selects a source. Needs SmartThings.   |
+| `artmode` | Art Mode        | Turns Art Mode on. Only for Frame TVs. |
 
 ### value
 
-Required for `app`, `command`, and `input`. Not used for `artmode`.
+Required for `app`, `command` and `input`. Not used for `artmode`.
 
-- Type: `string`
+- Type: `string`, or a list of strings for `command`
 - Example: `11101200001`
+
+## Active input
+
+Home shows which input is active. Application, source and Art Mode inputs are shown as active while that app, source or Art Mode is on the TV. A command input is never active, because a command is not a source. Home clears the selection right after the command runs.
+
+To find the active input, the plugin checks the inputs one by one and stops at the first match. It starts with the cheapest checks: Art Mode, then the input that was active last time, then sources, then apps. Apps are checked last because each one is a separate request to the TV.
 
 ## Examples
 
 ### Application
 
-Opens an installed app. A list of ids is on the [Applications](/extra/applications.md) page.
+Opens an installed app. Some app ids are on the [Applications](/extra/applications.md) page.
 
-The plugin can only ask the TV whether one app is in front. Five application inputs mean five requests. Add the apps you actually switch to.
-
-A command input does not stay selected. Application, source, and Art Mode inputs do, while that app, source, or Art Mode is active.
+When you add the input from a TV's own **Inputs** tab, the settings screen lists the apps installed on that TV, if the TV has reported them. Choose **Other** to type an id that is not in the list. A global input applies to every TV, so there is no single TV to load the list from, and you type the id.
 
 ```json
 {
@@ -52,9 +60,15 @@ A command input does not stay selected. Application, source, and Art Mode inputs
 }
 ```
 
+::: warning Add only the apps you use
+We do not recommend adding many applications as inputs. Each one is a separate request to the TV every time Home checks the active input. Twenty application inputs can mean twenty requests, which makes Home slower and puts extra load on the TV.
+:::
+
 ### Command
 
-Sends one or more remote keys. The list is on the [Commands](/extra/commands.md) page. Separate keys with a comma, or pass a list. Home clears the selection right after the command runs, because a command is not a source.
+Sends one or more remote keys. The list is on the [Commands](/extra/commands.md) page.
+
+`value` is one key as a string, or a list when you send several keys one after the other. In the settings screen each key is a row. You can repeat a key with `KEY_VOLUP*3` and hold it with `KEY_POWER*2.5s`. See [Switches](/features/switches.md#command) for the details.
 
 ```json
 {
@@ -66,7 +80,7 @@ Sends one or more remote keys. The list is on the [Commands](/extra/commands.md)
     {
       "name": "Source and enter",
       "type": "command",
-      "value": "KEY_SOURCE,KEY_ENTER"
+      "value": ["KEY_SOURCE", "KEY_ENTER"]
     }
   ]
 }
@@ -75,14 +89,14 @@ Sends one or more remote keys. The list is on the [Commands](/extra/commands.md)
 ### Source
 
 ::: warning
-This type needs [SmartThings](/configuration/smartthings-api.md) on the platform and a `deviceId` on the TV.
+This type needs [SmartThings](/smartthings/index.md) to be connected and a `deviceId` on the TV.
 :::
 
-Selects a specific source. Digital TV is `dtv`. If an older config still says `digitalTv`, open the input and save it again as Digital TV. Until you do, Home will not show it as the active source.
+Selects a source such as HDMI or Digital TV. The values, and how the active source is read, are on the [SmartThings features](/smartthings/features.md#input-source) page.
 
 Values: `dtv`, `HDMI1`, `HDMI2`, `HDMI3`, `HDMI4`, `HDMI5`, `HDMI6`, `USB`, `USB-C`, `Display Port`.
 
-When SmartThings is connected, the settings screen lists the sources that TV actually reports. The ids above are the fallback list.
+When you add the input from a TV's own **Inputs** tab, the settings screen lists the sources that TV reports.
 
 ```json
 {
@@ -99,7 +113,7 @@ When SmartThings is connected, the settings screen lists the sources that TV act
 
 ### Art Mode
 
-On a Frame, this input turns Art Mode on and shows as the active input while Art Mode is on. `value` is not used. The type is `artmode`. Details are on the [Frame TVs](/configuration/frame-tvs.md#art-mode-input) page.
+On a Frame, this input turns Art Mode on. It is shown as the active input while Art Mode is on. `value` is not used. Details are on the [Frame TVs](/configuration/frame-tvs.md#art-mode-input) page.
 
 ```json
 {

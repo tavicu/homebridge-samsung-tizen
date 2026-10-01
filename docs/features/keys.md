@@ -1,12 +1,20 @@
 # Keys
 
+Every TV you add in Home also shows up in the Apple TV Remote on your iPhone and iPad. You can use it like the physical remote of the TV: move through menus, select, go back, play and pause.
+
+Keys decide which TV command each button of that remote sends. Every button already has a default, so you only change a key when you want a button to do something else.
+
 ::: warning
-This does not add buttons in Home. It only chooses which TV key runs when you press a button on the Apple TV remote in Control Center. Apple decides which buttons are on that remote.
+This does not add buttons to the remote. Apple decides which buttons it shows. The plugin only chooses the command each button sends.
 :::
 
-Open Control Center by swiping down from the upper-right corner. If the remote icon is missing, add it in `Settings` → `Control Center`.
+## Open the remote
 
-The volume buttons on the phone change the TV volume while that remote is open. See [Volume](/features/volume.md).
+Open Control Center by swiping down from the upper-right corner and tap the remote icon. Choose the TV at the top of the remote.
+
+If the remote icon is missing, add it to Control Center. On iOS 18 and newer, touch and hold an empty area of Control Center, tap **Add a Control** and pick **Apple TV Remote**. On older versions, add it in `Settings` → `Control Center`.
+
+While the remote is open, the volume buttons of the iPhone change the TV volume. See [Volume](/features/volume.md).
 
 ![Apple TV remote](/images/features.keys.jpg)
 
@@ -32,7 +40,9 @@ The command list is on the [Commands](/extra/commands.md) page.
 
 ## Changing a button
 
-Keys on the plugin **Remote Keys** tab apply to every TV. Keys on a TV override the same button for that TV only. A mapping does not leak from one TV to another.
+Global keys, set on the **Remote Keys** tab of the dashboard, apply to every TV. Keys on a TV's own **Remote Keys** tab replace the same button for that TV only. The other buttons keep the global value, or the default. A mapping on one TV never changes another TV.
+
+In the settings screen, an empty field shows the value it falls back to as a placeholder.
 
 ```json
 {

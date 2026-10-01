@@ -53,9 +53,8 @@ export default defineConfig({
         collapsed: false,
         items: [
           { text: 'Examples', link: '/configuration/' },
-          { text: 'Device settings', link: '/configuration/device-settings' },
-          { text: 'Frame TVs', link: '/configuration/frame-tvs' },
-          { text: 'SmartThings API', link: '/configuration/smartthings-api' }
+          { text: 'Settings', link: '/configuration/device-settings' },
+          { text: 'Frame TVs', link: '/configuration/frame-tvs' }
         ]
       },
       {
@@ -66,6 +65,14 @@ export default defineConfig({
           { text: 'Switches', link: '/features/switches' },
           { text: 'Keys', link: '/features/keys' },
           { text: 'Volume', link: '/features/volume' }
+        ]
+      },
+      {
+        text: 'SmartThings',
+        collapsed: false,
+        items: [
+          { text: 'Integration', link: '/smartthings/' },
+          { text: 'Features', link: '/smartthings/features' }
         ]
       },
       {
