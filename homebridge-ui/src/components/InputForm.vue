@@ -10,6 +10,7 @@ import { useToast } from '../composables/useToast';
 import { normalizeCommand } from '../lib/command';
 import { DEFAULT_INPUT_SOURCES, groupInputSources } from '../lib/device';
 import DocsLink from './DocsLink.vue';
+import SmartThingsNotice from './SmartThingsNotice.vue';
 
 const props = defineProps({
   action: {
@@ -273,10 +274,7 @@ watch(
           </template>
         </select>
         <div class="invalid-feedback">Please choose an input source.</div>
-        <small class="form-text text-muted">
-          This input type requires a SmartThings integration.
-          <DocsLink path="smartthingsInputSource">Learn more</DocsLink>
-        </small>
+        <SmartThingsNotice class="mt-2" :device-index="deviceIndex" />
       </div>
 
       <div v-if="form.type === 'app'">

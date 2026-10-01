@@ -11,6 +11,7 @@ import { normalizeCommand } from '../lib/command';
 import { DEFAULT_INPUT_SOURCES, DEFAULT_PICTURE_MODES, DEFAULT_SOUND_MODES, groupInputSources } from '../lib/device';
 import Callout from './Callout.vue';
 import DocsLink from './DocsLink.vue';
+import SmartThingsNotice from './SmartThingsNotice.vue';
 
 const props = defineProps({
   action: {
@@ -386,10 +387,7 @@ watch(
 
       <hr class="my-3" />
 
-      <Callout class="callout-sm mb-2" state="warning">
-        These actions require a SmartThings integration.
-        <DocsLink path="smartthingsFeatures">Learn more</DocsLink>
-      </Callout>
+      <SmartThingsNotice class="mb-2" :device-index="deviceIndex" />
 
       <div class="row mb-3">
         <div class="col-md-6">
