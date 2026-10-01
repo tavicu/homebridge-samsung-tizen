@@ -450,7 +450,7 @@ watch(
             :pattern="COMMAND_PATTERN"
             @blur="command.value = normalizeCommand(command.value)"
           />
-          <button type="button" class="btn btn-outline-danger" @click="removeCommand(command.id)">
+          <button type="button" class="btn btn-outline-danger" aria-label="Remove command" @click="removeCommand(command.id)">
             <i class="fas fa-xmark" />
           </button>
           <div class="invalid-feedback">Use a key like KEY_VOLUP, KEY_VOLUP*3 or KEY_POWER*2.5s.</div>

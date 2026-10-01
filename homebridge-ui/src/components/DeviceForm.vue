@@ -327,6 +327,7 @@ watch(
 
         <input
           v-if="!stDevices.length || deviceIdSelect === 'other'"
+          :id="stDevices.length ? undefined : 'deviceId'"
           v-model="form.deviceId"
           type="text"
           class="form-control"

@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
 const props = defineProps({
   state: {
@@ -33,6 +33,7 @@ const props = defineProps({
 const emit = defineEmits(['cancel']);
 
 const isConfirming = ref(false);
+const cancelButton = ref(null);
 
 const stateIcons = {
   danger: 'fa-regular fa-circle-xmark',
@@ -42,6 +43,9 @@ const stateIcons = {
 };
 
 const paragraphs = computed(() => (Array.isArray(props.text) ? props.text : [props.text]));
+
+// Starts on the safe choice, so Enter or Space does not confirm by accident.
+onMounted(() => cancelButton.value?.focus());
 
 async function handleConfirm() {
   if (isConfirming.value) {
@@ -73,7 +77,7 @@ async function handleConfirm() {
     </div>
 
     <div class="d-flex gap-2">
-      <button type="button" class="btn btn-outline-secondary" :disabled="isConfirming" @click="emit('cancel')">
+      <button ref="cancelButton" type="button" class="btn btn-outline-secondary" :disabled="isConfirming" @click="emit('cancel')">
         {{ cancelLabel }}
       </button>
       <button type="button" class="btn" :class="`btn-${state}`" :disabled="isConfirming" @click="handleConfirm">

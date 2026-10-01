@@ -31,7 +31,7 @@ onUnmounted(() => {
 
 <template>
   <div class="dropdown d-inline-block">
-    <button type="button" class="btn btn-sm btn-icon-only" :class="{ active: open }" @click="toggle">
+    <button type="button" class="btn btn-sm btn-icon-only" :class="{ active: open }" aria-label="Actions" @click="toggle">
       <slot name="toggle">
         <i class="fas fa-ellipsis-v" />
       </slot>
