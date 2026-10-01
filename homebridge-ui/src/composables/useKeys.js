@@ -1,3 +1,5 @@
+import { normalizeCommand } from '../lib/command';
+
 const KEY_GROUPS = [
   {
     id: 'playback',
@@ -31,18 +33,11 @@ const KEYS = KEY_GROUPS.flatMap((group) => group.keys);
 function readKeys(keys = {}) {
   const stored = Object.fromEntries(Object.entries(keys).map(([id, value]) => [id.toUpperCase(), value]));
 
-  return Object.fromEntries(
-    KEYS.map((key) => [
-      key.id,
-      String(stored[key.id] || '')
-        .trim()
-        .toUpperCase(),
-    ]),
-  );
+  return Object.fromEntries(KEYS.map((key) => [key.id, normalizeCommand(stored[key.id] || '')]));
 }
 
 function toConfigKeys(form) {
-  return Object.fromEntries(Object.entries(form).map(([id, value]) => [id, value.toUpperCase()]));
+  return Object.fromEntries(Object.entries(form).map(([id, value]) => [id, normalizeCommand(value)]));
 }
 
 export function useKeys() {

@@ -5,6 +5,7 @@ import { useForm } from '../composables/useForm';
 import { useHomebridge } from '../composables/useHomebridge';
 import { useKeys } from '../composables/useKeys';
 import { useToast } from '../composables/useToast';
+import { normalizeCommand } from '../lib/command';
 import Callout from './Callout.vue';
 import DocsLink from './DocsLink.vue';
 
@@ -34,6 +35,11 @@ const storedKeys = computed(() => {
 });
 
 const form = createForm(readKeys());
+
+// An empty field falls back to the global key on a device, and to the plugin default globally.
+function placeholder(key) {
+  return (isDeviceScoped.value && globalKeys.value[key.id]) || key.default;
+}
 
 function fillForm() {
   Object.assign(form, storedKeys.value);
@@ -108,8 +114,9 @@ watch(
             :id="`remote-key-${key.id}`"
             v-model="form[key.id]"
             type="text"
-            class="form-control font-monospace text-uppercase"
-            :placeholder="globalKeys[key.id] || key.default"
+            class="form-control font-monospace"
+            :placeholder="placeholder(key)"
+            @blur="form[key.id] = normalizeCommand(form[key.id])"
           />
         </div>
       </div>
