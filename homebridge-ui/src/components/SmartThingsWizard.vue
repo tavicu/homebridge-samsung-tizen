@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, ref, watch } from 'vue';
+import { nextTick, reactive, ref, watch } from 'vue';
 import { useConfig } from '../composables/useConfig';
 import { useForm } from '../composables/useForm';
 import { useHomebridge } from '../composables/useHomebridge';
@@ -35,6 +35,20 @@ watch(currentStep, () => {
   validated.value = false;
 });
 
+// The code is often pasted with quotes around it, or as the whole redirect URL, so keep only the code itself.
+function normalizeAuthorizationCode(value) {
+  const code = String(value ?? '')
+    .trim()
+    .replace(/^["']|["']$/g, '')
+    .trim();
+
+  try {
+    return new URL(code).searchParams.get('code') ?? code;
+  } catch {
+    return code;
+  }
+}
+
 function customRedirectUrl() {
   return state.showAdvanced ? state.redirectUrl : undefined;
 }
@@ -60,12 +74,10 @@ async function submitStep1() {
 }
 
 async function submitStep2() {
-  const authorizationCode = state.authorizationCode?.replace(/^["']|["']$/g, '').trim();
-
   const authorizationToken = await getAuthToken({
     clientId: state.clientId,
     clientSecret: state.clientSecret,
-    authorizationCode,
+    authorizationCode: state.authorizationCode,
     redirectUrl: customRedirectUrl(),
   });
 
@@ -82,6 +94,13 @@ async function submitStep2() {
 }
 
 async function handleSubmit() {
+  if (currentStep.value === 2) {
+    state.authorizationCode = normalizeAuthorizationCode(state.authorizationCode);
+
+    // Validation reads the input from the DOM, so wait until it shows the cleaned code.
+    await nextTick();
+  }
+
   if (!checkValidity()) {
     return;
   }
