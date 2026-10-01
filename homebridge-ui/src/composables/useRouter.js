@@ -46,10 +46,20 @@ export function useRouter() {
     applyRoute(fallbackView, fallbackParams);
   }
 
+  // Where an input or switch lives, as [view, params]: the device tab when it belongs to a device, the dashboard tab otherwise.
+  function parentRoute(tab, deviceIndex) {
+    if (deviceIndex !== undefined) {
+      return ['device', { action: 'edit', deviceIndex, tab }];
+    }
+
+    return ['dashboard', { tab }];
+  }
+
   return {
     currentView,
     currentParams,
     navigateTo,
     navigateBack,
+    parentRoute,
   };
 }

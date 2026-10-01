@@ -17,7 +17,7 @@ const props = defineProps({
 });
 
 const { config, updateConfig } = useConfig();
-const { navigateBack } = useRouter();
+const { navigateTo, navigateBack, parentRoute } = useRouter();
 const toast = useToast();
 
 const switchItem = computed(() => {
@@ -29,12 +29,7 @@ const switchItem = computed(() => {
 });
 
 function goBack() {
-  if (props.deviceIndex !== undefined) {
-    navigateBack('device', { action: 'edit', deviceIndex: props.deviceIndex, tab: 'switches' });
-    return;
-  }
-
-  navigateBack('dashboard', { tab: 'switches' });
+  navigateBack(...parentRoute('switches', props.deviceIndex));
 }
 
 async function confirmDelete() {
@@ -58,7 +53,9 @@ async function confirmDelete() {
     }
 
     toast.success('Switch deleted successfully.');
-    goBack();
+
+    // Going back could land on the edit screen of this index, which now holds the next switch.
+    navigateTo(...parentRoute('switches', props.deviceIndex));
   } catch {
     toast.error('Failed to delete switch');
   }

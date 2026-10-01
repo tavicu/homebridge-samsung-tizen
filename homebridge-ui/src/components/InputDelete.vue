@@ -17,7 +17,7 @@ const props = defineProps({
 });
 
 const { config, updateConfig } = useConfig();
-const { navigateBack } = useRouter();
+const { navigateTo, navigateBack, parentRoute } = useRouter();
 const toast = useToast();
 
 const inputItem = computed(() => {
@@ -29,12 +29,7 @@ const inputItem = computed(() => {
 });
 
 function goBack() {
-  if (props.deviceIndex !== undefined) {
-    navigateBack('device', { action: 'edit', deviceIndex: props.deviceIndex, tab: 'inputs' });
-    return;
-  }
-
-  navigateBack('dashboard', { tab: 'inputs' });
+  navigateBack(...parentRoute('inputs', props.deviceIndex));
 }
 
 async function confirmDelete() {
@@ -58,7 +53,9 @@ async function confirmDelete() {
     }
 
     toast.success('Input deleted successfully.');
-    goBack();
+
+    // Going back could land on the edit screen of this index, which now holds the next input.
+    navigateTo(...parentRoute('inputs', props.deviceIndex));
   } catch {
     toast.error('Failed to delete input');
   }
