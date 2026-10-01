@@ -7,7 +7,7 @@ import DocsLink from './DocsLink.vue';
 
 const { navigateTo } = useRouter();
 
-const { smartthings, isLoading, status, getToken } = useSmartThings();
+const { isLoading, status, getToken } = useSmartThings();
 
 const statusBadge = {
   connected: { label: 'Connected', class: 'bg-success' },
@@ -18,14 +18,6 @@ const statusBadge = {
 onMounted(() => {
   getToken();
 });
-
-function formatDate(timestamp) {
-  return new Date(timestamp).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
-}
 </script>
 
 <template>
@@ -50,8 +42,7 @@ function formatDate(timestamp) {
 
       <template v-else-if="status === 'expired'">
         <p class="mb-2">
-          Your access token expired on <span class="fw-semibold">{{ formatDate(smartthings.expiresAt) }}</span
-          >. Re-authorize to restore full functionality.
+          Your SmartThings authorization is no longer valid. Re-authorize to restore full functionality.
           <DocsLink path="smartthingsStatus" class="text-white text-decoration-underline">Learn more</DocsLink>
         </p>
         <button type="button" class="btn btn-danger" @click="navigateTo('smartthings')"><i class="fas fa-arrows-rotate me-1" /> Re-authorize SmartThings</button>
