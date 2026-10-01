@@ -1,16 +1,20 @@
 # Examples
 
 ::: tip
-Before adding your devices make sure to assign a **static IP address** for each device on your router.
+Assign a **static IP address** to each TV on your router before you add it.
 :::
 
-::: warning Subnet/VLAN
-Samsung TVs does not allow WebSocket connections across different subnets or VLANs. If your TV is not on the same subnet as Homebridge server it will fail to connect.
+::: warning Subnet
+Samsung TVs do not allow WebSocket connections across subnets or VLANs. The TV has to be on the same subnet as Homebridge.
 :::
+
+`inputs`, `switches` and `keys` can be set once on the platform. Every TV inherits them. A list set on a device replaces the platform list for that TV.
+
+`clientId` and `clientSecret` belong on the platform. `deviceId` belongs on each TV. See [SmartThings](/configuration/smartthings-api.md).
 
 ### Basic configuration
 
-``` json
+```json
 "platforms": [
     {
         "platform": "SamsungTizen",
@@ -27,7 +31,7 @@ Samsung TVs does not allow WebSocket connections across different subnets or VLA
 
 ### Configuration with multiple TVs
 
-``` json
+```json
 "platforms": [
     {
         "platform": "SamsungTizen",
@@ -47,56 +51,16 @@ Samsung TVs does not allow WebSocket connections across different subnets or VLA
 ]
 ```
 
-### Advanced configuration with all settings
+### Same settings for every TV
 
-``` json
+`inputs`, `switches`, and `keys` below apply to both TVs. Each TV still has its own `deviceId`.
+
+```json
 "platforms": [
     {
         "platform": "SamsungTizen",
-        "devices": [
-            {
-                "name": "Bedroom TV",
-                "ip": "10.20.30.40",
-                "mac": "A0:B1:C2:D3:E4:F5",
-                "uuid": "a1",
-                "api_key": "e2c3de7e-05e2-4690-8ee7-8d4355f992b9",
-                "device_id": "5d9215vx-c421-412-a998-c4ec48754f08",
-                "inputs": [
-                    {"name": "Netflix", "type": "app", "value": "11101200001"}
-                ],
-                "switches": [
-                    {"name": "Sleep", "sleep": 60}
-                ],
-                "keys": {
-                    "SELECT": "KEY_ENTER"
-                },
-                "delay": 400,
-                "refresh": {
-                    main: 5000,
-                    switch: 30000
-                }
-            }
-        ]
-    }
-]
-```
-
-### Configuration with same settings for multiple TVs
-
-Some of the settings can be set as main and they will apply for every device so you will not have to duplicate them for each device.
-
-In the folowing example `api_key`, `delay`, `refresh`, `inputs`, `switches` and `keys` will apply to both TVs.
-
-``` json
-"platforms": [
-    {
-        "platform": "SamsungTizen",
-        "api_key": "e2c3de7e-05e2-4690-8ee7-8d4355f992b9",
-        "delay": 400,
-        "refresh": {
-            main: 5000,
-            switch: 30000
-        },
+        "clientId": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+        "clientSecret": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
         "inputs": [
             {"name": "Netflix", "type": "app", "value": "11101200001"}
         ],
@@ -111,15 +75,47 @@ In the folowing example `api_key`, `delay`, `refresh`, `inputs`, `switches` and 
                 "name": "Bedroom TV",
                 "ip": "10.20.30.40",
                 "mac": "A0:B1:C2:D3:E4:F5",
-                "device_id": "5d9215vx-c421-412-a998-c4ec48754f08"
+                "deviceId": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
             },
             {
                 "name": "Living Room TV",
                 "ip": "10.20.30.41",
                 "mac": "A0:B1:C2:D3:E4:F6",
-                "device_id": "5d9215vx-a998-412-c421-c4ce52121s12"
+                "deviceId": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
             }
         ]
     }
 ]
 ```
+
+### Device with its own inputs
+
+The bedroom TV uses only the input in its own list. The living room TV uses the platform input.
+
+```json
+"platforms": [
+    {
+        "platform": "SamsungTizen",
+        "inputs": [
+            {"name": "Netflix", "type": "app", "value": "11101200001"}
+        ],
+        "devices": [
+            {
+                "name": "Bedroom TV",
+                "ip": "10.20.30.40",
+                "mac": "A0:B1:C2:D3:E4:F5",
+                "inputs": [
+                    {"name": "YouTube", "type": "app", "value": "111299001912"}
+                ]
+            },
+            {
+                "name": "Living Room TV",
+                "ip": "10.20.30.41",
+                "mac": "A0:B1:C2:D3:E4:F6"
+            }
+        ]
+    }
+]
+```
+
+Every field is described on the [device settings](/configuration/device-settings.md) page.

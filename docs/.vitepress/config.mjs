@@ -17,9 +17,9 @@ export default defineConfig({
       {
         text: 'Donate',
         items: [
-          { text: 'GitHub Sponsors', link: 'https://github.com/sponsors/tavicu' },
+          { text: 'PayPal', link: 'https://www.paypal.com/donate?hosted_button_id=5QLCDRNH77Z9L' },
           { text: 'Buy Me a Coffee', link: 'https://www.buymeacoffee.com/tavicu' },
-          { text: 'PayPal', link: 'https://www.paypal.com/donate?hosted_button_id=5QLCDRNH77Z9L' }
+          { text: 'GitHub Sponsors', link: 'https://github.com/sponsors/tavicu' }
         ]
       }
     ],
@@ -64,7 +64,8 @@ export default defineConfig({
         items: [
           { text: 'Inputs', link: '/features/inputs' },
           { text: 'Switches', link: '/features/switches' },
-          { text: 'Keys', link: '/features/keys' }
+          { text: 'Keys', link: '/features/keys' },
+          { text: 'Volume', link: '/features/volume' }
         ]
       },
       {
@@ -81,6 +82,7 @@ export default defineConfig({
         items: [
           { text: 'Applications', link: '/extra/applications' },
           { text: 'Commands', link: '/extra/commands' },
+          { text: 'Upgrading from version 5', link: '/extra/upgrading' },
           { text: 'Installing beta version', link: '/extra/install-beta' }
         ]
       }

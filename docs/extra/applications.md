@@ -1,10 +1,16 @@
 # Applications
 
+When you set an application on an input or a custom switch, the settings screen can list the apps installed on that TV. Pick one from the list, or choose **Other** and type an id.
+
+The plugin tries to fetch that list when you pair the TV. Not every TV supports this request. If the dropdown is empty, type the id yourself.
+
+If the app you want is not in the dropdown, use the [table below](#list-with-ids), the [Samsung website](#view-application-ids-on-samsung-website), or [Tizen Studio](#get-installed-applications).
+
 ## List with IDs
 
 Over the years we managed to gather a list of IDs for most used applications.
 
-Because the IDs change with each release we cannot guarantee that IDs from this list will work on your TV! If you can't find an application in the list or if the ID doesn't work you can follow the steps from the [next section](#get-installed-applications) and get a list with installed applications from your TV.
+Because the IDs change with each release we cannot guarantee that IDs from this list will work on your TV! If you can't find an application in the list or if the ID doesn't work, use the dropdown in the plugin settings, or follow the steps from [Get installed applications](#get-installed-applications).
 
 ::: tip Multiple IDs for one application
 Some applications have multiple IDs  because they may differ depending on what year your TV was released and what version of Tizen is using.
@@ -171,9 +177,7 @@ To be able to use Inspect Element functionality in Safari, you should have devel
 
 ## Get installed applications
 
-::: warning Samsung makes our life harder ...
-Unfortunately Samsung decided to remove the API that we used in the past to get installed applications right from the plugin. The good news is that we still have an option but it is more complicated and requires installing Tizen Studio on your personal computer.
-:::
+Use this when the settings screen has no list yet, or the app you need is missing from it. It requires Tizen Studio on your computer.
 
 1. Download and install `Tizen Studio` and `TV Extensions-<version>`
 [https://developer.samsung.com/smarttv/develop/getting-started/setting-up-sdk/installing-tv-sdk.html](https://developer.samsung.com/smarttv/develop/getting-started/setting-up-sdk/installing-tv-sdk.html)

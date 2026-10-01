@@ -1,15 +1,15 @@
 # Introduction
 
-Homebridge Samsung Tizen is a plugin created for [Homebridge](https://github.com/homebridge/homebridge) that allows you to control your Samsung TVs *(models starting from 2017)* that are running Tizen Operating System.
+Homebridge Samsung Tizen is a plugin for [Homebridge](https://github.com/homebridge/homebridge) that controls Samsung TVs running Tizen OS **(2017 and later)** from the Apple Home app.
 
-Please make sure to read our shiny documentation where you find step by step instructions with images on how to install and configure the plugin.
+The main focus of the plugin is that basic functionality works on your local network, with no internet connection required. SmartThings is optional. It is an add-on that brings extra features, not something the plugin depends on.
 
-If you do have problems please make sure to check the [common issues page](/troubleshooting/common-issues.md) and in case you want to open a new issue make sure to read details on [how to open a new issue](/troubleshooting/open-new-issue.md) so we will have all the details needed to help you!
+The plugin has its own interface in Homebridge UI, which helps you add devices and configure everything. This documentation walks through installation, pairing, and every setting.
+
+If something does not work, check the [common issues](/troubleshooting/common-issues.md) page. When you open a GitHub issue, follow [how to open a new issue](/troubleshooting/open-new-issue.md) so the report includes the details needed to help.
 
 ***
 
-If you find this plugin useful and want to show your support then please **star this plugin** on GitHub, or better yet; you can [donate through PayPal](https://www.paypal.com/donate?hosted_button_id=5QLCDRNH77Z9L) whatever you think the plugin value is. You can also use other methods by accessing the `Donate` menu from the top navbar.
+If the plugin is useful, a GitHub star helps other people find it. Sponsorships and donations are optional and very welcome. They go toward time spent on new features, maintenance, and support, all of it in spare time.
 
-Adding new features, maintaining the plugin and responding to issues it's made in my spare time. I really appreciate any help you can give :)
-
-Thank you!
+You can [donate through PayPal](https://www.paypal.com/donate?hosted_button_id=5QLCDRNH77Z9L), or use the other methods in the `Donate` menu at the top of this site.

@@ -4,42 +4,43 @@ sidebarDepth: 0
 
 # Device settings
 
-| Name                    | Required | Description                                               |
-| :---------------------- | :------- | :-------------------------------------------------------- |
-| [name](#name)           | **Yes**  | Name of the device                                        |
-| [ip](#ip)               | **Yes**  | IP address of the device                                  |
-| [mac](#mac)             | **Yes**  | MAC address of the device                                 |
-| [uuid](#uuid)           | -        | Option to change UUID                                     |
-| [options](#options)     | -        | Options that allows you to change the default behavior    |
-| [api_key](#api_key)     | -        | Api key for SmartThings                                   |
-| [device_id](#device_id) | -        | Device ID for SmartThings                                 |
-| [inputs](#inputs)       | -        | Custom inputs                                             |
-| [switches](#switches)   | -        | Custom switches                                           |
-| [keys](#keys)           | -        | Changing the default keys for buttons from Remote Control |
-| [delay](#delay)         | -        | The delay between commands in miliseconds                 |
-| [refresh](#refresh)     | -        | Intervals for refreshing accessories in the background    |
+Settings on the platform apply to every TV. The same keys on a device apply only to that TV. `clientId` and `clientSecret` belong on the platform. See [SmartThings](/configuration/smartthings-api.md).
+
+| Name                          | Where      | Required | Description                                      |
+| :---------------------------- | :--------- | :------- | :----------------------------------------------- |
+| [name](#name)                 | Device     | **Yes**  | Name of the TV                                   |
+| [ip](#ip)                     | Device     | **Yes**  | IP address of the TV                             |
+| [mac](#mac)                   | Device     | **Yes**  | MAC address of the TV                            |
+| [uuid](#uuid)                 | Device     | -        | Extra string mixed into the HomeKit id          |
+| [deviceId](#deviceid)         | Device     | -        | SmartThings device id                           |
+| [options](#options)           | Device     | -        | Flags that change the default behavior          |
+| [inputs](#inputs)             | Both       | -        | Custom inputs                                    |
+| [switches](#switches)         | Both       | -        | Custom switches                                  |
+| [keys](#keys)                 | Both       | -        | Remote button mapping                            |
+
+`inputs`, `switches`, and `keys` on the platform are inherited by every TV. A device list for `inputs` or `switches` replaces the platform list for that TV. `keys` are merged, and a value on the device overrides the same value from the platform.
 
 ## name
 
-**(Required)** The name of the device. It will appear in Home app and also will be used in the name of the custom switches.
+**(Required)** The name shown in Home, and the prefix used on custom switches unless you disable that.
 
 - Type: `string`
 - Example: `Bedroom TV`
 
-``` json
+```json
 {
-    "name": "Frame TV"
+    "name": "Bedroom TV"
 }
 ```
 
 ## ip
 
-**(Required)** The IP address of the device. Make sure to assign a static IP from your router settings.
+**(Required)** The IP address of the TV. Assign a static address on the router.
 
 - Type: `string`
 - Example: `192.168.1.100`
 
-``` json
+```json
 {
     "ip": "192.168.1.100"
 }
@@ -47,14 +48,12 @@ sidebarDepth: 0
 
 ## mac
 
-**(Required)** The MAC address of the device. This is required to power on the TV.
-
-You need to use `:` as a separator.
+**(Required)** The MAC address of the TV. Separate the bytes with `:`.
 
 - Type: `string`
 - Example: `A0:B1:C2:D3:E4:F5`
 
-``` json
+```json
 {
     "mac": "A0:B1:C2:D3:E4:F5"
 }
@@ -62,86 +61,62 @@ You need to use `:` as a separator.
 
 ## uuid
 
-Each device have a unique id that is used by Home app for pairing. By default UUID is created from the MAC address since this is unique for each TV.
-
-But there are times when the TV was unpaired from Home app but not from the Homebridge server. This will result in not being able to add the accessory again in Home app.
-
-That's why we added this key where you can set a string and the new UUID will be created by merging the MAC address and this key. You can set whatever you want here.
+HomeKit identifies the TV from its MAC address. If the TV was removed in Home but is still paired in Homebridge, Home may refuse to add it again. Set any string here and the id becomes the MAC plus this value.
 
 - Type: `string`
 - Example: `a1`
 
-``` json
+```json
 {
     "uuid": "a1"
 }
 ```
 
+## deviceId
+
+The SmartThings device id for this TV. See [SmartThings](/configuration/smartthings-api.md).
+
+- Type: `string`
+- Example: `5d9215vx-c421-412a-a998-c4ec48754f08`
+
+```json
+{
+    "deviceId": "5d9215vx-c421-412a-a998-c4ec48754f08"
+}
+```
+
 ## options
 
-With this list you can select some options that change the default behavior of the plugin for a device.
+A list of flags for this TV. The default is an empty list.
 
-- Type: `list`
-- Default: `[]`
+- `Device.Disable` skips the TV without deleting it from the config
+- `Volume.Slider.Enable` adds a slider for the volume. See [Volume](/features/volume.md)
+- `Switch.DeviceName.Disable` stops prefixing custom switches with the TV name
+- `Frame.RealPowerMode` makes the Home tile turn a Frame fully on and off. See [Frame TVs](/configuration/frame-tvs.md)
+- `Frame.ArtSwitch.Disable` hides the Art Mode switch
+- `Frame.PowerSwitch.Disable` hides the Power switch
 
-Possible options:
-
-- `Switch.DeviceName.Disable` - By default all custom switches have the main device prepended to the name. With this option you can disable this and create the switch only with the name you select in config file for the switch.
-
-- `Frame.ArtSwitch.Disable` - Remove the default Art Mode Switch that is created by default for Frame TVs
-
-- `Frame.PowerSwitch.Disable` - Remove the default Power Switch that is created by default for Frame TVs
-
-- `Frame.RealPowerMode` - Change the main accessory behaivor for Frame TVs and control the real power of TV
-
-``` json
+```json
 {
     "name": "Frame TV",
     "ip": "10.20.30.40",
     "mac": "A0:B1:C2:D3:E4:F5",
     "options": [
         "Switch.DeviceName.Disable",
-        "Frame.RealPowerMode",
-        "Frame.ArtSwitch.Disable",
-        "Frame.PowerSwitch.Disable"
+        "Volume.Slider.Enable",
+        "Frame.RealPowerMode"
     ]
-}
-```
-
-## api_key
-
-This option is to set the api key for SmartThings API. Read more and how to setup SmartThings [over here](/configuration/smartthings-api.md).
-
-- Type: `string`
-- Example: `e2c3de7e-05e2-4690-8ee7-8d4355f992b9`
-
-``` json
-{
-    "api_key": "e2c3de7e-05e2-4690-8ee7-8d4355f992b9"
-}
-```
-
-## device_id
-
-Option to set the device ID for SmartThings API. Read more and how to setup SmartThings [over here](/configuration/smartthings-api.md).
-
-- Type: `string`
-- Example: `5d9215vx-c421-412-a998-c4ec48754f08`
-
-``` json
-{
-    "device_id": "5d9215vx-c421-412-a998-c4ec48754f08"
 }
 ```
 
 ## inputs
 
-Set custom inputs for the TV. You can read more on [Inputs page](/features/inputs.md).
+Custom inputs. See [Inputs](/features/inputs.md).
 
-- Type: `list`
+- Type: `array`
 - Default: `[]`
 
-``` json
+```json
 {
     "inputs": [
         {"name": "Netflix", "type": "app", "value": "11101200001"}
@@ -151,63 +126,30 @@ Set custom inputs for the TV. You can read more on [Inputs page](/features/input
 
 ## switches
 
-Create custom switches for the TV. You can read more on [Switches page](/features/switches.md).
+Custom switches. See [Switches](/features/switches.md).
 
-- Type: `list`
+- Type: `array`
 - Default: `[]`
 
-``` json
+```json
 {
     "switches": [
-        {"name": "Sleep", "sleep": 10}
+        {"name": "Sleep", "sleep": 60}
     ]
 }
 ```
 
 ## keys
 
-Changing the default keys for buttons from Remote Control. You can read more on [Keys page](/features/keys.md).
+Remote button mapping. See [Keys](/features/keys.md). Leave a button out to keep the default.
 
-- Type: `list`
+- Type: `object`
 - Default: `{}`
 
-``` json
+```json
 {
     "keys": {
         "SELECT": "KEY_ENTER"
-    }
-}
-```
-
-## delay
-
-The delay between commands in miliseconds.
-
-- Type: `number`
-- Default: `400`
-
-``` json
-{
-    "delay": 400
-}
-```
-
-## refresh
-
-Intervals for refreshing accessories in the background.
-
-By default the main accessory will be refreshed every **5 seconds** and the custom switches will refresh every **30 seconds**. I don't recomment changing the values to something lower because it will flood the TV with requests.
-
-The minimum value is `500` *(0.5 seconds)* for main accessory and `1000` *(1 seconds)* for custom switches.
-
-- Type: `object`
-- Default: `{main: 5000, switch: 30000}`
-
-``` json
-{
-    "refresh": {
-        main: 5000,
-        switch: 30000
     }
 }
 ```

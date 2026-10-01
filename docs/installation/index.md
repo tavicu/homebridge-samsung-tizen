@@ -2,22 +2,26 @@
 
 ## Check compatibility
 
-Samsung TVs have different methods of pairing and API depending on what model of TV you have and what year was released. TVs released before 2017 uses another pairing method, known as PIN method, which this plugin does not support. Your TV needs to be released starting with 2017 to be compatible.
+The plugin supports Samsung TVs with Tizen OS from 2017 onward that use token authentication. TVs from 2016 and earlier use a PIN pairing method, which this plugin does not support.
 
-First step is to access the folowing url `http://TV_IP:8001/api/v2/` (replace TV_IP with the IP your TV has). The page should return informations regarding your TV. If the endpoint is not working then your TV is not compatible with the plugin.
+Make sure the TV is turned on, then open `http://TV_IP:8001/api/v2/` from a device on the same network and replace `TV_IP` with the TV address. A compatible TV returns information about the device as JSON. If there is no response, the TV is not supported.
 
-You can read more regaring the API on [Samsung Developers page](https://developer.samsung.com/tv/develop/extension-libraries/smart-view-sdk/receiver-apps/debugging).
+## Network
 
-Some older TVs respond to that API even if they use PIN method as pairing. Starting with Tizen 3.0 (2017 model) the dashoard design was changed and we can see very easy if the TV is compatible by check it.
+Give every TV a **static IP address** on your router. The plugin uses that address to reach the TV, so it has to stay the same after the TV or the router restarts. If it changes, the plugin can no longer find the TV until you update the address in the settings.
 
-| Compatible                                     | Not compatible                                         |
-| ---------------------------------------------- | ------------------------------------------------------ |
-| ![Compatible](/images/install.compatible.jpg) | ![Not Compatible](/images/install.not-compatible.jpg) |
+The TV and Homebridge must be on the **same subnet**. Samsung blocks the WebSocket connection across VLANs, so a TV on another VLAN will not pair or accept commands. Wake on LAN can still turn the TV on in that case, which is why power-on sometimes works when nothing else does.
 
-## Homebridge Server
+## Requirements
 
-This plugin was designed for Homebridge and it will require you to have a Homebridge server set up.
+- **Node.js:** `22.10+`, `24`, or `26`
+- **[Homebridge](https://github.com/homebridge/homebridge):** `1.8+` (Homebridge 2.0 recommended)
+- **[Homebridge Config UI X](https://github.com/homebridge/homebridge-config-ui-x):** `v5.27.0+` (required for the new interactive configuration interface)
 
-Homebridge is a lightweight server you can run on your home network that emulates the iOS HomeKit API and it allows you to control devices that are not compatible with HomeKit.
+## Homebridge
 
-You can follow the steps from [Homebridge documentation](https://github.com/homebridge/homebridge/blob/master/README.md) on how to install and run the server and also learn more regarding Homebridge.
+This plugin runs on Homebridge, so you need a Homebridge server on your network.
+
+Homebridge is a lightweight server that emulates the iOS HomeKit API. It lets you control devices that are not compatible with HomeKit.
+
+You can follow the steps from the [Homebridge documentation](https://github.com/homebridge/homebridge/blob/master/README.md) on how to install and run the server and also learn more regarding Homebridge.

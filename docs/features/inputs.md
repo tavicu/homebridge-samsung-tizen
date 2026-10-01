@@ -1,102 +1,108 @@
 # Inputs
 
 ::: tip
-Sometimes when you add inputs it takes some time for HomeKit to link them to TV. You can try restarting the Home app on your phone, some suggested this will fix the problem. If it's still not working after that just wait, it will link after some time.
+After you add inputs, HomeKit can take a while to attach them to the TV. Force-quit the Home app and open it again. If they are still separate, wait. They attach on their own.
 :::
 
-Since iOS 12 Apple allows us to add inputs for TVs.
+You can add inputs that open an [application](#application), send [commands](#command), select a [source](#source) such as HDMI, or turn on [Art Mode](#art-mode) on a Frame.
 
-There are multiple types of inputs. With the basic configuration you can open [applications](#application-type) or send [commands](#command-type) to TV.
+Inputs set on the plugin apply to every TV. A list on a device replaces that list for that TV. Home identifies an input by its type and value, not by its name or its position. Renaming it keeps the same input. Reordering only changes the order in Home. An input with no name is skipped and written to the log.
 
-If you also have [SmartThing API](/configuration/smartthings-api.md) configured you can select specific inputs like `HDMI1`.
+When the plugin already has the installed apps for that TV, the application field is a dropdown. Choose **Other** to type an id that is not in the list. See [Applications](/extra/applications.md).
 
 ## Settings
 
 ### name
 
-**(Required)** The name of the input to be used in Home app.
+**(Required)** The name shown in Home.
 
 - Type: `string`
 - Example: `Netflix`
 
 ### type
 
-**(Required)** The type of the input.
+**(Required)** What the input does.
 
 - Type: `string`
-- Example: `app`
-- Options: [`app`](#application-type) / [`command`](#command-type) / [`input`](#input-type) / [`art`](#art-type)
+- Options: `app`, `command`, `input`, `artmode`
 
 ### value
 
-**(Required)** The value of the input. Depending on what type the input is it can be an application id or a command.
+Required for `app`, `command`, and `input`. Not used for `artmode`.
 
 - Type: `string`
 - Example: `11101200001`
 
 ## Examples
 
-### Application type
+### Application
 
-This option allow you to select an application. You can find a list with applications on the [Applications page](/extra/applications.md).
+Opens an installed app. A list of ids is on the [Applications](/extra/applications.md) page.
 
-::: tip
-At the moment Samsung don't have an API to tell us what application is active. But there is an API which we can access that tells us the status of a specific application. That means if you have 5 inputs of this type there will be made 5 requests to the TV in order to check the status of each application.
+The plugin can only ask the TV whether one app is in front. Five application inputs mean five requests. Add the apps you actually switch to.
 
-That's why I don't recommend creating unnecessary inputs of this type because it will flood your TV with requests until the point that it will not respond to anything. Create only the inputs that you are using most often.
-:::
+A command input does not stay selected. Application, source, and Art Mode inputs do, while that app, source, or Art Mode is active.
 
-``` json
+```json
 {
-    "name": "Bedroom TV",
-    "ip": "10.20.30.40",
-    "mac": "A0:B1:C2:D3:E4:F5",
-    "inputs": [
-        {"name": "Netflix", "type": "app", "value": "11101200001"}
-    ]
+  "name": "Bedroom TV",
+  "ip": "10.20.30.40",
+  "mac": "A0:B1:C2:D3:E4:F5",
+  "inputs": [{ "name": "Netflix", "type": "app", "value": "11101200001" }]
 }
 ```
 
-### Command type
+### Command
 
-This option will allows you to send a command or a list of commands to your TV. These commands represents buttons from phisical remotes. You can find a list with known commands on the [Commands page](/extra/commands.md).
+Sends one or more remote keys. The list is on the [Commands](/extra/commands.md) page. Separate keys with a comma, or pass a list. Home clears the selection right after the command runs, because a command is not a source.
 
-``` json
+```json
 {
-    "name": "Bedroom TV",
-    "ip": "10.20.30.40",
-    "mac": "A0:B1:C2:D3:E4:F5",
-    "inputs": [
-        {"name": "Simple command", "type": "command", "value": "KEY_SOURCE"},
-        {"name": "List commands", "type": "command", "value": "KEY_SOURCE,KEY_ENTER"}
-    ]
+  "name": "Bedroom TV",
+  "ip": "10.20.30.40",
+  "mac": "A0:B1:C2:D3:E4:F5",
+  "inputs": [
+    { "name": "Source", "type": "command", "value": "KEY_SOURCE" },
+    {
+      "name": "Source and enter",
+      "type": "command",
+      "value": "KEY_SOURCE,KEY_ENTER"
+    }
+  ]
 }
 ```
 
-### Input type
+### Source
 
 ::: warning
-In order to use this type of input you must have [SmartThings API](/configuration/smartthings-api.md) configured.
+This type needs [SmartThings](/configuration/smartthings-api.md) on the platform and a `deviceId` on the TV.
 :::
 
-This will allows you to select a specific input source like `HDMI1`.
+Selects a specific source. Digital TV is `dtv`. If an older config still says `digitalTv`, open the input and save it again as Digital TV. Until you do, Home will not show it as the active source.
 
-Possible `values` for this input type: `digitalTv`, `USB`, `HDMI1`, `HDMI2`, `HDMI3`, `HDMI4`, `HDMI5`, `HDMI6`
+Values: `dtv`, `HDMI1`, `HDMI2`, `HDMI3`, `HDMI4`, `HDMI5`, `HDMI6`, `USB`, `USB-C`, `Display Port`.
 
-``` json
+When SmartThings is connected, the settings screen lists the sources that TV actually reports. The ids above are the fallback list.
+
+```json
 {
-    "name": "Bedroom TV",
-    "ip": "10.20.30.40",
-    "mac": "A0:B1:C2:D3:E4:F5",
-    "inputs": [
-        {"name": "Live TV", "type": "input", "value": "digitalTv"},
-        {"name": "My Xbox", "type": "input", "value": "HDMI1"}
-    ]
+  "name": "Bedroom TV",
+  "ip": "10.20.30.40",
+  "mac": "A0:B1:C2:D3:E4:F5",
+  "deviceId": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+  "inputs": [
+    { "name": "Live TV", "type": "input", "value": "dtv" },
+    { "name": "Xbox", "type": "input", "value": "HDMI1" }
+  ]
 }
 ```
 
-### Art type
+### Art Mode
 
-If you have a Frame TV there is an option to create an input for Art Mode. For this type the `value` key is not required.
+On a Frame, this input turns Art Mode on and shows as the active input while Art Mode is on. `value` is not used. The type is `artmode`. Details are on the [Frame TVs](/configuration/frame-tvs.md#art-mode-input) page.
 
-You can read more regarding this type and see example of how to use it on the [Frame TVs page](/configuration/frame-tvs.md#art-input).
+```json
+{
+  "inputs": [{ "name": "Art Mode", "type": "artmode" }]
+}
+```

@@ -4,107 +4,71 @@ sidebarDepth: 0
 
 # Frame TVs
 
-::: danger Users with Frame TVs from 2022 (Tizen 6.5) or newer
-Samsung decided to remove the API for Art Mode from newer TVs. Unfortunately they didn't offer an alternative yet. Only TVs from 2022 or newer are affected, TVs running Tizen 6.5 OS or newer.
+A Frame is detected automatically when you pair the TV. You do not set this yourself.
 
-When Samsung will decide to add an API in SmartThings we will implement it. Unfortunately until then our only option is to control the Real Power of TV.
+Samsung does not allow a full power off through the local API. When SmartThings is connected, turning the Frame fully off uses SmartThings. Without it, the plugin holds the power key. Newer Frames ignore that hold, so a full power off may not work until SmartThings is set up. See [SmartThings](/configuration/smartthings-api.md).
 
-For the moment this is not done automatically. So you will have to set the config manually. You can also create a custom switch which will send the `KEY_POWER` command just like you have on physical remote. In the end the main accessory will turn off your TV complety and the custom switch will toggle Art Mode.
+## Default tile
 
-``` json
+By default the Home tile follows Art Mode. It does not cut power.
+
+- The tile is **ON** while you are watching TV (Art Mode off, and the TV has power).
+- The tile is **OFF** while Art Mode is on, and also while the TV is fully off.
+- Turning the tile **OFF** switches Art Mode on. It does not turn the panel off.
+- Turning the tile **ON** switches Art Mode off. If the TV is fully off, it is turned on first.
+
+## Art Mode and Power switches
+
+A Frame gets two switches on the TV accessory:
+
+- **Art Mode** turns Art Mode on and off. It shows ON only when Art Mode is on and the TV has power. If the TV is fully off, turning the switch on powers the TV first, then sets Art Mode.
+- **Power** turns the TV fully on and off, including while Art Mode is on. ON means the TV has power. OFF cuts power, using SmartThings when it is connected.
+
+Hide either switch with `Frame.ArtSwitch.Disable` or `Frame.PowerSwitch.Disable`.
+
+## Real power on the tile
+
+`Frame.RealPowerMode` makes the tile follow power instead of Art Mode.
+
+- **ON** means the TV has power, including while Art Mode is on.
+- **OFF** cuts power. This needs SmartThings (authorization and a device id). Without SmartThings the plugin holds the power key for about 3.5 seconds, which newer Frames no longer honor.
+
+```json
 {
-    "name": "Frame TV",
-    "ip": "192.168.1.1",
-    "mac": "D0:C2:4E:A6:4B:7D",
-    "options": [
-        "Frame.RealPowerMode",
-        "Frame.ArtSwitch.Disable",
-        "Frame.PowerSwitch.Disable"
-    ],
-    "switches": [
-        {"name": "Art Mode", "command": "KEY_POWER"}
-    ]
+  "name": "Frame TV",
+  "ip": "10.20.30.40",
+  "mac": "A0:B1:C2:D3:E4:F5",
+  "options": ["Frame.RealPowerMode"]
 }
 ```
 
-:::
+To hide both extra switches and use only the tile as a power control:
 
-***
-
-The plugin detects if a TV is Frame by looking at `FrameTVSupport` key from the `/api/v2/` request to be **true**. The request is made every time the Homebridge server starts if the TV is powered on. If the request responds with success it will update the storage file where all informations regarding the TV are saved.
-
-If the plugin detects that the TV is a Frame it will change it's default behaivor for the main accessory and add new features.
-
-## How the plugin works as default when detects a TV is a Frame
-
-- Main accessory
-  - As action, the accessory will control the Art Mode ON/OFF
-  - It will display as OFF when the TV is in Art Mode or when the real power is OFF (ArtMode = ON or RealPower = OFF)
-  - It will display as ON when the TV has Art Mode OFF and real power ON (ArtMode = OFF and RealPower = ON)
-  - When it's OFF, first it will turn on the TV then it will switch Art Mode OFF
-- Art Mode Switch
-  - This switch will be created by default and you have the option to disable it with `Frame.ArtSwitch.Disable`
-  - It will control the Art Mode status
-  - It will display as OFF when Art Mode is not active or when the real power is OFF (ArtMode = OFF or RealPower = OFF)
-  - It will display as ON when the TV is in Art Mode and real power is ON (ArtMode = ON and RealPower = ON)
-  - When the TV real power it's off and you turn the switch ON/OFF, first it will turn the TV ON then it will set the ArtMode to selected value
-- Power Switch
-  - This switch will be created by default and you have the option to disable it with `Frame.PowerSwitch.Disable`
-  - It will control the Real Power of TV
-  - It will display as OFF when the real power is OFF, not responding to ping or having powerstate to standby (RealPower = OFF)
-  - It will display as ON when the real power is ON, responding to ping and having powerstate different than standby (RealPower = ON)
-  - It will just control the power. So if the TV real power is OFF and you switch this to ON, the TV will turn ON to the last state. If it was in Art Mode it will go in Art Mode, if it was on an app / hdmi / digitalTV / ... it will go back to that state
-
-## Options
-
-With this version we implemented an `options` key which allows you to set up a few things.
-
-- `Frame.ArtSwitch.Disable`
-  - This will remove the default Art Mode Switch
-
-- `Frame.PowerSwitch.Disable`
-  - This will remove the default Power Switch
-
-- `Frame.RealPowerMode`
-  - This will change the behaivor of the main accessory
-  - When you toggle the main accessory ON/OFF it will actually control the real power of TV
-  - Main accessory will display as ON when the TV real power is ON
-  - Main accessory will display as OFF when the TV real power is OFF
-
-Example of config:
-
-``` json
+```json
 {
-    "name": "Frame TV",
-    "ip": "10.20.30.40",
-    "mac": "A0:B1:C2:D3:E4:F5",
-    "options": [
-        "Frame.RealPowerMode",
-        "Frame.ArtSwitch.Disable",
-        "Frame.PowerSwitch.Disable"
-    ]
+  "name": "Frame TV",
+  "ip": "10.20.30.40",
+  "mac": "A0:B1:C2:D3:E4:F5",
+  "deviceId": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+  "options": [
+    "Frame.RealPowerMode",
+    "Frame.ArtSwitch.Disable",
+    "Frame.PowerSwitch.Disable"
+  ]
 }
 ```
 
-## Art input
+## Art Mode input
 
-We added a new type of input for Frame TVs. This only make sense in combination with `Frame.RealPowerMode` option set.
+You can add an input that turns Art Mode on. In Home it shows as the active input while Art Mode is on, and it updates as soon as Art Mode changes on the TV. While the TV is on, Art Mode is also checked on the same 15 second interval used for custom switches. The plugin does not ask the TV when Home only reads the tile, and it skips Frame requests while the TV is off.
 
-Unfortunately updating the inputs as soon as you toggle the Art Mode Switch was not possible right now because of a problem creating delays of requests and triggering timeouts.
-I will look into it and add it soon. But until then, it will only update the inputs when Home App request it (usually when you open the home app).
+The type is `artmode`. No `value` is required.
 
-Example of how to add the new input:
-
-``` json
+```json
 {
-    "name": "Frame TV",
-    "ip": "192.168.10.230",
-    "mac": "4C:C9:5E:94:39:BC",
-    "options": [
-        "Frame.RealPowerMode"
-    ],
-    "inputs": [
-        {"name": "Art Mode", "type": "art"}
-    ]
+  "name": "Frame TV",
+  "ip": "10.20.30.40",
+  "mac": "A0:B1:C2:D3:E4:F5",
+  "inputs": [{ "name": "Art Mode", "type": "artmode" }]
 }
 ```

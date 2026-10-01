@@ -2,44 +2,46 @@
 sidebarDepth: 0
 ---
 
-# How to open new issue
+# How to open a new issue
 
-Before opening a new issue make sure you checked the documentation for a solution to your problem and also check the [Common issues page](/troubleshooting/common-issues.md).
+Check this documentation and the [common issues](/troubleshooting/common-issues.md) page first. Search the [existing issues](https://github.com/tavicu/homebridge-samsung-tizen/issues?q=is%3Aissue+), including closed ones. The same problem may already have an answer.
 
-It is recommended to also search the [closed issues](https://github.com/tavicu/homebridge-samsung-tizen/issues?q=is%3Aissue+), maybe someone already had your problem and he found a solution.
+Describe what you expected, what happened, and how to repeat it. Include:
 
-Try to describe your problem in a few words and how we can replicate it, with all the details you can provide and you think it will make it easier for us to help you.
+1. Plugin version, for example `6.0.0`
+2. Node.js, Homebridge, and Config UI X versions
+3. TV model and year, for example QN90A / 2021
+4. Whether SmartThings is connected
+5. The relevant part of `config.json`
 
-If you problem is related to configuration or that something it's not working please also include the **configuration file** but make sure to remove sensitive informations like `api_key` or `device_id`.
+Remove `clientId`, `clientSecret`, and `deviceId` before you paste the config. Remove tokens from logs.
 
 ::: warning
-If you have a technical problem and something it's not working as it should you are required to start the plugin in debug mode and provide logs from the console related to the plugin and the problem. If you don't provide this information the issue will be closed without response.
+If something fails, start Homebridge in debug mode and attach the lines for that TV. An issue without those logs will be closed.
 :::
 
-To identify what logs are helpful you must look for logs that include the name of the TV you set in config file or for the plugin name (for example `Bedroom TV` or `homebridge-samsung-tizen`).
+Useful lines contain the TV name from your config, or `homebridge-samsung-tizen`.
 
-![Troubleshooting console one](/images/trouble.console-one.png)
+![Log lines for the TV](/images/trouble.console-one.png)
 
-The logs in gray are debug logs and the ones in red are failures. Usually if you start the plugin in debug mode right after a failure log you will have some debug lines that tells why the command failed and the root of the problem. This is very important in finding a solution to your problem!
+Gray lines are debug. Red lines are failures. The debug lines just after a failure usually say why the command failed.
 
-![Troubleshooting console two](/images/trouble.console-two.png)
+![Debug lines after a failure](/images/trouble.console-two.png)
 
-Once you are sure you want to open a new issue you can access the [Issues page](https://github.com/tavicu/homebridge-samsung-tizen/issues) from GitHub. Please make sure to follow instructions from there.
+Open a new issue from the [Issues page](https://github.com/tavicu/homebridge-samsung-tizen/issues).
 
 ## Enable debug mode
 
-If you are using Homebridge UI you can do this from the settings.
+In Homebridge UI, open the menu in the upper-right corner and select `Homebridge Settings`.
 
-Press the three dots from the upper-right corner then select `Homebridge Settings`.
+Under `Startup Options`, enable `Homebridge Debug Mode -D`.
 
-Then on the `Startup Options` make sure to enable the radio button for `Homebridge Debug Mode -D`.
+![Enable debug mode](/images/trouble.open-issue.png)
 
-![Troubleshooting enable debug mode](/images/trouble.open-issue.png)
+---
 
-***
+From the command line:
 
-If you are starting your Homebridge server from Command Line then you can use this command to start it in debug mode:
-
-``` bash
+```bash
 DEBUG=* homebridge -D
 ```

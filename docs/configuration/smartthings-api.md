@@ -1,131 +1,94 @@
-# SmartThings API
-
-::: tip
-SmartThings have a weird functionality and if you don't use the SmartThings application from your phone for longer times (about a month) it will deactivate your device and you will not be able to control it through SmartThings until you pair the device again in the application.
-
-In my opinion, these are anti-competitive methods to force you to use their application.
-:::
+# SmartThings
 
 ::: warning
-Features using SmartThings API are not local and it will require the server to have access to internet. Requests are sent to SmartThings API, not the TV itself.
+SmartThings features are not local. Homebridge sends those requests to the SmartThings API, so the server needs internet access. Power, volume, mute, apps, and remote keys do not use SmartThings.
 :::
 
-We are starting to implement new features from SmartThings API and migrate some functionalities to their API instead of using hacks.
+::: tip
+If the SmartThings app on your phone is left unused for a long time, SmartThings can drop the TV. Control stops until you add the TV in the app again.
+:::
 
-What can be done throught SmartThings API:
+SmartThings is optional. Without it, the plugin still turns the TV on and off, changes the volume, launches apps, and sends remote keys.
 
-**Select a specific input like `HDMI1`**: The local API only supports to send KEYs that are found on a phisical remote and because of that it was not possible to select a specific input. With SmartThings we can do that :)
+These actions need SmartThings, plus a device id on that TV:
 
-**Set a specific volume**: Now you can set a volume for your TV. Until now you were able to use only `VOLUP` and `VOLDOWN`.
+- Select a source such as Digital TV, HDMI, USB, USB-C, or DisplayPort
+- Set a picture mode or a sound mode
+- Change the channel through the API. Without SmartThings, a channel switch falls back to sending the digit keys
+- Turn a Frame fully off. See [Frame TVs](/configuration/frame-tvs.md)
 
-**Change the picture mode**: Option to change the picture mode.
+Absolute volume does **not** need SmartThings. See [Volume](/features/volume.md).
 
-**Change channel**: This is possible even without SmartThings API but it was using some hacks. If you setup the SmartThings API then it will be used, if not, it will fallback on the old method of changing channel.
-
-***
-
-But before starting to use these awesome features we will need to setup SmartThings API to work with our devices.
-There are a few steps but if you follow the guide it's not that hard!
-
-In order to connect with SmartThings API we will need two keys, `api_key` which is unique for your account and it's the same for all devices and `device_id` which is specific to every device.
+Personal access tokens are no longer accepted. You create a SmartThings app once, enter the client id and client secret, and the plugin refreshes the access token on its own.
 
 ::: danger
-Please make sure to never post the `api_key` and `device_id` public on the internet when you are looking for help or want to show an example of config. Having those informations anyone could control your device!
+Do not post `clientSecret` or `deviceId` in a public issue or screenshot. Anyone with the client secret can request tokens for your app.
 :::
 
-## Setting up the app
+## Create the SmartThings app
 
-First step is to install the SmartThings application on your phone.
+Install the TV in the SmartThings app and confirm you can control it from there.
 
-If you need help you can follow the steps from [Samsung support page](https://www.samsung.com/uk/support/apps-services/how-to-install-and-use-the-smartthings-app-on-my-iphone/)
+Install the [SmartThings CLI](https://github.com/SmartThingsCommunity/smartthings-cli), then run:
 
-Then you want to make sure you add your TV to SmartThings application and that you can control the TV. Make sure you can control the TV because if you didn't use the application for a long time, SmartThings will remove the device connection and you will have to remove the device add it again.
+```bash
+smartthings apps:create
+```
 
-## Getting the api key
+The command opens a browser so you can sign in. Use these answers:
 
-Go to [https://account.smartthings.com/tokens](https://account.smartthings.com/tokens)
+- **App Type:** `OAuth-In App`
+- **Display Name:** `Homebridge Samsung-Tizen` (any name is fine)
+- **Description:** `Monitor and control Samsung Smart TVs via SmartThings API`
+- **Icon Image URL:** leave empty
+- **Target URL:** `https://tavicu.github.io/homebridge-samsung-tizen/token.html`
+- **Scopes:** only `r:devices:*` and `x:devices:*`
+- **Redirect URI:** `https://tavicu.github.io/homebridge-samsung-tizen/token.html`
 
-Login with the same credentials you used in the SmartThings application.
+Finish the redirect URIs, then finish creating the app. Copy the **OAuth Client ID** and **OAuth Client Secret**. They are shown once.
 
-Click on `Generate new token` button:
+## Connect from Homebridge UI
 
-![SmartThings Generate token](/images/smartthings.generate-token.png)
+Open the plugin settings. On the SmartThings card, choose **Connect to SmartThings**.
 
-On `Token Name` insert a name for your token so you will be able to identify it. For example `Homebridge Samsung-Tizen`.
+1. Paste the client id and client secret. **Continue** builds the authorization URL and saves those two values in the plugin config.
+2. Copy the authorization URL, open it in a browser, and allow access. The browser lands on the token page with a code. Copy that code.
+3. Paste the code into **Authorization Code** and choose **Authorize**.
 
-On `Authorized Scopes` you can select all checkboxes. I suggest selecting everything from the list because I don't know what features will be included in a future version or what SmartThings API want to access when you use one of the current feature.
+When it succeeds, the card shows **Connected**. If the code was wrong, expired, or already used, the wizard says so. Start again and use a fresh code.
 
-_If you don't want to select everything from the `Authorized Scopes` the minimum you need is all from `Devices`, `Installed Applications`, `Applications`, `Channels`, `Custom Capabilites` and `Device Profiles`. But again, depending on the features you may get `Unauthorized response` from SmartThings API_.
+**Edit Credentials** runs the wizard again. **Disconnect** removes the stored tokens. Features that need SmartThings stop until you connect again. If the card says **Expired**, choose **Re-authorize SmartThings**.
 
-Click `Generate token` button on the lower part of the screen then copy the token key! Please make sure you copy it now because after refresh you will not be able to see the token key ever again and you will have to generate a new token.
+## Pick the TV
 
-![SmartThings Generate token](/images/smartthings.copy-token.png)
+After SmartThings is connected, edit a TV and pick it from the device list. The list comes from your SmartThings account. If the TV is not there, choose **Other** and paste the id.
 
-## Getting the device id
+The same connection fills input sources, picture modes, and sound modes when you edit an input or a switch for that TV. Installed apps, when the TV has already reported them, show up in the application list. You can still type an id by choosing **Other**.
 
-Go to [https://account.smartthings.com/](https://account.smartthings.com/)
+Until this flow is done, every feature that depends on SmartThings stays unavailable.
 
-Login with the same credentials you used in the SmartThings application.
+## What the plugin ignores
 
-Now you should see the Dashboard with your rooms and devices. Click on the device you want to get the ID for.
+SmartThings values for the active input, picture mode, sound mode, and channel are ignored when SmartThings has not updated them for more than 24 hours. That keeps Home from showing the last source after the TV has been off or has lost its cloud connection.
 
-![SmartThings Dashboard](/images/smartthings.dashboard.png)
+## Manual configuration
 
-After you click on the device a popup should open and on the left side you should have the `device_id` (`5d9215vx-c421-4e12-a998-c4ec48754f08` from our example).
+The settings screen writes the same keys. `clientId` and `clientSecret` sit on the platform. `deviceId` sits on each TV.
 
-![SmartThings Device ID](/images/smartthings.device-id.png)
-
-If you have multiple TVs click on each one to see the popup and copy the `device_id` for each one.
-
-## Setting up the configuration
-
-If you are using Config UI X you can do this from the settings of the plugin.
-
-If you like to be the master of your config and edit it then here are some examples:
-
-``` json
+```json
 {
-    "platform": "SamsungTizen",
-    "devices": [
-        {
-            "name": "Bedroom TV",
-            "ip": "10.20.30.40",
-            "mac": "A0:B1:C2:D3:E4:F5",
-            "api_key": "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXX",
-            "device_id": "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXX"
-        }
-    ]
+  "platform": "SamsungTizen",
+  "clientId": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+  "clientSecret": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+  "devices": [
+    {
+      "name": "Bedroom TV",
+      "ip": "10.20.30.40",
+      "mac": "A0:B1:C2:D3:E4:F5",
+      "deviceId": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+    }
+  ]
 }
 ```
 
-If you have multiple devices you can set the `api_key` as general and it will apply to all devices like this:
-
-``` json
-{
-    "platform": "SamsungTizen",
-    "api_key": "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXX",
-    "devices": [
-        {
-            "name": "Bedroom TV",
-            "ip": "10.20.30.40",
-            "mac": "A0:B1:C2:D3:E4:F5",
-            "device_id": "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXX"
-        },
-        {
-            "name": "Living Room TV",
-            "ip": "10.20.30.40",
-            "mac": "A0:B1:C2:D3:E4:F5",
-            "device_id": "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXX"
-        }
-    ]
-}
-```
-
-Now all you have to do is to restart the Homebridge server and you are set!
-
-***
-
-Ok Ok, the Smart Things API is set but how do I use all the new cool stuff????
-
-- [Inputs page](/features/inputs.md)
-- [Swiches page](/features/switches.md)
+Restart Homebridge after you save. The authorization code from the token page still has to be exchanged once from the wizard. Pasting only the client id and secret does not connect the account.

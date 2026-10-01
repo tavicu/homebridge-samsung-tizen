@@ -1,31 +1,31 @@
-# Installing beta version
+# Installing a beta version
 
-When big features are developed we release a beta software that can be installed by anyone to test it and provide feedback before making it available to everyone.
+Large changes are published as a beta before they are released for everyone. Feedback goes on the [version 6 discussion](https://github.com/tavicu/homebridge-samsung-tizen/issues/756).
+
+Version 6 needs Node.js 22.10+, 24, or 26, Homebridge 1.8 or newer, and Config UI X v5.27.0 or newer for the settings screen. Read [Upgrading from version 5](/extra/upgrading.md) before you install it over an existing setup.
 
 ## Using Homebridge UI
 
-If you are unsing Config UI X you can install the beta version of the plugin right from the interface.
+Open the `Plugins` tab.
 
-First access the interface and select the `Plugins` tab from the navbar.
+Click the wrench icon and select `Install Alternate Version`.
 
-Then click on the wrench icon and select `Install Alternate Version`.
+![Beta version menu](/images/extra.beta-one.png)
 
-![Beta Version one](/images/extra.beta-one.png)
+Select the beta version in the list and click `Install`.
 
-In the dropdown make sure it's selected the beta version and click `Install`.
+![Beta version install](/images/extra.beta-two.png)
 
-![Beta Version two](/images/extra.beta-two.png)
+## Using the command line
 
-## Using Command Line
+With `hb-service`:
 
-You can manually install the beta version with `npm` by running:
-
-``` bash
-npm install homebridge-samsung-tizen@beta
+```bash
+hb-service add homebridge-samsung-tizen@beta
 ```
 
-If the plugin is installed globally don't forget the `-g` attribute like this:
+With npm, add `-g` when the plugin is installed globally:
 
-``` bash
+```bash
 npm install -g homebridge-samsung-tizen@beta
 ```

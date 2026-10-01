@@ -1,46 +1,40 @@
 # Setting the device
 
-Once you install the plugin you will need to add your devices.
+After you install the plugin, add each TV and restart Homebridge so the change is applied.
 
-After each change to the configuration you will need to restart your Homebridge server to apply the changes.
-
-::: tip
-Before adding your devices make sure to assign a **static IP address** for each device on your router.
+::: tip Important
+Before you add a TV, give it a **static IP address** on your router. The plugin uses that address to reach the TV, so it has to stay the same after the TV or the router restarts. If it changes, the plugin can no longer find the TV until you update the address in the settings.
 :::
 
-::: warning Subnet/VLAN
-Samsung TVs does not allow WebSocket connections across different subnets or VLANs. If your TV is not on the same subnet as Homebridge server it will fail to connect.
+::: warning Subnet
+Samsung TVs do not allow WebSocket connections across subnets or VLANs. The TV has to be on the same subnet as Homebridge.
 :::
+
+The settings screen needs Homebridge Config UI X v5.27.0 or newer. Older versions show a short notice and the basic editor instead. You can still enter devices there, or in `config.json`.
 
 ## Using Homebridge UI
 
-Access the Homebridge UI and select `Plugins` tab from the navbar.
+Open the `Plugins` tab and click `SETTINGS` on **Homebridge Samsung Tizen**.
 
-After that click the `SETTINGS` button on the plugin and a modal will appear.
+This is the screen where you manage the plugin. **Devices** is the list of TVs. **Inputs**, **Switches**, and **Remote Keys** are the shared settings, used by every TV. The card at the top is the SmartThings connection. You can add and control a TV without it. Connect it when you want the extra features that depend on SmartThings.
 
-![Setting device open configuration](/images/install.setting-device-one.png)
+### Add a TV
 
-The minimum configuration for each device are the inputs **Name**, **IP Address** and **MAC Address**. Without one of this the plugin will fail to initialize the device.
+The first step is to add a new device on the **Devices** tab. This form only asks for the essential details: **Device Name**, **IP Address**, and **MAC Address**. After you add it, you are taken to the device edit page, where you can configure all of its options. Those options are described in the [configuration](/configuration/) section.
 
-You can add multiple devices by pressing `ADD DEVICE` button for each new device.
+Enter the IP, then click **Test** to make a quick check.
 
-After entering your device informations you can click the `SAVE` button to update the configuration.
-
-![Setting device saving configuration](/images/install.setting-device-two.png)
-
-Once the configuration was saved you will have to restart Homebridge server to apply the changes.
-
-After the Homebridge server restarts you will have to pair each device. So make sure all your devices are ON. Follow the [next page](/installation/pairing-the-device.md) to see how this process is done.
+- **Connection established** means the TV answered. If the MAC field is empty, it is filled in automatically.
+- **TV not supported** means the TV answered, but this plugin does not support it.
+- **Unable to connect** means the IP is wrong, the TV is off, or Homebridge cannot reach it.
 
 ## Manual configuration
 
-If you want to manually set up your devices from `config.json` file you can do that. I also prefer this method!
+You can edit the config from the `Config` tab in Homebridge UI, or open `config.json` from a terminal. The usual path is `~/.homebridge/config.json`. If yours is somewhere else, see the [Homebridge wiki](https://github.com/homebridge/homebridge/wiki).
 
-You can do this from Homebridge UI by selecting the `Config` tab from the navbar or by editing the `config.json` file from the Command Line/Terminal. Usually the file should be found at this location: `~/.homebridge/config.json` but this may be different depending on what platform are you using or how you installed Homebridge. If you don't know where your config file is please reffer to [Homebridge Wiki](https://github.com/homebridge/homebridge/wiki)
+This is just an example with a basic configuration. For more detailed examples, see the [configuration page](/configuration/index.md).
 
-This is just an exaple with basic configuration. For more detailed examples please see the [Configuration page](/configuration/index.md).
-
-``` json
+```json
 "platforms": [
     {
         "platform": "SamsungTizen",
