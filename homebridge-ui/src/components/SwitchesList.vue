@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import SwitchesIcon from '../assets/icons/switches.svg';
 import { useConfig } from '../composables/useConfig';
 import { useRouter } from '../composables/useRouter';
+import { useToast } from '../composables/useToast';
 import { DEFAULT_INPUT_SOURCES, DEFAULT_PICTURE_MODES, DEFAULT_SOUND_MODES } from '../lib/device';
 import DocsLink from './DocsLink.vue';
 import Dropdown from './Dropdown.vue';
@@ -23,8 +24,9 @@ const props = defineProps({
   },
 });
 
-const { config } = useConfig();
+const { config, updateScoped } = useConfig();
 const { navigateTo } = useRouter();
+const toast = useToast();
 
 const switches = computed(() => {
   if (props.deviceIndex !== undefined && config.value?.devices?.[props.deviceIndex]) {
@@ -56,6 +58,17 @@ const switchActions = (switchItem) =>
     .filter(([key]) => switchItem[key] !== undefined && switchItem[key] !== null && switchItem[key] !== '')
     .map(([key, format]) => ({ key, ...format(switchItem[key]) }))
     .filter((action) => action.label);
+
+async function move(index, offset) {
+  const items = [...switches.value];
+  [items[index], items[index + offset]] = [items[index + offset], items[index]];
+
+  try {
+    await updateScoped('switches', props.deviceIndex, items);
+  } catch {
+    toast.error('Failed to move switch');
+  }
+}
 </script>
 
 <template>
@@ -97,6 +110,12 @@ const switchActions = (switchItem) =>
               <button class="dropdown-item" type="button" @click="navigateTo('switch', { action: 'delete', switchIndex: index, deviceIndex })">
                 <i class="fas fa-trash" /> Delete
               </button>
+              <template v-if="switches.length > 1">
+                <button class="dropdown-item" type="button" :disabled="index === 0" @click="move(index, -1)"><i class="fas fa-arrow-right fa-rotate-270" /> Move up</button>
+                <button class="dropdown-item" type="button" :disabled="index === switches.length - 1" @click="move(index, 1)">
+                  <i class="fas fa-arrow-right fa-rotate-90" /> Move down
+                </button>
+              </template>
             </Dropdown>
           </td>
         </tr>

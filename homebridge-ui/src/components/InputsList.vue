@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import InputsIcon from '../assets/icons/inputs.svg';
 import { useConfig } from '../composables/useConfig';
 import { useRouter } from '../composables/useRouter';
+import { useToast } from '../composables/useToast';
 import DocsLink from './DocsLink.vue';
 import Dropdown from './Dropdown.vue';
 import EmptyState from './EmptyState.vue';
@@ -23,8 +24,9 @@ const props = defineProps({
   },
 });
 
-const { config } = useConfig();
+const { config, updateScoped } = useConfig();
 const { navigateTo } = useRouter();
+const toast = useToast();
 
 const inputs = computed(() => {
   if (props.deviceIndex !== undefined && config.value?.devices?.[props.deviceIndex]) {
@@ -41,6 +43,17 @@ const formatValue = (input) => {
 
   return Array.isArray(input.value) ? input.value.join(', ') : input.value || 'N/A';
 };
+
+async function move(index, offset) {
+  const items = [...inputs.value];
+  [items[index], items[index + offset]] = [items[index + offset], items[index]];
+
+  try {
+    await updateScoped('inputs', props.deviceIndex, items);
+  } catch {
+    toast.error('Failed to move input');
+  }
+}
 </script>
 
 <template>
@@ -77,6 +90,12 @@ const formatValue = (input) => {
               <button class="dropdown-item" type="button" @click="navigateTo('input', { action: 'delete', inputIndex: index, deviceIndex })">
                 <i class="fas fa-trash" /> Delete
               </button>
+              <template v-if="inputs.length > 1">
+                <button class="dropdown-item" type="button" :disabled="index === 0" @click="move(index, -1)"><i class="fas fa-arrow-right fa-rotate-270" /> Move up</button>
+                <button class="dropdown-item" type="button" :disabled="index === inputs.length - 1" @click="move(index, 1)">
+                  <i class="fas fa-arrow-right fa-rotate-90" /> Move down
+                </button>
+              </template>
             </Dropdown>
           </td>
         </tr>
