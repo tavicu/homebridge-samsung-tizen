@@ -28,9 +28,11 @@ defineProps({
   transform: translateX(-50%);
   background: #212529;
   color: #fff;
-  padding: 3px 8px;
+  padding: 4px 8px;
   border-radius: 4px;
   font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 1.5;
   white-space: nowrap;
   pointer-events: none;
   opacity: 0;
@@ -38,7 +40,8 @@ defineProps({
   z-index: 100;
 }
 
-.tooltip-wrapper:hover::after {
+.tooltip-wrapper:hover::after,
+.tooltip-wrapper:focus-within::after {
   opacity: 1;
 }
 </style>

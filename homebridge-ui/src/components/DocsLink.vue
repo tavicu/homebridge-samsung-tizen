@@ -1,6 +1,7 @@
 <script setup>
 import { computed, useSlots } from 'vue';
 import { docsUrl } from '../lib/docs';
+import Tooltip from './Tooltip.vue';
 
 const props = defineProps({
   path: {
@@ -15,29 +16,33 @@ const href = computed(() => docsUrl(props.path));
 
 <template>
   <a v-if="slots.default" :href="href" target="_blank" rel="noopener noreferrer" class="docs-link-text"><slot /></a>
-  <a v-else :href="href" target="_blank" rel="noopener noreferrer" class="docs-link" title="Open documentation" aria-label="Open documentation">
-    <i class="fas fa-circle-question" />
-  </a>
+  <Tooltip v-else text="Open documentation" class="docs-link">
+    <a :href="href" target="_blank" rel="noopener noreferrer" class="docs-link-icon" aria-label="Open documentation">
+      <i class="fas fa-circle-question" />
+    </a>
+  </Tooltip>
 </template>
 
 <style scoped>
 .docs-link {
-  display: inline-block;
   margin-left: 0.3rem;
   font-size: 0.85em;
-  color: inherit;
-  opacity: 0.45;
-  text-decoration: none;
   vertical-align: baseline;
-  transition: opacity 0.15s ease;
 }
 
 .form-label > .docs-link {
   margin-left: 0;
 }
 
-.docs-link:hover,
-.docs-link:focus-visible {
+.docs-link-icon {
+  color: inherit;
+  opacity: 0.45;
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+}
+
+.docs-link-icon:hover,
+.docs-link-icon:focus-visible {
   opacity: 1;
 }
 
