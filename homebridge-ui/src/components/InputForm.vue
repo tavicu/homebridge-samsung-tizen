@@ -98,7 +98,8 @@ async function loadInputSources() {
 }
 
 async function loadDeviceApps() {
-  deviceApps.value = await getApps(device.value?.mac);
+  // Global ones apply to every TV, so they offer the apps of all of them.
+  deviceApps.value = await getApps(device.value ? [device.value] : config.value.devices || []);
 }
 
 function goBack() {

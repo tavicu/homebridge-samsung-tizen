@@ -13,8 +13,12 @@ export function useDevice() {
     return serverRequest('/device/get-info', { ip });
   }
 
-  async function getApps(mac) {
-    return serverRequest('/device/get-apps', { mac });
+  // Apps installed on any of the given TVs, each listed once and sorted by name.
+  async function getApps(devices) {
+    const lists = await Promise.all(devices.filter((device) => device?.mac).map((device) => serverRequest('/device/get-apps', { mac: device.mac })));
+    const apps = new Map(lists.flat().map((app) => [String(app.id), app]));
+
+    return [...apps.values()].sort((a, b) => a.name.localeCompare(b.name));
   }
 
   async function testConnection(ip) {
