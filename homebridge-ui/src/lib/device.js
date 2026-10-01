@@ -1,5 +1,12 @@
 const DIGITAL_TV_NAME = 'Digital TV';
 
+export const INPUT_TYPES = [
+  { id: 'input', name: 'Input' },
+  { id: 'app', name: 'Application' },
+  { id: 'command', name: 'Command' },
+  { id: 'artmode', name: 'Art Mode' },
+];
+
 export const DEFAULT_INPUT_SOURCES = [
   { id: 'dtv', name: DIGITAL_TV_NAME },
   { id: 'HDMI1', name: 'HDMI 1' },

@@ -1,6 +1,7 @@
 <script setup>
 import { computed } from 'vue';
 import SwitchesIcon from '../assets/icons/switches.svg';
+import { useApps } from '../composables/useApps';
 import { useConfig } from '../composables/useConfig';
 import { useRouter } from '../composables/useRouter';
 import { useToast } from '../composables/useToast';
@@ -27,6 +28,7 @@ const props = defineProps({
 const { config, updateScoped } = useConfig();
 const { navigateTo } = useRouter();
 const toast = useToast();
+const apps = useApps(() => props.deviceIndex);
 
 const switches = computed(() => {
   if (props.deviceIndex !== undefined && config.value?.devices?.[props.deviceIndex]) {
@@ -37,7 +39,7 @@ const switches = computed(() => {
 });
 
 // Ids missing from the default lists (custom modes, other sources) are shown as they are.
-const findName = (items, id) => items.find((item) => item.id === id)?.name ?? id;
+const findName = (items, id) => items.find((item) => String(item.id) === String(id))?.name ?? id;
 
 // One summary line per action, in the order the switch form lists them.
 const ACTIONS = {
@@ -45,7 +47,7 @@ const ACTIONS = {
   mute: (value) => ({ label: value ? 'Mute' : 'Unmute' }),
   sleep: (value) => ({ label: 'Sleep', value: `${value} min` }),
   volume: (value) => ({ label: 'Volume', value }),
-  app: (value) => ({ label: 'App', value }),
+  app: (value) => ({ label: 'App', value: findName(apps.value, value) }),
   channel: (value) => ({ label: 'Channel', value }),
   input: (value) => ({ label: 'Input', value: findName(DEFAULT_INPUT_SOURCES, value) }),
   picture_mode: (value) => ({ label: 'Picture', value: findName(DEFAULT_PICTURE_MODES, value) }),

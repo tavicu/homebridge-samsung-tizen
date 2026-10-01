@@ -6,6 +6,7 @@ import { useForm } from '../composables/useForm';
 import { useRouter } from '../composables/useRouter';
 import { useToast } from '../composables/useToast';
 import { createCommand, fromCommandRows, toCommandRows } from '../lib/command';
+import { INPUT_TYPES } from '../lib/device';
 import ApplicationSelect from './ApplicationSelect.vue';
 import CommandsField from './CommandsField.vue';
 import DocsLink from './DocsLink.vue';
@@ -186,10 +187,7 @@ watch(
         <label for="type" class="form-label">Input Type</label>
         <select id="type" v-model="form.type" class="form-select" required>
           <option disabled value="">Choose input type ...</option>
-          <option value="input">Input</option>
-          <option value="app">Application</option>
-          <option value="command">Command</option>
-          <option value="artmode">Art Mode</option>
+          <option v-for="inputType in INPUT_TYPES" :key="inputType.id" :value="inputType.id">{{ inputType.name }}</option>
         </select>
         <div class="invalid-feedback">Please choose an input type.</div>
         <small v-if="form.type === 'artmode'" class="form-text text-muted">

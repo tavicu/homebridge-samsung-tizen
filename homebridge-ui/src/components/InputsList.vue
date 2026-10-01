@@ -4,6 +4,7 @@ import InputsIcon from '../assets/icons/inputs.svg';
 import { useConfig } from '../composables/useConfig';
 import { useRouter } from '../composables/useRouter';
 import { useToast } from '../composables/useToast';
+import { INPUT_TYPES } from '../lib/device';
 import DocsLink from './DocsLink.vue';
 import Dropdown from './Dropdown.vue';
 import EmptyState from './EmptyState.vue';
@@ -35,6 +36,9 @@ const inputs = computed(() => {
 
   return config.value?.inputs || [];
 });
+
+// Types the form does not offer (an old `art` input) are shown as they are.
+const typeName = (type) => INPUT_TYPES.find((item) => item.id === type)?.name ?? type;
 
 const formatValue = (input) => {
   if (input.type === 'artmode') {
@@ -81,7 +85,7 @@ async function move(index, offset) {
           <td class="text-body fw-semibold">{{ input.name }}</td>
           <td>
             <Tooltip :text="formatValue(input)">
-              <span class="text-abbr text-capitalize">{{ input.type }}</span>
+              <span class="text-abbr">{{ typeName(input.type) }}</span>
             </Tooltip>
           </td>
           <td class="text-end">

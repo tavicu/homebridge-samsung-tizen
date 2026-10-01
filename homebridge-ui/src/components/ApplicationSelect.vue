@@ -1,7 +1,6 @@
 <script setup>
-import { computed, ref, watch } from 'vue';
-import { useConfig } from '../composables/useConfig';
-import { useDevice } from '../composables/useDevice';
+import { computed } from 'vue';
+import { useApps } from '../composables/useApps';
 
 const value = defineModel({
   type: String,
@@ -23,12 +22,7 @@ const props = defineProps({
   },
 });
 
-const { config } = useConfig();
-const { getApps } = useDevice();
-const apps = ref([]);
-
-// Global inputs and switches apply to every TV, so they offer the apps of all of them.
-const devices = computed(() => (props.deviceIndex === undefined ? config.value.devices || [] : [config.value.devices?.[props.deviceIndex]]));
+const apps = useApps(() => props.deviceIndex);
 
 const appSelect = computed({
   get() {
@@ -38,14 +32,6 @@ const appSelect = computed({
     value.value = selected === 'other' ? '' : selected;
   },
 });
-
-watch(
-  devices,
-  async (list) => {
-    apps.value = await getApps(list);
-  },
-  { immediate: true },
-);
 </script>
 
 <template>
