@@ -6,6 +6,8 @@ import { useHomebridge } from '../composables/useHomebridge';
 import { useRouter } from '../composables/useRouter';
 import { useSmartThings } from '../composables/useSmartThings';
 import { useToast } from '../composables/useToast';
+import Callout from './Callout.vue';
+import DocsLink from './DocsLink.vue';
 import WizardSteps from './WizardSteps.vue';
 
 const { config, updateConfig, saveConfig } = useConfig();
@@ -117,10 +119,16 @@ function copyAuthorizationUrl() {
 <template>
   <WizardSteps :current="currentStep" :outcome="state.status" :steps="['Credentials', 'Authorization', 'Result']" class="my-4 mx-sm-5" />
 
+  <Callout v-if="currentStep === 1" class="mb-3" state="info" title="Create a SmartThings app first">
+    You only do this once, with the official command line tool on a computer that has a browser. When it is done, it shows the client ID and client secret that go below. The
+    documentation walks you through each step.
+    <DocsLink path="smartthingsCreateApp">Follow the guide</DocsLink>
+  </Callout>
+
   <form v-if="currentStep === 1" ref="formEl" class="card shadow" :class="{ 'was-validated': validated }" novalidate @submit.prevent="handleSubmit">
     <div class="card-header">
       <h6 class="fw-semibold mb-0">API Credentials</h6>
-      <p class="small text-secondary mt-1">Enter your SmartThings OAuth client ID and secret</p>
+      <p class="small text-secondary mt-1">Enter the client ID and client secret of your SmartThings app.</p>
     </div>
     <div class="card-body">
       <div class="mb-3">
@@ -171,7 +179,7 @@ function copyAuthorizationUrl() {
 
   <form v-if="currentStep === 2" ref="formEl" class="card shadow" :class="{ 'was-validated': validated }" novalidate @submit.prevent="handleSubmit">
     <div class="card-header">
-      <h6 class="fw-semibold mb-0">Authorization Code</h6>
+      <h6 class="fw-semibold mb-0">Authorization Code <DocsLink path="smartthingsAuthorization" /></h6>
       <p class="small text-secondary mt-1">Copy the authorization URL, paste it in your browser, then paste the code you receive</p>
     </div>
     <div class="card-body">
@@ -215,6 +223,7 @@ function copyAuthorizationUrl() {
         <button type="button" class="btn btn-outline-secondary" @click="navigateTo('dashboard')">Cancel</button>
         <button type="button" class="btn btn-danger" @click="handleRetry">Try again</button>
       </div>
+      <p class="small mt-3 mb-0"><DocsLink path="smartthingsAuthFailed">Troubleshooting</DocsLink></p>
     </template>
   </div>
 </template>

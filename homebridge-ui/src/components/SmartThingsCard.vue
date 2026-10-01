@@ -3,6 +3,7 @@ import { onMounted } from 'vue';
 import SmartThingsIcon from '../assets/icons/smartthings.svg';
 import { useRouter } from '../composables/useRouter';
 import { useSmartThings } from '../composables/useSmartThings';
+import DocsLink from './DocsLink.vue';
 
 const { navigateTo } = useRouter();
 
@@ -31,7 +32,7 @@ function formatDate(timestamp) {
   <div class="st-card d-flex align-items-center gap-4 shadow">
     <div class="flex-grow-1">
       <div class="d-flex align-items-center flex-wrap gap-2 mb-2">
-        <h5 class="fw-semibold mb-0">SmartThings Integration</h5>
+        <h5 class="fw-semibold mb-0">SmartThings Integration <DocsLink path="smartthings" /></h5>
         <span v-if="!isLoading" class="badge rounded-pill" :class="statusBadge[status].class">
           {{ statusBadge[status].label }}
         </span>
@@ -51,13 +52,17 @@ function formatDate(timestamp) {
         <p class="mb-2">
           Your access token expired on <span class="fw-semibold">{{ formatDate(smartthings.expiresAt) }}</span
           >. Re-authorize to restore full functionality.
+          <DocsLink path="smartthingsStatus" class="text-white text-decoration-underline">Learn more</DocsLink>
         </p>
         <button type="button" class="btn btn-danger" @click="navigateTo('smartthings')"><i class="fas fa-arrows-rotate me-1" /> Re-authorize SmartThings</button>
         <button type="button" class="btn btn-disconnect" @click="navigateTo('smartthings', { action: 'disconnect' })">Disconnect</button>
       </template>
 
       <template v-else>
-        <p class="mb-2">Connect your SmartThings account to control your devices directly from this plugin.</p>
+        <p class="mb-2">
+          Connect your SmartThings account to control your devices directly from this plugin.
+          <DocsLink path="smartthingsFeatures" class="text-white text-decoration-underline">What does it add?</DocsLink>
+        </p>
         <button type="button" class="btn btn-success" @click="navigateTo('smartthings')"><i class="fas fa-link me-1" /> Connect to SmartThings</button>
       </template>
     </div>

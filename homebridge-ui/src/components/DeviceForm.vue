@@ -8,6 +8,7 @@ import { useRouter } from '../composables/useRouter';
 import { useSmartThings } from '../composables/useSmartThings';
 import { useToast } from '../composables/useToast';
 import Callout from './Callout.vue';
+import DocsLink from './DocsLink.vue';
 import InputsList from './InputsList.vue';
 import KeysForm from './KeysForm.vue';
 import SwitchesList from './SwitchesList.vue';
@@ -246,7 +247,7 @@ watch(
 
   <form v-show="!isEdit || currentTab === 'settings'" ref="formEl" class="card rounded" :class="{ 'was-validated': validated }" novalidate @submit.prevent="handleSubmit">
     <div class="card-header">
-      <h6 class="fw-semibold mb-0">Main Configuration</h6>
+      <h6 class="fw-semibold mb-0">Main Configuration <DocsLink path="addDevice" /></h6>
       <p class="small text-secondary mt-1">The name and network details used to control this TV</p>
     </div>
 
@@ -301,9 +302,11 @@ watch(
         class="callout-sm mt-3"
         :state="testResult.error ? 'danger' : 'success'"
         :title="testResult.title"
-        :text="testResult.message"
         :icon="testResult.error ? 'fa-exclamation-triangle' : 'fa-check'"
-      />
+      >
+        {{ testResult.message }}
+        <DocsLink v-if="testResult.docs" :path="testResult.docs">Learn more</DocsLink>
+      </Callout>
     </div>
 
     <div class="card-header">
@@ -313,7 +316,7 @@ watch(
 
     <div class="card-body">
       <div :class="{ 'mb-3': isEdit }">
-        <label for="deviceId" class="form-label">SmartThings Device ID <span class="form-optional">Optional</span></label>
+        <label for="deviceId" class="form-label">SmartThings Device ID <span class="form-optional">Optional</span> <DocsLink path="smartthingsPickTv" /></label>
 
         <select v-if="stDevices.length" id="deviceId" v-model="deviceIdSelect" class="form-select mb-2">
           <option v-for="device in stDevices" :key="device.deviceId" :value="device.deviceId">{{ device.name }} ({{ device.deviceId }})</option>
@@ -335,12 +338,17 @@ watch(
         <div class="mb-3">
           <label for="uuid" class="form-label">UUID <span class="form-optional">Optional</span></label>
           <input id="uuid" v-model="form.uuid" type="text" class="form-control" placeholder="e.g. AX1D" />
-          <small class="form-text text-muted">If you have problems adding the TV to Home app, set this field to a unique value</small>
+          <small class="form-text text-muted">
+            If you have problems adding the TV to Home app, set this field to a unique value.
+            <DocsLink path="uuid">Learn more</DocsLink>
+          </small>
         </div>
 
         <hr class="my-4" />
 
         <div>
+          <p class="small text-muted mb-2">Options that change how the plugin handles this TV. <DocsLink path="options">Learn more</DocsLink></p>
+
           <div class="form-check form-switch">
             <input id="option.Device.Disable" v-model="form.options" class="form-check-input" type="checkbox" role="switch" value="Device.Disable" />
             <label class="form-check-label" for="option.Device.Disable">Disable device from processing</label>
@@ -360,7 +368,7 @@ watch(
         <hr class="my-4" />
 
         <div>
-          <p class="small text-muted mb-2">These settings are for Frame TVs.</p>
+          <p class="small text-muted mb-2">These settings are for Frame TVs. <DocsLink path="frame">Learn more</DocsLink></p>
 
           <div class="form-check form-switch">
             <input id="option.Frame.RealPowerMode" v-model="form.options" class="form-check-input" type="checkbox" role="switch" value="Frame.RealPowerMode" />

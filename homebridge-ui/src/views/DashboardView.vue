@@ -2,6 +2,7 @@
 import { computed, onMounted } from 'vue';
 import Callout from '../components/Callout.vue';
 import DevicesList from '../components/DevicesList.vue';
+import DocsLink from '../components/DocsLink.vue';
 import InputsList from '../components/InputsList.vue';
 import KeysForm from '../components/KeysForm.vue';
 import SmartThingsCard from '../components/SmartThingsCard.vue';
@@ -29,13 +30,10 @@ onMounted(() => {
 </script>
 
 <template>
-  <Callout
-    v-if="hasChildBridgeEnabled"
-    class="mb-3"
-    state="warning"
-    text="This plugin already publishes devices as external accessories. Enabling the child bridge option for this plugin is unnecessary, and we recommend turning it off."
-    icon="fa-exclamation-triangle"
-  />
+  <Callout v-if="hasChildBridgeEnabled" class="mb-3" state="warning" icon="fa-exclamation-triangle">
+    This plugin already publishes devices as external accessories. Enabling the child bridge option for this plugin is unnecessary, and we recommend turning it off.
+    <DocsLink path="addToHome">Learn more</DocsLink>
+  </Callout>
 
   <SmartThingsCard class="mb-4" />
 
@@ -46,7 +44,5 @@ onMounted(() => {
     <KeysForm v-else-if="currentTab === 'keys'" />
   </Tabs>
 
-  <p class="text-center text-secondary small mt-3 mb-0">
-    Access the <a href="https://tavicu.github.io/homebridge-samsung-tizen/" target="_blank">documentation</a> of the plugin to see all settings.
-  </p>
+  <p class="text-center text-secondary small mt-3 mb-0">Access the <DocsLink path="home">documentation</DocsLink> of the plugin to see all settings.</p>
 </template>

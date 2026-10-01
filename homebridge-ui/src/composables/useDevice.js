@@ -29,6 +29,7 @@ export function useDevice() {
             error: true,
             title: 'TV not supported',
             message: 'We have successfully connected, but this TV is not supported by this plugin!',
+            docs: 'tvNotSupported',
           };
         }
 
@@ -48,6 +49,7 @@ export function useDevice() {
       error: true,
       title: 'Unable to connect',
       message: 'We could not reach the device, confirm that the IP is correct and that it is turned on!',
+      docs: 'network',
     };
   }
 

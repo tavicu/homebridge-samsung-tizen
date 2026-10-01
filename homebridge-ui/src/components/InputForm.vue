@@ -9,6 +9,7 @@ import { useSmartThings } from '../composables/useSmartThings';
 import { useToast } from '../composables/useToast';
 import { normalizeCommand } from '../lib/command';
 import { DEFAULT_INPUT_SOURCES, groupInputSources } from '../lib/device';
+import DocsLink from './DocsLink.vue';
 
 const props = defineProps({
   action: {
@@ -241,7 +242,7 @@ watch(
 
   <form ref="formEl" class="card rounded" :class="{ 'was-validated': validated }" novalidate @submit.prevent="handleSubmit">
     <div class="card-header">
-      <h6 class="fw-semibold mb-0">Input Configuration</h6>
+      <h6 class="fw-semibold mb-0">Input Configuration <DocsLink path="inputs" /></h6>
       <p class="small text-secondary mt-1">Name this input and choose what it should do when selected</p>
     </div>
 
@@ -262,7 +263,10 @@ watch(
           <option value="artmode">Art Mode</option>
         </select>
         <div class="invalid-feedback">Please choose an input type.</div>
-        <small v-if="form.type === 'artmode'" class="form-text text-muted">This input type is only useful on Frame TVs. It does not need a value.</small>
+        <small v-if="form.type === 'artmode'" class="form-text text-muted">
+          This input type is only useful on Frame TVs. It does not need a value.
+          <DocsLink path="artModeInput">Learn more</DocsLink>
+        </small>
       </div>
 
       <div v-if="form.type === 'input'">
@@ -282,7 +286,10 @@ watch(
           </template>
         </select>
         <div class="invalid-feedback">Please choose an input source.</div>
-        <small class="form-text text-muted">This input type requires a SmartThings integration.</small>
+        <small class="form-text text-muted">
+          This input type requires a SmartThings integration.
+          <DocsLink path="smartthingsInputSource">Learn more</DocsLink>
+        </small>
       </div>
 
       <div v-if="form.type === 'app'">
@@ -305,7 +312,7 @@ watch(
         <div class="invalid-feedback">Please enter a valid application ID.</div>
         <small class="form-text text-muted">
           You can find a list of available application IDs in the
-          <a href="https://tavicu.github.io/homebridge-samsung-tizen/extra/applications.html" target="_blank" rel="noopener noreferrer">documentation</a>.
+          <DocsLink path="applications">documentation</DocsLink>.
         </small>
       </div>
 
@@ -322,6 +329,7 @@ watch(
         <button type="button" class="btn btn-sm btn-outline-primary mt-2" @click="addCommand"><i class="fas fa-plus" /> Add Command</button>
         <small class="form-text d-block text-muted mt-2">
           You can repeat a command with <code class="fw-semibold">KEY_VOLUP*3</code> and hold a key by using <code class="fw-semibold">KEY_POWER*2.5s</code>.
+          <DocsLink path="commands">See all commands</DocsLink>
         </small>
       </div>
     </div>

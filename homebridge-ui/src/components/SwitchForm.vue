@@ -10,6 +10,7 @@ import { useToast } from '../composables/useToast';
 import { normalizeCommand } from '../lib/command';
 import { DEFAULT_INPUT_SOURCES, DEFAULT_PICTURE_MODES, DEFAULT_SOUND_MODES, groupInputSources } from '../lib/device';
 import Callout from './Callout.vue';
+import DocsLink from './DocsLink.vue';
 
 const props = defineProps({
   action: {
@@ -309,7 +310,7 @@ watch(
 
   <form ref="formEl" class="card rounded" :class="{ 'was-validated': validated }" novalidate @submit.prevent="handleSubmit">
     <div class="card-header">
-      <h6 class="fw-semibold mb-0">Switch Configuration</h6>
+      <h6 class="fw-semibold mb-0">Switch Configuration <DocsLink path="switches" /></h6>
       <p class="small text-secondary mt-1">The name shown in HomeKit, and whether the TV should be turned on first</p>
     </div>
 
@@ -386,7 +387,7 @@ watch(
           />
           <small class="form-text text-muted">
             Opens the selected application. See the
-            <a href="https://tavicu.github.io/homebridge-samsung-tizen/extra/applications.html" target="_blank" rel="noopener noreferrer">application IDs list</a>.
+            <DocsLink path="applications">application IDs list</DocsLink>.
           </small>
         </div>
         <div class="col-md-6">
@@ -398,7 +399,10 @@ watch(
 
       <hr class="my-3" />
 
-      <Callout class="callout-sm mb-2" state="warning">These actions require a SmartThings integration.</Callout>
+      <Callout class="callout-sm mb-2" state="warning">
+        These actions require a SmartThings integration.
+        <DocsLink path="smartthingsFeatures">Learn more</DocsLink>
+      </Callout>
 
       <div class="row mb-3">
         <div class="col-md-6">
@@ -440,7 +444,7 @@ watch(
     </div>
 
     <div class="card-header">
-      <h6 class="fw-semibold mb-0">Remote Commands</h6>
+      <h6 class="fw-semibold mb-0">Remote Commands <DocsLink path="commands" /></h6>
       <p class="small text-secondary mt-1">Send one or more remote keys after the other actions</p>
     </div>
 

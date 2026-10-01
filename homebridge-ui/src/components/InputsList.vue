@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import InputsIcon from '../assets/icons/inputs.svg';
 import { useConfig } from '../composables/useConfig';
 import { useRouter } from '../composables/useRouter';
+import DocsLink from './DocsLink.vue';
 import Dropdown from './Dropdown.vue';
 import EmptyState from './EmptyState.vue';
 import Tooltip from './Tooltip.vue';
@@ -46,7 +47,7 @@ const formatValue = (input) => {
   <div class="card shadow">
     <div class="card-header d-flex align-items-center justify-content-between gap-3 bg-transparent">
       <div>
-        <h6 class="fw-semibold mb-0">{{ title }}</h6>
+        <h6 class="fw-semibold mb-0">{{ title }} <DocsLink path="inputs" /></h6>
         <p v-if="description" class="small text-secondary mt-1">{{ description }}</p>
       </div>
       <button v-if="inputs.length" type="button" class="btn btn-primary flex-shrink-0" @click="navigateTo('input', { action: 'add', deviceIndex })">
