@@ -26,7 +26,7 @@ const props = defineProps({
   },
 });
 
-const { config, updateConfig, cleanConfig } = useConfig();
+const { config, updateScoped, cleanConfig } = useConfig();
 const { getApps } = useDevice();
 const { navigateTo, navigateBack, parentRoute } = useRouter();
 const { getInputSources } = useSmartThings();
@@ -143,25 +143,6 @@ function buildInputData() {
   });
 }
 
-async function persistInputs(nextInputs) {
-  if (props.deviceIndex !== undefined) {
-    const updatedDevices = (config.value.devices || []).map((item, index) => {
-      if (index !== props.deviceIndex) {
-        return item;
-      }
-
-      return {
-        ...item,
-        inputs: nextInputs,
-      };
-    });
-
-    await updateConfig({ devices: updatedDevices });
-  } else {
-    await updateConfig({ inputs: nextInputs });
-  }
-}
-
 function handleReset() {
   const input = getCurrentInputs()[props.inputIndex];
 
@@ -185,11 +166,11 @@ async function handleSubmit() {
   try {
     if (isEdit.value) {
       const updatedInputs = getCurrentInputs().map((input, index) => (index === props.inputIndex ? inputData : input));
-      await persistInputs(updatedInputs);
+      await updateScoped('inputs', props.deviceIndex, updatedInputs);
 
       toast.success('Input updated successfully.');
     } else {
-      await persistInputs([...getCurrentInputs(), inputData]);
+      await updateScoped('inputs', props.deviceIndex, [...getCurrentInputs(), inputData]);
 
       toast.success('Input added successfully.');
     }

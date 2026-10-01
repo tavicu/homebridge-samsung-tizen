@@ -17,7 +17,7 @@ const props = defineProps({
 
 const isDeviceScoped = computed(() => props.deviceIndex !== undefined);
 
-const { config, updateConfig, cleanConfig } = useConfig();
+const { config, updateScoped, cleanConfig } = useConfig();
 const { enableSaveButton, disableSaveButton } = useHomebridge();
 const toast = useToast();
 const { formEl, validated, checkValidity, createForm, isDirty, isSaving, markPristine, withSaving } = useForm();
@@ -48,13 +48,7 @@ async function handleSubmit() {
   const nextKeys = cleanConfig(toConfigKeys(form));
 
   try {
-    if (isDeviceScoped.value) {
-      const updatedDevices = (config.value.devices || []).map((item, index) => (index === props.deviceIndex ? { ...item, keys: nextKeys } : item));
-
-      await updateConfig({ devices: updatedDevices });
-    } else {
-      await updateConfig({ keys: nextKeys });
-    }
+    await updateScoped('keys', props.deviceIndex, nextKeys);
 
     markPristine();
     toast.success('Remote keys updated successfully.');

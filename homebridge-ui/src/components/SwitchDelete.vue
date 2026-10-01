@@ -16,17 +16,12 @@ const props = defineProps({
   },
 });
 
-const { config, updateConfig } = useConfig();
+const { config, updateScoped } = useConfig();
 const { navigateTo, navigateBack, parentRoute } = useRouter();
 const toast = useToast();
 
-const switchItem = computed(() => {
-  if (props.deviceIndex !== undefined) {
-    return config.value?.devices?.[props.deviceIndex]?.switches?.[props.switchIndex];
-  }
-
-  return config.value?.switches?.[props.switchIndex];
-});
+const switches = computed(() => (props.deviceIndex !== undefined ? config.value?.devices?.[props.deviceIndex]?.switches : config.value?.switches) || []);
+const switchItem = computed(() => switches.value[props.switchIndex]);
 
 function goBack() {
   navigateBack(...parentRoute('switches', props.deviceIndex));
@@ -34,23 +29,11 @@ function goBack() {
 
 async function confirmDelete() {
   try {
-    if (props.deviceIndex !== undefined) {
-      const updatedDevices = config.value.devices.map((item, dIndex) => {
-        if (dIndex !== props.deviceIndex) {
-          return item;
-        }
-
-        return {
-          ...item,
-          switches: item.switches.filter((_, index) => index !== props.switchIndex),
-        };
-      });
-
-      await updateConfig({ devices: updatedDevices });
-    } else {
-      const updatedSwitches = config.value.switches.filter((_, index) => index !== props.switchIndex);
-      await updateConfig({ switches: updatedSwitches });
-    }
+    await updateScoped(
+      'switches',
+      props.deviceIndex,
+      switches.value.filter((_, index) => index !== props.switchIndex),
+    );
 
     toast.success('Switch deleted successfully.');
 

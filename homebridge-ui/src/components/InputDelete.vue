@@ -16,17 +16,12 @@ const props = defineProps({
   },
 });
 
-const { config, updateConfig } = useConfig();
+const { config, updateScoped } = useConfig();
 const { navigateTo, navigateBack, parentRoute } = useRouter();
 const toast = useToast();
 
-const inputItem = computed(() => {
-  if (props.deviceIndex !== undefined) {
-    return config.value?.devices?.[props.deviceIndex]?.inputs?.[props.inputIndex];
-  }
-
-  return config.value?.inputs?.[props.inputIndex];
-});
+const inputs = computed(() => (props.deviceIndex !== undefined ? config.value?.devices?.[props.deviceIndex]?.inputs : config.value?.inputs) || []);
+const inputItem = computed(() => inputs.value[props.inputIndex]);
 
 function goBack() {
   navigateBack(...parentRoute('inputs', props.deviceIndex));
@@ -34,23 +29,11 @@ function goBack() {
 
 async function confirmDelete() {
   try {
-    if (props.deviceIndex !== undefined) {
-      const updatedDevices = config.value.devices.map((item, dIndex) => {
-        if (dIndex !== props.deviceIndex) {
-          return item;
-        }
-
-        return {
-          ...item,
-          inputs: item.inputs.filter((_, index) => index !== props.inputIndex),
-        };
-      });
-
-      await updateConfig({ devices: updatedDevices });
-    } else {
-      const updatedInputs = config.value.inputs.filter((_, index) => index !== props.inputIndex);
-      await updateConfig({ inputs: updatedInputs });
-    }
+    await updateScoped(
+      'inputs',
+      props.deviceIndex,
+      inputs.value.filter((_, index) => index !== props.inputIndex),
+    );
 
     toast.success('Input deleted successfully.');
 

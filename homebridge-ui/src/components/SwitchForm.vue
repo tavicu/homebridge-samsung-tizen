@@ -27,7 +27,7 @@ const props = defineProps({
   },
 });
 
-const { config, updateConfig, cleanConfig } = useConfig();
+const { config, updateScoped, cleanConfig } = useConfig();
 const { getApps } = useDevice();
 const { navigateTo, navigateBack, parentRoute } = useRouter();
 const { getInputSources, getPictureModes, getSoundModes } = useSmartThings();
@@ -205,25 +205,6 @@ function buildSwitchData() {
   });
 }
 
-async function persistSwitches(nextSwitches) {
-  if (props.deviceIndex !== undefined) {
-    const updatedDevices = (config.value.devices || []).map((item, index) => {
-      if (index !== props.deviceIndex) {
-        return item;
-      }
-
-      return {
-        ...item,
-        switches: nextSwitches,
-      };
-    });
-
-    await updateConfig({ devices: updatedDevices });
-  } else {
-    await updateConfig({ switches: nextSwitches });
-  }
-}
-
 function handleReset() {
   const switchItem = getCurrentSwitches()[props.switchIndex];
 
@@ -253,11 +234,11 @@ async function handleSubmit() {
   try {
     if (isEdit.value) {
       const updatedSwitches = getCurrentSwitches().map((item, index) => (index === props.switchIndex ? switchData : item));
-      await persistSwitches(updatedSwitches);
+      await updateScoped('switches', props.deviceIndex, updatedSwitches);
 
       toast.success('Switch updated successfully.');
     } else {
-      await persistSwitches([...getCurrentSwitches(), switchData]);
+      await updateScoped('switches', props.deviceIndex, [...getCurrentSwitches(), switchData]);
 
       toast.success('Switch added successfully.');
     }

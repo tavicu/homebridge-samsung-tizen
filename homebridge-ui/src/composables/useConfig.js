@@ -76,6 +76,17 @@ export function useConfig() {
     return updatedConfig;
   }
 
+  // Saves a setting that exists both globally and per device (inputs, switches, keys): on the device when one is given, globally otherwise.
+  async function updateScoped(key, deviceIndex, value) {
+    if (deviceIndex === undefined) {
+      return updateConfig({ [key]: value });
+    }
+
+    const devices = (config.value.devices || []).map((device, index) => (index === deviceIndex ? { ...device, [key]: value } : device));
+
+    return updateConfig({ devices });
+  }
+
   return {
     config,
     restartRequired,
@@ -84,5 +95,6 @@ export function useConfig() {
     saveConfig,
     cleanConfig,
     updateConfig,
+    updateScoped,
   };
 }
