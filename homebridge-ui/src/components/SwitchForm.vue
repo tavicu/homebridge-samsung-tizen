@@ -7,9 +7,10 @@ import { useForm } from '../composables/useForm';
 import { useRouter } from '../composables/useRouter';
 import { useSmartThings } from '../composables/useSmartThings';
 import { useToast } from '../composables/useToast';
-import { COMMAND_PATTERN, normalizeCommand } from '../lib/command';
+import { createCommand, fromCommandRows, toCommandRows } from '../lib/command';
 import { DEFAULT_INPUT_SOURCES, DEFAULT_PICTURE_MODES, DEFAULT_SOUND_MODES, groupInputSources } from '../lib/device';
 import Callout from './Callout.vue';
+import CommandsField from './CommandsField.vue';
 import DocsLink from './DocsLink.vue';
 import SmartThingsNotice from './SmartThingsNotice.vue';
 
@@ -33,23 +34,7 @@ const { getApps } = useDevice();
 const { navigateTo, navigateBack, parentRoute } = useRouter();
 const { getInputSources, getPictureModes, getSoundModes } = useSmartThings();
 const toast = useToast();
-const { formEl, validated, checkValidity, createForm, createId, isDirty, isSaving, markPristine, withSaving } = useForm();
-
-function createCommand(value = '') {
-  return { id: createId(), value };
-}
-
-function toCommands(value) {
-  if (Array.isArray(value)) {
-    return value.length > 0 ? value.map((item) => createCommand(String(item).trim())) : [createCommand()];
-  }
-
-  if (typeof value === 'string' && value.trim()) {
-    return value.split(',').map((item) => createCommand(item.trim()));
-  }
-
-  return [createCommand()];
-}
+const { formEl, validated, checkValidity, createForm, isDirty, isSaving, markPristine, withSaving } = useForm();
 
 const isEdit = computed(() => props.action === 'edit');
 const device = computed(() => (props.deviceIndex === undefined ? undefined : config.value.devices?.[props.deviceIndex]));
@@ -108,7 +93,7 @@ function fillForm(switchItem = {}) {
   form.channel = switchItem.channel !== undefined && switchItem.channel !== null ? String(switchItem.channel) : '';
   form.picture_mode = switchItem.picture_mode || '';
   form.sound_mode = switchItem.sound_mode || '';
-  form.commands = switchItem.command !== undefined ? toCommands(switchItem.command) : [createCommand()];
+  form.commands = switchItem.command !== undefined ? toCommandRows(switchItem.command) : [createCommand()];
   markPristine();
 }
 
@@ -190,7 +175,7 @@ function init() {
 }
 
 function buildSwitchData() {
-  const commands = form.commands.map((item) => normalizeCommand(item.value)).filter(Boolean);
+  const commands = fromCommandRows(form.commands);
 
   return cleanConfig({
     name: form.name,
@@ -252,19 +237,6 @@ async function handleSubmit() {
 }
 
 const submit = withSaving(handleSubmit);
-
-function addCommand() {
-  form.commands.push(createCommand());
-}
-
-function removeCommand(id) {
-  if (form.commands.length === 1) {
-    form.commands[0].value = '';
-    return;
-  }
-
-  form.commands = form.commands.filter((command) => command.id !== id);
-}
 
 watch(
   () => [props.action, props.switchIndex, props.deviceIndex],
@@ -439,24 +411,7 @@ watch(
         >You can repeat a command with <code class="fw-semibold">KEY_VOLUP*3</code> and hold a key by using <code class="fw-semibold">KEY_POWER*2.5s</code>.</Callout
       >
 
-      <label class="form-label">Key(s) to execute</label>
-      <div class="d-flex flex-column gap-2">
-        <div v-for="command in form.commands" :key="command.id" class="input-group input-group-sm has-validation">
-          <input
-            v-model="command.value"
-            type="text"
-            class="form-control font-monospace"
-            placeholder="e.g. KEY_VOLUP"
-            :pattern="COMMAND_PATTERN"
-            @blur="command.value = normalizeCommand(command.value)"
-          />
-          <button type="button" class="btn btn-outline-danger" aria-label="Remove command" @click="removeCommand(command.id)">
-            <i class="fas fa-xmark" />
-          </button>
-          <div class="invalid-feedback">Use a key like KEY_VOLUP, KEY_VOLUP*3 or KEY_POWER*2.5s.</div>
-        </div>
-      </div>
-      <button type="button" class="btn btn-sm btn-outline-primary mt-2" @click="addCommand"><i class="fas fa-plus" /> Add Command</button>
+      <CommandsField v-model="form.commands" />
     </div>
 
     <div class="card-footer">

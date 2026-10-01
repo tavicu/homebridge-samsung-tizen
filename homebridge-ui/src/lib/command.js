@@ -14,3 +14,29 @@ export function normalizeCommand(value) {
 
   return `${key}*${suffix}`;
 }
+
+let lastCommandId = 0;
+
+// One editable row of a command list. The id only keeps the rows stable while they are added and removed.
+export function createCommand(value = '') {
+  lastCommandId += 1;
+  return { id: lastCommandId, value };
+}
+
+// Turns the command value from the config (an array or a comma separated string) into editable rows.
+export function toCommandRows(value) {
+  if (Array.isArray(value) && value.length > 0) {
+    return value.map((item) => createCommand(String(item).trim()));
+  }
+
+  if (typeof value === 'string' && value.trim()) {
+    return value.split(',').map((item) => createCommand(item.trim()));
+  }
+
+  return [createCommand()];
+}
+
+// Turns the rows back into the list saved in the config, leaving out the empty ones.
+export function fromCommandRows(rows) {
+  return rows.map((row) => normalizeCommand(row.value)).filter(Boolean);
+}

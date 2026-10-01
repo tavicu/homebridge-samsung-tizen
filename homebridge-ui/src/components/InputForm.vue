@@ -7,8 +7,9 @@ import { useForm } from '../composables/useForm';
 import { useRouter } from '../composables/useRouter';
 import { useSmartThings } from '../composables/useSmartThings';
 import { useToast } from '../composables/useToast';
-import { COMMAND_PATTERN, normalizeCommand } from '../lib/command';
+import { createCommand, fromCommandRows, toCommandRows } from '../lib/command';
 import { DEFAULT_INPUT_SOURCES, groupInputSources } from '../lib/device';
+import CommandsField from './CommandsField.vue';
 import DocsLink from './DocsLink.vue';
 import SmartThingsNotice from './SmartThingsNotice.vue';
 
@@ -32,23 +33,7 @@ const { getApps } = useDevice();
 const { navigateTo, navigateBack, parentRoute } = useRouter();
 const { getInputSources } = useSmartThings();
 const toast = useToast();
-const { formEl, validated, checkValidity, createForm, createId, isDirty, isSaving, markPristine, withSaving } = useForm();
-
-function createCommand(value = '') {
-  return { id: createId(), value };
-}
-
-function toCommands(value) {
-  if (Array.isArray(value)) {
-    return value.length > 0 ? value.map((item) => createCommand(String(item).trim())) : [createCommand()];
-  }
-
-  if (typeof value === 'string' && value.trim()) {
-    return value.split(',').map((item) => createCommand(item.trim()));
-  }
-
-  return [createCommand()];
-}
+const { formEl, validated, checkValidity, createForm, isDirty, isSaving, markPristine, withSaving } = useForm();
 
 const isEdit = computed(() => props.action === 'edit');
 const device = computed(() => (props.deviceIndex === undefined ? undefined : config.value.devices?.[props.deviceIndex]));
@@ -78,7 +63,7 @@ function fillForm(input = {}) {
   form.type = input.type || '';
   form.valueInput = input.type === 'input' ? String(input.value || '') : '';
   form.valueApp = input.type === 'app' ? String(input.value || '') : '';
-  form.commands = input.type === 'command' ? toCommands(input.value) : [createCommand()];
+  form.commands = input.type === 'command' ? toCommandRows(input.value) : [createCommand()];
   markPristine();
 }
 
@@ -131,7 +116,7 @@ function buildInputData() {
   let value;
 
   if (form.type === 'command') {
-    value = form.commands.map((item) => normalizeCommand(item.value)).filter(Boolean);
+    value = fromCommandRows(form.commands);
   } else if (form.type === 'app') {
     value = form.valueApp.trim();
   } else if (form.type === 'input') {
@@ -184,19 +169,6 @@ async function handleSubmit() {
 }
 
 const submit = withSaving(handleSubmit);
-
-function addCommand() {
-  form.commands.push(createCommand());
-}
-
-function removeCommand(id) {
-  if (form.commands.length === 1) {
-    form.commands[0].value = '';
-    return;
-  }
-
-  form.commands = form.commands.filter((command) => command.id !== id);
-}
 
 watch(
   () => [props.action, props.inputIndex, props.deviceIndex],
@@ -303,25 +275,7 @@ watch(
       </div>
 
       <div v-if="form.type === 'command'">
-        <label class="form-label">Key(s) to execute</label>
-        <div class="d-flex flex-column gap-2">
-          <div v-for="command in form.commands" :key="command.id" class="input-group input-group-sm has-validation">
-            <input
-              v-model="command.value"
-              type="text"
-              class="form-control font-monospace"
-              placeholder="e.g. KEY_VOLUP"
-              :pattern="COMMAND_PATTERN"
-              required
-              @blur="command.value = normalizeCommand(command.value)"
-            />
-            <button type="button" class="btn btn-outline-danger" aria-label="Remove command" @click="removeCommand(command.id)">
-              <i class="fas fa-xmark" />
-            </button>
-            <div class="invalid-feedback">Use a key like KEY_VOLUP, KEY_VOLUP*3 or KEY_POWER*2.5s.</div>
-          </div>
-        </div>
-        <button type="button" class="btn btn-sm btn-outline-primary mt-2" @click="addCommand"><i class="fas fa-plus" /> Add Command</button>
+        <CommandsField v-model="form.commands" required />
         <small class="form-text d-block text-muted mt-2">
           You can repeat a command with <code class="fw-semibold">KEY_VOLUP*3</code> and hold a key by using <code class="fw-semibold">KEY_POWER*2.5s</code>.
           <DocsLink path="commands">See all commands</DocsLink>
