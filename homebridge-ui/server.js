@@ -35,10 +35,15 @@ class PluginUiServer extends HomebridgePluginUiServer {
       throw new Error('Client ID and client secret are required');
     }
 
-    const resolvedRedirectUrl = this.#resolveRedirectUrl(redirectUrl);
-    const scopes = 'r:devices:* x:devices:*'.replace(' ', '%20');
+    const query = new URLSearchParams({
+      client_id: clientId,
+      response_type: 'code',
+      redirect_uri: this.#resolveRedirectUrl(redirectUrl),
+      scope: 'r:devices:* x:devices:*',
+    });
 
-    return `https://api.smartthings.com/oauth/authorize?client_id=${clientId}&response_type=code&redirect_uri=${encodeURIComponent(resolvedRedirectUrl)}&scope=${scopes}`;
+    // URLSearchParams writes spaces as "+"; keep "%20", which is what SmartThings has always received here.
+    return `https://api.smartthings.com/oauth/authorize?${query.toString().replaceAll('+', '%20')}`;
   }
 
   async stAuthToken(config) {
@@ -66,7 +71,13 @@ class PluginUiServer extends HomebridgePluginUiServer {
       body: body.toString(),
     });
 
-    const data = await response.json();
+    // A rejected code comes back as a JSON error, which the wizard shows; anything else means SmartThings is not answering properly.
+    const data = await response.json().catch(() => null);
+
+    if (!data || (!response.ok && !data.error)) {
+      throw new Error(`SmartThings answered with HTTP ${response.status}. Try again in a moment.`);
+    }
+
     return data;
   }
 
@@ -124,7 +135,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
     }
 
     try {
-      const response = await fetch(`https://api.smartthings.com/v1/devices/${deviceId}/status`, {
+      const response = await fetch(`https://api.smartthings.com/v1/devices/${encodeURIComponent(deviceId)}/status`, {
         headers: { Authorization: `Bearer ${stData.accessToken}` },
       });
 
