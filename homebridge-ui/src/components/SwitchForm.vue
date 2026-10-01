@@ -1,18 +1,19 @@
 <script setup>
-import { computed, ref, watch } from 'vue';
+import { computed, watch } from 'vue';
 import SwitchesIcon from '../assets/icons/switches.svg';
 import { useConfig } from '../composables/useConfig';
-import { useDevice } from '../composables/useDevice';
 import { useForm } from '../composables/useForm';
 import { useRouter } from '../composables/useRouter';
-import { useSmartThings } from '../composables/useSmartThings';
 import { useToast } from '../composables/useToast';
 import { createCommand, fromCommandRows, toCommandRows } from '../lib/command';
-import { DEFAULT_INPUT_SOURCES, DEFAULT_PICTURE_MODES, DEFAULT_SOUND_MODES, groupInputSources } from '../lib/device';
+import ApplicationSelect from './ApplicationSelect.vue';
 import Callout from './Callout.vue';
 import CommandsField from './CommandsField.vue';
 import DocsLink from './DocsLink.vue';
+import InputSourceSelect from './InputSourceSelect.vue';
+import PictureModeSelect from './PictureModeSelect.vue';
 import SmartThingsNotice from './SmartThingsNotice.vue';
+import SoundModeSelect from './SoundModeSelect.vue';
 
 const props = defineProps({
   action: {
@@ -30,19 +31,12 @@ const props = defineProps({
 });
 
 const { config, updateScoped, cleanConfig } = useConfig();
-const { getApps } = useDevice();
 const { navigateTo, navigateBack, parentRoute } = useRouter();
-const { getInputSources, getPictureModes, getSoundModes } = useSmartThings();
 const toast = useToast();
 const { formEl, validated, checkValidity, createForm, isDirty, isSaving, markPristine, withSaving } = useForm();
 
 const isEdit = computed(() => props.action === 'edit');
 const device = computed(() => (props.deviceIndex === undefined ? undefined : config.value.devices?.[props.deviceIndex]));
-const deviceId = computed(() => device.value?.deviceId || device.value?.device_id);
-const deviceApps = ref([]);
-const pictureModes = ref(DEFAULT_PICTURE_MODES);
-const soundModes = ref(DEFAULT_SOUND_MODES);
-const inputSources = ref({ available: [], other: DEFAULT_INPUT_SOURCES });
 
 const form = createForm({
   name: '',
@@ -56,15 +50,6 @@ const form = createForm({
   picture_mode: '',
   sound_mode: '',
   commands: [createCommand()],
-});
-
-const appSelect = computed({
-  get() {
-    return deviceApps.value.some((app) => String(app.id) === form.app) ? form.app : 'other';
-  },
-  set(value) {
-    form.app = value === 'other' ? '' : value;
-  },
 });
 
 function hasAnyAction() {
@@ -105,48 +90,6 @@ function getCurrentSwitches() {
   return config.value.switches || [];
 }
 
-function withCurrentMode(modes, currentMode) {
-  if (currentMode && !modes.some((mode) => mode.id === currentMode)) {
-    return [...modes, { id: currentMode, name: currentMode }];
-  }
-
-  return modes;
-}
-
-async function loadPictureModes() {
-  let modes = DEFAULT_PICTURE_MODES;
-  const fetched = await getPictureModes(deviceId.value);
-
-  if (fetched.length) {
-    modes = fetched;
-  }
-
-  pictureModes.value = withCurrentMode(modes, form.picture_mode);
-}
-
-async function loadSoundModes() {
-  let modes = DEFAULT_SOUND_MODES;
-  const fetched = await getSoundModes(deviceId.value);
-
-  if (fetched.length) {
-    modes = fetched;
-  }
-
-  soundModes.value = withCurrentMode(modes, form.sound_mode);
-}
-
-async function loadInputSources() {
-  const grouped = groupInputSources(await getInputSources(deviceId.value), form.input);
-
-  inputSources.value = grouped;
-  form.input = grouped.value;
-}
-
-async function loadDeviceApps() {
-  // Global ones apply to every TV, so they offer the apps of all of them.
-  deviceApps.value = await getApps(device.value ? [device.value] : config.value.devices || []);
-}
-
 function goBack() {
   navigateBack(...parentRoute('switches', props.deviceIndex));
 }
@@ -167,11 +110,6 @@ function init() {
   } else {
     fillForm();
   }
-
-  loadPictureModes();
-  loadSoundModes();
-  loadInputSources();
-  loadDeviceApps();
 }
 
 function buildSwitchData() {
@@ -201,8 +139,6 @@ function handleReset() {
 
   validated.value = false;
   fillForm(switchItem);
-  loadInputSources();
-  loadDeviceApps();
 }
 
 async function handleSubmit() {
@@ -333,19 +269,7 @@ watch(
         <div class="col-md-6">
           <label for="app" class="form-label">Application ID</label>
 
-          <select v-if="deviceApps.length" id="app" v-model="appSelect" class="form-select mb-2">
-            <option v-for="app in deviceApps" :key="app.id" :value="String(app.id)">{{ app.name }} ({{ app.id }})</option>
-            <option value="other">Other</option>
-          </select>
-
-          <input
-            v-if="!deviceApps.length || appSelect === 'other'"
-            :id="deviceApps.length ? undefined : 'app'"
-            v-model="form.app"
-            type="text"
-            class="form-control"
-            placeholder="e.g. 111299001912"
-          />
+          <ApplicationSelect id="app" v-model="form.app" :device-index="deviceIndex" />
           <small class="form-text text-muted">
             Opens the selected application. See the
             <DocsLink path="applications">application IDs list</DocsLink>.
@@ -365,38 +289,19 @@ watch(
       <div class="row mb-3">
         <div class="col-md-6">
           <label for="input" class="form-label">Input Source</label>
-          <select id="input" v-model="form.input" class="form-select">
-            <option value="">None</option>
-            <template v-if="inputSources.available.length">
-              <optgroup label="Available">
-                <option v-for="source in inputSources.available" :key="source.id" :value="source.id">{{ source.name }}</option>
-              </optgroup>
-              <optgroup v-if="inputSources.other.length" label="Other">
-                <option v-for="source in inputSources.other" :key="source.id" :value="source.id">{{ source.name }}</option>
-              </optgroup>
-            </template>
-            <template v-else>
-              <option v-for="source in inputSources.other" :key="source.id" :value="source.id">{{ source.name }}</option>
-            </template>
-          </select>
+          <InputSourceSelect id="input" v-model="form.input" :device-index="deviceIndex" />
         </div>
 
         <div class="col-md-6">
           <label for="picture_mode" class="form-label">Picture Mode</label>
-          <select id="picture_mode" v-model="form.picture_mode" class="form-select">
-            <option value="">None</option>
-            <option v-for="mode in pictureModes" :key="mode.id" :value="mode.id">{{ mode.name }}</option>
-          </select>
+          <PictureModeSelect id="picture_mode" v-model="form.picture_mode" :device-index="deviceIndex" />
         </div>
       </div>
 
       <div class="row">
         <div class="col-md-6">
           <label for="sound_mode" class="form-label">Sound Mode</label>
-          <select id="sound_mode" v-model="form.sound_mode" class="form-select">
-            <option value="">None</option>
-            <option v-for="mode in soundModes" :key="mode.id" :value="mode.id">{{ mode.name }}</option>
-          </select>
+          <SoundModeSelect id="sound_mode" v-model="form.sound_mode" :device-index="deviceIndex" />
         </div>
       </div>
     </div>

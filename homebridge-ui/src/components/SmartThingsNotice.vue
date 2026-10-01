@@ -43,6 +43,12 @@ onMounted(getToken);
       This TV has no SmartThings Device ID, so this will not work yet.
       <a href="#" @click.prevent="navigateTo('device', { action: 'edit', deviceIndex, tab: 'settings' })">Open TV settings</a>
     </template>
-    <template v-else>TVs without a SmartThings Device ID skip this: {{ missingDevices.map((device) => device.name).join(', ') }}.</template>
+    <template v-else>
+      TVs without a SmartThings Device ID skip this:
+      <template v-for="(device, index) in missingDevices" :key="index">
+        <span class="fw-semibold">{{ device.name }}</span
+        >{{ index < missingDevices.length - 1 ? ', ' : '.' }}
+      </template>
+    </template>
   </Callout>
 </template>

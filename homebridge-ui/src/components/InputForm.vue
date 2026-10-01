@@ -1,16 +1,15 @@
 <script setup>
-import { computed, ref, watch } from 'vue';
+import { computed, watch } from 'vue';
 import InputsIcon from '../assets/icons/inputs.svg';
 import { useConfig } from '../composables/useConfig';
-import { useDevice } from '../composables/useDevice';
 import { useForm } from '../composables/useForm';
 import { useRouter } from '../composables/useRouter';
-import { useSmartThings } from '../composables/useSmartThings';
 import { useToast } from '../composables/useToast';
 import { createCommand, fromCommandRows, toCommandRows } from '../lib/command';
-import { DEFAULT_INPUT_SOURCES, groupInputSources } from '../lib/device';
+import ApplicationSelect from './ApplicationSelect.vue';
 import CommandsField from './CommandsField.vue';
 import DocsLink from './DocsLink.vue';
+import InputSourceSelect from './InputSourceSelect.vue';
 import SmartThingsNotice from './SmartThingsNotice.vue';
 
 const props = defineProps({
@@ -29,17 +28,12 @@ const props = defineProps({
 });
 
 const { config, updateScoped, cleanConfig } = useConfig();
-const { getApps } = useDevice();
 const { navigateTo, navigateBack, parentRoute } = useRouter();
-const { getInputSources } = useSmartThings();
 const toast = useToast();
 const { formEl, validated, checkValidity, createForm, isDirty, isSaving, markPristine, withSaving } = useForm();
 
 const isEdit = computed(() => props.action === 'edit');
 const device = computed(() => (props.deviceIndex === undefined ? undefined : config.value.devices?.[props.deviceIndex]));
-const deviceId = computed(() => device.value?.deviceId || device.value?.device_id);
-const deviceApps = ref([]);
-const inputSources = ref({ available: [], other: DEFAULT_INPUT_SOURCES });
 
 const form = createForm({
   name: '',
@@ -47,15 +41,6 @@ const form = createForm({
   valueInput: '',
   valueApp: '',
   commands: [createCommand()],
-});
-
-const appSelect = computed({
-  get() {
-    return deviceApps.value.some((app) => String(app.id) === form.valueApp) ? form.valueApp : 'other';
-  },
-  set(value) {
-    form.valueApp = value === 'other' ? '' : value;
-  },
 });
 
 function fillForm(input = {}) {
@@ -73,18 +58,6 @@ function getCurrentInputs() {
   }
 
   return config.value.inputs || [];
-}
-
-async function loadInputSources() {
-  const grouped = groupInputSources(await getInputSources(deviceId.value), form.valueInput);
-
-  inputSources.value = grouped;
-  form.valueInput = grouped.value;
-}
-
-async function loadDeviceApps() {
-  // Global ones apply to every TV, so they offer the apps of all of them.
-  deviceApps.value = await getApps(device.value ? [device.value] : config.value.devices || []);
 }
 
 function goBack() {
@@ -107,9 +80,6 @@ function init() {
   } else {
     fillForm();
   }
-
-  loadInputSources();
-  loadDeviceApps();
 }
 
 function buildInputData() {
@@ -139,8 +109,6 @@ function handleReset() {
 
   validated.value = false;
   fillForm(input);
-  loadInputSources();
-  loadDeviceApps();
 }
 
 async function handleSubmit() {
@@ -232,20 +200,7 @@ watch(
 
       <div v-if="form.type === 'input'">
         <label for="value-input" class="form-label">Input Source</label>
-        <select id="value-input" v-model="form.valueInput" class="form-select" required>
-          <option disabled value="">Choose input source ...</option>
-          <template v-if="inputSources.available.length">
-            <optgroup label="Available">
-              <option v-for="source in inputSources.available" :key="source.id" :value="source.id">{{ source.name }}</option>
-            </optgroup>
-            <optgroup v-if="inputSources.other.length" label="Other">
-              <option v-for="source in inputSources.other" :key="source.id" :value="source.id">{{ source.name }}</option>
-            </optgroup>
-          </template>
-          <template v-else>
-            <option v-for="source in inputSources.other" :key="source.id" :value="source.id">{{ source.name }}</option>
-          </template>
-        </select>
+        <InputSourceSelect id="value-input" v-model="form.valueInput" :device-index="deviceIndex" placeholder="Choose input source ..." required />
         <div class="invalid-feedback">Please choose an input source.</div>
         <SmartThingsNotice class="mt-2" :device-index="deviceIndex" />
       </div>
@@ -253,20 +208,7 @@ watch(
       <div v-if="form.type === 'app'">
         <label for="value-app" class="form-label">Application ID</label>
 
-        <select v-if="deviceApps.length" id="value-app" v-model="appSelect" class="form-select mb-2">
-          <option v-for="app in deviceApps" :key="app.id" :value="String(app.id)">{{ app.name }} ({{ app.id }})</option>
-          <option value="other">Other</option>
-        </select>
-
-        <input
-          v-if="!deviceApps.length || appSelect === 'other'"
-          :id="deviceApps.length ? undefined : 'value-app'"
-          v-model="form.valueApp"
-          type="text"
-          class="form-control"
-          placeholder="e.g. 111299001912"
-          required
-        />
+        <ApplicationSelect id="value-app" v-model="form.valueApp" :device-index="deviceIndex" required />
         <div class="invalid-feedback">Please enter a valid application ID.</div>
         <small class="form-text text-muted">
           You can find a list of available application IDs in the
