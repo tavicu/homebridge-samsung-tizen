@@ -6,6 +6,7 @@ const deviceCache = useCache();
 
 const smartthings = ref(null);
 const isLoading = ref(false);
+let loaded = false;
 
 export function useSmartThings() {
   const { serverRequest } = useHomebridge();
@@ -19,14 +20,16 @@ export function useSmartThings() {
   }
 
   async function getToken() {
-    isLoading.value = true;
+    // Only the first load shows a spinner; later ones refresh the known status in place.
+    isLoading.value = !loaded;
 
     try {
       smartthings.value = await serverRequest('/smartthings/get-token');
-    } catch (err) {
+    } catch {
       smartthings.value = null;
     } finally {
       isLoading.value = false;
+      loaded = true;
     }
   }
 
