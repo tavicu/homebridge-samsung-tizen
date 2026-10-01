@@ -128,8 +128,37 @@ function handleRetry() {
   currentStep.value = 1;
 }
 
-function copyAuthorizationUrl() {
-  navigator.clipboard.writeText(state.authorizationUrl);
+async function copyText(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    // navigator.clipboard only exists in a secure context, and Homebridge is usually opened over plain http on the LAN.
+  }
+
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  textarea.setAttribute('readonly', '');
+  textarea.style.position = 'fixed';
+  textarea.style.opacity = '0';
+  document.body.append(textarea);
+  textarea.select();
+
+  try {
+    return document.execCommand('copy');
+  } catch {
+    return false;
+  } finally {
+    textarea.remove();
+  }
+}
+
+async function copyAuthorizationUrl() {
+  if (!(await copyText(state.authorizationUrl))) {
+    toast.error('Could not copy the URL. Open the link or copy it manually.');
+    return;
+  }
+
   urlCopied.value = true;
   setTimeout(() => (urlCopied.value = false), 2000);
 }
