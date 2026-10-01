@@ -1,3 +1,6 @@
+// What the plugin's parseCommands understands: a key, a key repeated N times (KEY_VOLUP*3) or held for N seconds (KEY_POWER*2.5s).
+export const COMMAND_PATTERN = '[A-Za-z0-9_]+(\\*([1-9][0-9]*|[0-9]*\\.?[0-9]+[sS]))?';
+
 export function normalizeCommand(value) {
   const trimmed = String(value).trim();
   const star = trimmed.indexOf('*');

@@ -7,7 +7,7 @@ import { useForm } from '../composables/useForm';
 import { useRouter } from '../composables/useRouter';
 import { useSmartThings } from '../composables/useSmartThings';
 import { useToast } from '../composables/useToast';
-import { normalizeCommand } from '../lib/command';
+import { COMMAND_PATTERN, normalizeCommand } from '../lib/command';
 import { DEFAULT_INPUT_SOURCES, groupInputSources } from '../lib/device';
 import DocsLink from './DocsLink.vue';
 import SmartThingsNotice from './SmartThingsNotice.vue';
@@ -304,11 +304,20 @@ watch(
       <div v-if="form.type === 'command'">
         <label class="form-label">Key(s) to execute</label>
         <div class="d-flex flex-column gap-2">
-          <div v-for="command in form.commands" :key="command.id" class="input-group input-group-sm">
-            <input v-model="command.value" type="text" class="form-control font-monospace text-uppercase" placeholder="e.g. KEY_VOLUP" required />
+          <div v-for="command in form.commands" :key="command.id" class="input-group input-group-sm has-validation">
+            <input
+              v-model="command.value"
+              type="text"
+              class="form-control font-monospace"
+              placeholder="e.g. KEY_VOLUP"
+              :pattern="COMMAND_PATTERN"
+              required
+              @blur="command.value = normalizeCommand(command.value)"
+            />
             <button type="button" class="btn btn-outline-danger" @click="removeCommand(command.id)">
               <i class="fas fa-xmark" />
             </button>
+            <div class="invalid-feedback">Use a key like KEY_VOLUP, KEY_VOLUP*3 or KEY_POWER*2.5s.</div>
           </div>
         </div>
         <button type="button" class="btn btn-sm btn-outline-primary mt-2" @click="addCommand"><i class="fas fa-plus" /> Add Command</button>
