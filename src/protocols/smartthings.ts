@@ -410,8 +410,9 @@ export class SmartThingsClient {
 
   public setInputSource(value: string): Promise<void> {
     const capability = ['USB-C', 'Display Port'].includes(value) ? 'samsungvd.mediaInputSource' : 'mediaInputSource';
+    const source = value === 'dtv' ? 'digitalTv' : value;
 
-    return this.command({ capability, command: 'setInputSource', arguments: [value] });
+    return this.command({ capability, command: 'setInputSource', arguments: [source] });
   }
 
   public setPictureMode(value: string): Promise<void> {
