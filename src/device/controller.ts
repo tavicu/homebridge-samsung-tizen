@@ -1,5 +1,5 @@
-import axios from 'axios';
 import { IgnorableError, TvAlreadyOffError, TvAlreadyOnError, TvOfflineError, TvPoweringError } from '../errors.js';
+import { request } from '../lib/http.js';
 import { parseCommands } from '../lib/parsers.js';
 import { isPortReachable, sleep } from '../lib/tools.js';
 import { wol } from '../lib/wol.js';
@@ -42,7 +42,7 @@ export class DeviceController {
 
   public async getInfo(): Promise<TizenDeviceInfo> {
     const fetchInfo = async () => {
-      const { data } = await axios.get<TizenDeviceInfo>(`http://${this.device.config.ip}:8001/api/v2/`, { timeout: 1500 });
+      const data = await request<TizenDeviceInfo>(`http://${this.device.config.ip}:8001/api/v2/`, { timeout: 1500 });
 
       if (data?.device) {
         const storage = this.device.storage;
@@ -168,10 +168,7 @@ export class DeviceController {
   }
 
   public async getApplication(appId: string | number): Promise<TizenApplication> {
-    const fetchApp = async () => {
-      const response = await axios.get<TizenApplication>(`http://${this.device.config.ip}:8001/api/v2/applications/${appId}`, { timeout: 600 });
-      return response.data;
-    };
+    const fetchApp = () => request<TizenApplication>(`http://${this.device.config.ip}:8001/api/v2/applications/${appId}`, { timeout: 600 });
 
     return this.device.cache.get(`app-${appId}`, fetchApp, 3000);
   }
@@ -179,8 +176,7 @@ export class DeviceController {
   public async startApplication(appId: string | number): Promise<TizenApplication> {
     await this.waitPowering();
 
-    const response = await axios.post<TizenApplication>(`http://${this.device.config.ip}:8001/api/v2/applications/${appId}`, null, { timeout: 600 });
-    return response.data;
+    return request<TizenApplication>(`http://${this.device.config.ip}:8001/api/v2/applications/${appId}`, { method: 'POST', timeout: 600 });
   }
 
   public async setArtMode(value: boolean): Promise<void> {

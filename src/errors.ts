@@ -41,3 +41,12 @@ export class SmartThingsNotAvailable extends BaseError {
     super('SmartThings is not available or not configured');
   }
 }
+
+export class HttpError extends BaseError {
+  constructor(
+    public readonly status: number,
+    public readonly data?: any,
+  ) {
+    super(`Request failed with status code ${status}`);
+  }
+}

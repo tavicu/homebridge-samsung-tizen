@@ -1,6 +1,6 @@
-import axios from 'axios';
 import { Device } from '../device/index.js';
 import { SmartThingsNotAvailable } from '../errors.js';
+import { request } from '../lib/http.js';
 import { SamsungPlatform } from '../platform.js';
 import {
   SmartThingsAttribute,
@@ -36,7 +36,7 @@ function parseStateValue(attr?: SmartThingsAttribute): string | null {
 
 // The token endpoint answering 400/401 means the refresh token was rejected; retrying will not fix it.
 function isAuthorizationRejected(error: any): boolean {
-  const status = error?.response?.status;
+  const status = error?.status;
   return status === 400 || status === 401;
 }
 
@@ -176,21 +176,19 @@ export class SmartThingsManager {
       Authorization: `Basic ${credentialsBase64}`,
     };
 
-    const response = await axios.post(
-      OAUTH_TOKEN_URL,
-      new URLSearchParams({
+    const response = await request<any>(OAUTH_TOKEN_URL, {
+      method: 'POST',
+      headers,
+      body: new URLSearchParams({
         grant_type: 'refresh_token',
         refresh_token: this.storage.refreshToken,
       }).toString(),
-      {
-        headers,
-        timeout: REQUEST_TIMEOUT,
-      },
-    );
+      timeout: REQUEST_TIMEOUT,
+    });
 
-    this.storage.accessToken = response.data.access_token;
-    this.storage.refreshToken = response.data.refresh_token || this.storage.refreshToken;
-    this.storage.expiresAt = Date.now() + response.data.expires_in * 1000;
+    this.storage.accessToken = response.access_token;
+    this.storage.refreshToken = response.refresh_token || this.storage.refreshToken;
+    this.storage.expiresAt = Date.now() + response.expires_in * 1000;
 
     this.platform.log.debug('[SmartThings] Access token refreshed successfully');
   }
@@ -210,27 +208,26 @@ export class SmartThingsManager {
     const headers = { Authorization: `Bearer ${this.storage.accessToken}`, 'Content-Type': 'application/json' };
 
     try {
-      const response = await axios({
-        url: endpoint,
+      const response = await request<any>(endpoint, {
         method,
         headers,
-        data,
+        body: data && JSON.stringify(data),
         timeout: REQUEST_TIMEOUT,
       });
 
-      if (response.data?.error) {
-        throw new Error(response.data.error.message || response.data.error);
+      if (response?.error) {
+        throw new Error(response.error.message || response.error);
       }
 
-      return response.data as T;
+      return response as T;
     } catch (error: any) {
       // The access token was revoked or expired early: refresh it once and repeat the request.
-      if (error.response?.status === 401 && !isRetry) {
+      if (error.status === 401 && !isRetry) {
         await this.refreshToken();
         return this.send<T>(config, true);
       }
 
-      const apiError = error.response?.data?.error;
+      const apiError = error.data?.error;
 
       throw new Error(apiError?.details?.[0]?.message || apiError?.message || error.message, { cause: error });
     }
