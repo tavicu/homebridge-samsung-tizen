@@ -230,7 +230,9 @@ export class SmartThingsManager {
         return this.send<T>(config, true);
       }
 
-      throw new Error(error.message, { cause: error });
+      const apiError = error.response?.data?.error;
+
+      throw new Error(apiError?.details?.[0]?.message || apiError?.message || error.message, { cause: error });
     }
   }
 }
