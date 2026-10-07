@@ -129,6 +129,15 @@ That is fine. Power, volume, mute, apps, remote keys and Art Mode work without i
 - The SmartThings card in the settings screen has to show **Connected**.
 - The TV needs a `deviceId`. See [Pick the TV](/smartthings/index.md#pick-the-tv).
 - Restart Homebridge after the first connection.
+- The TV has to be online in the SmartThings app, and you can control it from there.
+
+### The log says invalid device state
+
+SmartThings returns `invalid device state` for any command sent to a TV that is no longer online in your SmartThings account. This usually happens after the SmartThings app on your phone is left unused for a long time.
+
+Open the SmartThings app and check the TV. The app may tell you it has not been used for a while, and the TV may show as offline or with the cloud icon turned off.
+
+Remove the TV from the SmartThings app and add it again. SmartThings commands should work again after that.
 
 ### The wizard fails, or SmartThings returns 401 or 403
 
