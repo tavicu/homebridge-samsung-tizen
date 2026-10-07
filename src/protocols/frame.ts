@@ -193,7 +193,15 @@ export class FrameSocket {
     const payload = DEBUG_EVENTS.has(data?.event) ? data : response;
 
     if (DEBUG_EVENTS.has(payload.event)) {
-      this.device.log.debug('[Frame]', JSON.stringify(payload));
+      // Handshake payloads can contain tokens, including those of other connected clients.
+      const details: Record<string, string> = { event: payload.event };
+      if (payload.value === 'on' || payload.value === 'off') {
+        details.value = payload.value;
+      }
+      if (payload.status === 'on' || payload.status === 'off') {
+        details.status = payload.status;
+      }
+      this.device.log.debug('[Frame]', JSON.stringify(details));
     }
   }
 

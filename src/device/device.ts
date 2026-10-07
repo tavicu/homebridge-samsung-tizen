@@ -117,9 +117,8 @@ export class Device extends EventEmitter<DeviceEvents> {
       platform.storage.saveApps(this.config.mac, apps);
     });
 
-    this.once('paired', ({ token }) => {
-      this.log.debug(`Device paired with success (token: ${token})`);
-      this.log.debug(`Device storage: ${JSON.stringify(this.storage)}`);
+    this.once('paired', () => {
+      this.log.debug('Device paired with success');
       this.poller.sync();
     });
 
