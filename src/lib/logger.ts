@@ -15,3 +15,7 @@ export function createDeviceLogger(log: Logging, name: string): Logging {
 
   return logger;
 }
+
+export function stringifyWithoutTokens(data: unknown): string | undefined {
+  return JSON.stringify(data, (key, value) => (key.toLowerCase() === 'token' ? '[REDACTED]' : value));
+}

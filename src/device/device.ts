@@ -4,7 +4,7 @@ import { Logging } from 'homebridge';
 import { FrameAccessory, SwitchAccessory, TelevisionAccessory } from '../accessories/index.js';
 import { Cache } from '../lib/cache.js';
 import { withSwitchIdentifiers } from '../lib/identifiers.js';
-import { createDeviceLogger } from '../lib/logger.js';
+import { createDeviceLogger, stringifyWithoutTokens } from '../lib/logger.js';
 import { debounce } from '../lib/tools.js';
 import { SamsungPlatform } from '../platform.js';
 import { DeviceConfig, DeviceEvents, DeviceOptions, DeviceState, DeviceStorage, TizenApplication, TizenDeviceInfo } from '../types/index.js';
@@ -118,7 +118,8 @@ export class Device extends EventEmitter<DeviceEvents> {
     });
 
     this.once('paired', () => {
-      this.log.debug('Device paired with success');
+      this.log.debug('Device pairing state ready. Token present in memory:', !!this.storage.token);
+      this.log.debug(`Device storage: ${stringifyWithoutTokens(this.storage)}`);
       this.poller.sync();
     });
 
