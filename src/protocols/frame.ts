@@ -191,7 +191,7 @@ export class FrameSocket {
       data = JSON.parse(data);
     } catch {}
 
-    const payload = DEBUG_EVENTS.has(data?.event) ? data : response;
+    const payload = DEBUG_EVENTS.has(data?.event) ? data : { ...response, data };
 
     if (DEBUG_EVENTS.has(payload.event)) {
       this.device.log.debug('[Frame]', stringifyWithoutTokens(payload));
