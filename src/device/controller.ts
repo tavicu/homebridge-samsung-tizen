@@ -168,7 +168,7 @@ export class DeviceController {
   }
 
   public async getApplication(appId: string | number): Promise<TizenApplication> {
-    const fetchApp = () => request<TizenApplication>(`http://${this.device.config.ip}:8001/api/v2/applications/${appId}`, { timeout: 600 });
+    const fetchApp = () => request<TizenApplication>(`http://${this.device.config.ip}:8001/api/v2/applications/${appId}`, { timeout: 800 });
 
     return this.device.cache.get(`app-${appId}`, fetchApp, 3000);
   }
@@ -176,7 +176,7 @@ export class DeviceController {
   public async startApplication(appId: string | number): Promise<TizenApplication> {
     await this.waitPowering();
 
-    return request<TizenApplication>(`http://${this.device.config.ip}:8001/api/v2/applications/${appId}`, { method: 'POST', timeout: 600 });
+    return request<TizenApplication>(`http://${this.device.config.ip}:8001/api/v2/applications/${appId}`, { method: 'POST', timeout: 2000 });
   }
 
   public async setArtMode(value: boolean): Promise<void> {
