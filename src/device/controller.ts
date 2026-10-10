@@ -176,7 +176,13 @@ export class DeviceController {
   public async startApplication(appId: string | number): Promise<TizenApplication> {
     await this.waitPowering();
 
-    return request<TizenApplication>(`http://${this.device.config.ip}:8001/api/v2/applications/${appId}`, { method: 'POST', timeout: 2000 });
+    // Some TVs answer a POST with `Content-Length: 0` with a malformed response, so an empty JSON body is sent.
+    return request<TizenApplication>(`http://${this.device.config.ip}:8001/api/v2/applications/${appId}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: '{}',
+      timeout: 2200,
+    });
   }
 
   public async setArtMode(value: boolean): Promise<void> {
