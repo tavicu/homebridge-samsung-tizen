@@ -6,7 +6,7 @@
 [![npm version](https://img.shields.io/npm/v/homebridge-samsung-tizen?style=flat-square)](https://www.npmjs.com/package/homebridge-samsung-tizen)
 [![Issues Status](https://img.shields.io/github/issues/tavicu/homebridge-samsung-tizen?style=flat-square)](https://github.com/tavicu/homebridge-samsung-tizen/issues)
 
-Control Samsung TVs running Tizen OS (2017 and later) from Apple Home, through [Homebridge](https://github.com/homebridge/homebridge).
+Control Samsung TVs running Tizen OS (2017 and later) from Apple Home, through [Homebridge](https://github.com/homebridge/homebridge): power, inputs and apps, volume, the remote in Control Center, custom switches for scenes and automations, and Art Mode on Frame TVs.
 
 Basic functionality runs entirely on your local network. No internet connection is required. That has been a core requirement of the plugin since the first release. Cloud services such as SmartThings are optional extras, not a dependency.
 
@@ -14,7 +14,9 @@ Devices and settings are managed from the plugin’s own interface in Homebridge
 
 ## Version 6
 
-This release is a full rewrite in TypeScript. Existing TVs stay in Home, so you do not have to add them again. A few settings changed, SmartThings has to be authorized again, and inputs or custom switches may need their Home names and scenes set up once more. Everything else is backwards compatible.
+This release is a full rewrite in TypeScript. It is backwards compatible: existing TVs stay in Home, so you do not have to add them again, and your current config keeps working. SmartThings has to be authorized again, and inputs or custom switches may need their Home names and scenes set up once more. A few settings were renamed or removed. The old names still work for now, and the log tells you what to change.
+
+If you are coming from version 5, the [upgrade guide](https://tavicu.github.io/homebridge-samsung-tizen/extra/upgrading.html) has the steps.
 
 **New in this release:**
 
@@ -30,7 +32,7 @@ You can see the [changelog](CHANGELOG.md) for the full list of changes.
 
 ## Requirements
 
-- A Samsung TV with Tizen OS, 2017 or newer, on the **same subnet** as Homebridge (Samsung blocks WebSocket access across VLANs)
+- A Samsung TV with Tizen OS, 2017 or newer, on the **same subnet** as Homebridge (Samsung blocks WebSocket access across VLANs). TVs from 2016 and earlier, which pair with a PIN, are not supported
 - [Homebridge](https://github.com/homebridge/homebridge) 1.8 or newer (Homebridge 2.0 is recommended)
 - Node.js 22.10+, 24, or 26
 - A static IP for each TV on your router
@@ -49,13 +51,15 @@ hb-service add homebridge-samsung-tizen
 
 ## Setup
 
-1. Open the plugin settings in Homebridge UI and add a TV (name, IP, MAC). There is a **Test connection** button on the device form, which also fills in the MAC address.
+1. Open the plugin settings in Homebridge UI and add a TV (name, IP, MAC). The **Test** button next to the IP address checks that the TV can be reached and is supported. It also fills in the MAC address if the field is empty.
 2. Restart Homebridge and turn the TV on. Allow the pairing prompt that appears on the TV. If the TV was off when Homebridge started, the prompt appears as soon as you turn it on, without another restart.
-3. In the Home app, add the TV as a new accessory using the QR code Homebridge shows for that TV.
+3. In the Home app, tap **Add Accessory**, then **More options...**, choose the TV and enter the setup code that Homebridge prints in the log for it.
 
-If you clicked Deny on the pairing prompt, on the TV go to **Settings → General → External Device Manager → Device Connection Manager → Device List** and allow the plugin. You can also remove the entry, and the prompt appears again the next time the TV turns on.
+Each TV is published as its own accessory, separate from the main Homebridge bridge. Adding the bridge to Home does not add the TVs, so repeat step 3 for every TV.
 
-SmartThings, if you want it, has a wizard in the same settings screen. You create a SmartThings app once, paste the client ID and secret, and the plugin refreshes the access token on its own. If the authorization ever expires, the plugin writes it in the log and the settings screen shows it as expired. Go through the wizard again and the plugin picks up the new authorization.
+If you clicked Deny on the pairing prompt, on the TV go to **Settings → General → External Device Manager → Device Connection Manager → Device List** (on newer TVs the menu is **General & Privacy**) and allow **Homebridge**. You can also remove the entry, and the prompt appears again the next time the TV turns on.
+
+SmartThings is optional. It adds what Samsung only offers through its cloud: selecting a source such as HDMI, picture and sound modes, and a full power off on Frame TVs. It has a wizard in the same settings screen, and the [SmartThings guide](https://tavicu.github.io/homebridge-samsung-tizen/smartthings/) covers every step. You create a SmartThings app once, paste the client ID and secret, and the plugin refreshes the access token on its own. If the authorization ever expires, the plugin writes it in the log and the settings screen shows it as expired. Go through the wizard again and the plugin picks up the new authorization.
 
 ## Help
 
