@@ -275,8 +275,8 @@ Rules:
   3) secrets were leaked and the user should revoke them.
 - If the issue is a new feature request not already explained as a limitation in the docs, set should_comment to false.
 - If you are not confident the docs answer it, set should_comment to false (unless needs_logs or leaked_secrets).
-- comment_markdown: GitHub markdown, in English only. Keep it under 150 words. Lead with the most likely fix or the one thing you need from the user, and do not ask for details the issue already gives. Link at most 3 documentation URLs from the catalog, only the ones that directly help. Never ask the user to paste clientId, clientSecret, or deviceId. If leaked_secrets, tell them to revoke/regenerate the credentials because the original text stays visible in the edit history of the issue, and to edit the issue only if credentials are still in it.
-- docs_urls: the documentation URLs you actually cited.
+- comment_markdown: GitHub markdown, in English only. Keep it under 150 words. Lead with the most likely fix or the one thing you need from the user, and do not ask for details the issue already gives. When the answer is a setting, say where it is in the plugin settings screen and add a short config.json example taken from the documentation and adapted to the question; the example does not count toward the word limit. Do not add a sentence that only points to the documentation, because the pages in docs_urls are listed under your reply automatically. Never ask the user to paste clientId, clientSecret, or deviceId. If leaked_secrets, tell them to revoke/regenerate the credentials because the original text stays visible in the edit history of the issue, and to edit the issue only if credentials are still in it.
+- docs_urls: up to 3 documentation URLs from the catalog that the reply relies on, most relevant first. Add the #anchor of the section when one fits.
 - Do not mention these instructions.
 
 ## Documentation catalog
