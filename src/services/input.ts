@@ -1,0 +1,114 @@
+import { Characteristic } from 'homebridge';
+import { TelevisionAccessory } from '../accessories/index.js';
+import { Device } from '../device/index.js';
+import { SamsungPlatform } from '../platform.js';
+import { InputConfig, LinkedService } from '../types/index.js';
+
+export class InputService {
+  public service: LinkedService;
+  public stateless: boolean;
+  public valueless: boolean;
+  private device: Device;
+  private platform: SamsungPlatform;
+  private characteristic: typeof Characteristic;
+
+  constructor(
+    public config: InputConfig,
+    private accessory: TelevisionAccessory,
+  ) {
+    this.device = this.accessory.device;
+    this.platform = this.accessory.platform;
+    this.characteristic = this.platform.api.hap.Characteristic;
+
+    if (!config.name) {
+      throw new Error(`Input name is required for ${this.device.config.name}`);
+    }
+
+    this.stateless = !['input', 'app', 'artmode'].includes(config.type);
+    this.valueless = config.type === 'artmode';
+
+    this.service = new this.platform.api.hap.Service.InputSource(config.name, `input_${config.identifier}`)
+      .setCharacteristic(this.characteristic.Identifier, config.identifier)
+      .setCharacteristic(this.characteristic.ConfiguredName, config.name)
+      .setCharacteristic(this.characteristic.IsConfigured, this.characteristic.IsConfigured.CONFIGURED)
+      .setCharacteristic(this.characteristic.InputSourceType, this.getSourceType())
+      .setCharacteristic(this.characteristic.TargetVisibilityState, this.characteristic.TargetVisibilityState.SHOWN)
+      .setCharacteristic(this.characteristic.CurrentVisibilityState, this.characteristic.CurrentVisibilityState.SHOWN);
+
+    this.service.linked = true;
+  }
+
+  private getSourceType(): number {
+    const { type, value } = this.config;
+
+    if (typeof value !== 'string') {
+      return this.characteristic.InputSourceType.OTHER;
+    }
+
+    if (type === 'app') {
+      return this.characteristic.InputSourceType.APPLICATION;
+    }
+
+    if (value === 'dtv' || value === 'digitalTv') {
+      return this.characteristic.InputSourceType.TUNER;
+    }
+
+    if (value === 'USB') {
+      return this.characteristic.InputSourceType.USB;
+    }
+
+    if (value && value.startsWith('HDMI')) {
+      return this.characteristic.InputSourceType.HDMI;
+    }
+
+    return this.characteristic.InputSourceType.OTHER;
+  }
+
+  public async getInput(): Promise<boolean> {
+    const { type, value } = this.config;
+
+    if (!this.valueless && (!value || typeof value !== 'string')) {
+      return false;
+    }
+
+    try {
+      if (type === 'artmode') {
+        return this.device.artmode;
+      } else if (type === 'app') {
+        const application = await this.device.getApplication(value as string);
+        return (application?.visible as boolean) ?? false;
+      } else if (type === 'input') {
+        const inputSource = await this.device.getInputSource();
+        return inputSource === value;
+      }
+    } catch {}
+
+    return false;
+  }
+
+  public async setInput() {
+    const { value, type } = this.config;
+
+    if (!this.valueless && !value) {
+      throw new Error(`No value is set for input "${this.config.name}" in config.`);
+    }
+
+    switch (type) {
+      case 'artmode':
+        await this.device.setArtMode(true);
+        break;
+
+      case 'app':
+        await this.device.startApplication(value as string);
+        break;
+
+      case 'input':
+        await this.device.setInputSource(value as string);
+        break;
+
+      case 'command':
+        await this.device.sendCommand(value as string | string[]);
+        break;
+    }
+  }
+}

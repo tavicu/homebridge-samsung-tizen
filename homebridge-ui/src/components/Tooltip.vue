@@ -1,0 +1,47 @@
+<script setup>
+defineProps({
+  text: {
+    type: String,
+    default: '',
+  },
+});
+</script>
+
+<template>
+  <span v-if="text" class="tooltip-wrapper" :data-tooltip="text">
+    <slot />
+  </span>
+  <slot v-else />
+</template>
+
+<style scoped>
+.tooltip-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip-wrapper::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #212529;
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 1.5;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  z-index: 100;
+}
+
+.tooltip-wrapper:hover::after,
+.tooltip-wrapper:focus-within::after {
+  opacity: 1;
+}
+</style>

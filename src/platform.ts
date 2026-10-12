@@ -1,0 +1,73 @@
+import { API, APIEvent, IndependentPlatformPlugin, Logging } from 'homebridge';
+import { Device } from './device/index.js';
+import { migrateConfig } from './lib/migrate.js';
+import { Storage } from './lib/storage.js';
+import { SmartThingsManager, SSDP, UPnPManager } from './protocols/index.js';
+import { PLUGIN_NAME } from './settings.js';
+import { DeviceConfig, PlatformConfig } from './types/index.js';
+
+export class SamsungPlatform implements IndependentPlatformPlugin {
+  private ssdp: SSDP;
+  private upnp: UPnPManager;
+  private smartthings: SmartThingsManager;
+
+  public storage: Storage;
+  public devices: Array<Device> = [];
+
+  constructor(
+    public log: Logging,
+    public config: PlatformConfig,
+    public api: API,
+  ) {
+    migrateConfig(config, log);
+
+    this.storage = new Storage(api, log);
+
+    this.ssdp = new SSDP(this);
+    this.upnp = new UPnPManager(this);
+    this.smartthings = new SmartThingsManager(this);
+
+    this.api.on(APIEvent.DID_FINISH_LAUNCHING, () => this.initialize());
+    this.api.on(APIEvent.SHUTDOWN, () => this.shutdown());
+  }
+
+  public get upnpManager(): UPnPManager {
+    return this.upnp;
+  }
+
+  public get smartthingsManager(): SmartThingsManager {
+    return this.smartthings;
+  }
+
+  private async initialize(): Promise<void> {
+    await this.storage.initialize();
+
+    this.config.devices?.forEach((deviceConfig: DeviceConfig) => {
+      if (Device.isDisabled(deviceConfig)) {
+        this.log.debug(`Device ${deviceConfig.name} is disabled, skipping initialization...`);
+        return;
+      }
+
+      try {
+        const device = new Device(deviceConfig, this);
+
+        this.devices.push(device);
+        this.api.publishExternalAccessories(PLUGIN_NAME, [device.mainAccessory.platformAccessory]);
+      } catch (error) {
+        this.log.error(error.message);
+        this.log.debug(error.stack);
+      }
+    });
+
+    this.ssdp.start();
+    this.upnp.start();
+    this.smartthings.start();
+  }
+
+  private shutdown(): void {
+    this.ssdp.destroy();
+    this.upnp.destroy();
+
+    this.devices.forEach((device) => device.destroy());
+  }
+}

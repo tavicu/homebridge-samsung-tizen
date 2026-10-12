@@ -1,0 +1,276 @@
+import { IgnorableError, TvAlreadyOffError, TvAlreadyOnError, TvOfflineError, TvPoweringError } from '../errors.js';
+import { request } from '../lib/http.js';
+import { parseCommands } from '../lib/parsers.js';
+import { isPortReachable, sleep } from '../lib/tools.js';
+import { wol } from '../lib/wol.js';
+import { SamsungPlatform } from '../platform.js';
+import { FrameSocket } from '../protocols/frame.js';
+import { SmartThingsClient, UPnPClient, WebSocket } from '../protocols/index.js';
+import { TizenApplication, TizenDeviceInfo } from '../types/index.js';
+import { Device } from './device.js';
+import { PowerMonitor } from './power.js';
+
+export class DeviceController {
+  private ws: WebSocket;
+  private upnp: UPnPClient;
+  private smartthings: SmartThingsClient;
+  private power: PowerMonitor;
+  private frame: FrameSocket;
+  private sleepTimeout: NodeJS.Timeout | null = null;
+
+  constructor(
+    private device: Device,
+    platform: SamsungPlatform,
+  ) {
+    this.ws = new WebSocket(this.device);
+    this.upnp = new UPnPClient(this.device, platform);
+    this.smartthings = new SmartThingsClient(this.device, platform);
+    this.power = new PowerMonitor(this.device, this);
+    this.frame = new FrameSocket(this.device);
+  }
+
+  /**
+   * Called by the Device once all its listeners are attached.
+   */
+  public start(): void {
+    this.ws.start();
+  }
+
+  public ping(): Promise<boolean> {
+    return isPortReachable(8001, this.device.config.ip);
+  }
+
+  public async getInfo(): Promise<TizenDeviceInfo> {
+    const fetchInfo = async () => {
+      const data = await request<TizenDeviceInfo>(`http://${this.device.config.ip}:8001/api/v2/`, { timeout: 1500 });
+
+      if (data?.device) {
+        const storage = this.device.storage;
+
+        storage.firmware = data.version;
+        storage.model = data.device.modelName;
+        storage.frameSupport = data.device.FrameTVSupport === 'true';
+        storage.tokenSupport = data.device.TokenAuthSupport === 'true';
+        storage.powerStateSupport = data.device.PowerState !== undefined;
+      }
+
+      return data;
+    };
+
+    return this.device.cache.get('device-info', fetchInfo, 2500);
+  }
+
+  public async setMute(value: boolean): Promise<void> {
+    await this.waitPowering();
+    return this.upnp.setMute(value);
+  }
+
+  public async setVolume(value: number): Promise<void> {
+    await this.waitPowering();
+    return this.upnp.setVolume(value);
+  }
+
+  public getInputSource(): Promise<string | null> {
+    return this.smartthings.getInputSource();
+  }
+
+  public async setInputSource(value: string): Promise<void> {
+    await this.waitPowering();
+    return this.smartthings.setInputSource(value);
+  }
+
+  public getPictureMode(): Promise<string | null> {
+    return this.smartthings.getPictureMode();
+  }
+
+  public async setPictureMode(value: string): Promise<void> {
+    await this.waitPowering();
+    return this.smartthings.setPictureMode(value);
+  }
+
+  public getSoundMode(): Promise<string | null> {
+    return this.smartthings.getSoundMode();
+  }
+
+  public async setSoundMode(value: string): Promise<void> {
+    await this.waitPowering();
+    return this.smartthings.setSoundMode(value);
+  }
+
+  public getSleep(): boolean {
+    return this.sleepTimeout !== null;
+  }
+
+  public clearSleep(): void {
+    clearTimeout(this.sleepTimeout || undefined);
+    this.sleepTimeout = null;
+  }
+
+  public async setSleep(minutes: number, onComplete?: () => Promise<void> | void): Promise<void> {
+    this.clearSleep();
+
+    if (!minutes) {
+      return;
+    }
+
+    if (!this.device.power) {
+      throw new TvOfflineError();
+    }
+
+    await this.waitPowering();
+
+    this.sleepTimeout = setTimeout(
+      async () => {
+        try {
+          this.sleepTimeout = null;
+
+          if (this.device.power) {
+            await this.device.setPower(false);
+          }
+
+          if (onComplete) {
+            Promise.resolve(onComplete()).catch(() => {});
+          }
+        } catch (error: any) {
+          if (error instanceof IgnorableError) {
+            this.device.log.debug(`[Sleep] Auto power off skipped: ${error.message}`);
+            return;
+          }
+
+          this.device.log.error(`[Sleep] Failed to execute auto power off: ${error.message}`);
+        }
+      },
+      1000 * 60 * minutes,
+    );
+  }
+
+  public getChannel(): Promise<string | null> {
+    return this.smartthings.getTvChannel();
+  }
+
+  public async setChannel(channel: number | string): Promise<void> {
+    await this.waitPowering();
+
+    const channelStr = String(channel);
+
+    if (!channel || !/^\d+$/.test(channelStr)) {
+      throw new Error(`Invalid channel: ${channel}`);
+    }
+
+    if (this.smartthings.isAvailable) {
+      await this.smartthings.setTvChannel(channel);
+    } else {
+      const commands = channelStr.split('').map((char) => `KEY_${char}`);
+      commands.push('KEY_ENTER');
+
+      await this.device.sendCommand(commands);
+    }
+  }
+
+  public async getApplication(appId: string | number): Promise<TizenApplication> {
+    const fetchApp = () => request<TizenApplication>(`http://${this.device.config.ip}:8001/api/v2/applications/${appId}`, { timeout: 800 });
+
+    return this.device.cache.get(`app-${appId}`, fetchApp, 3000);
+  }
+
+  public async startApplication(appId: string | number): Promise<TizenApplication> {
+    await this.waitPowering();
+
+    // Some TVs answer a POST with `Content-Length: 0` with a malformed response, so an empty JSON body is sent.
+    return request<TizenApplication>(`http://${this.device.config.ip}:8001/api/v2/applications/${appId}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: '{}',
+      timeout: 10000,
+    });
+  }
+
+  public async setArtMode(value: boolean): Promise<void> {
+    if (!this.device.power && !this.power.isPowering) {
+      await this.powerOn();
+    }
+
+    await this.waitPowering();
+    return this.frame.setArtMode(value);
+  }
+
+  public refreshArtMode(): void {
+    this.frame.refreshArtMode();
+  }
+
+  public async sendCommand(commands: string | string[]): Promise<void> {
+    await this.waitPowering();
+
+    const parsed = parseCommands(commands);
+
+    for (const [i, cmd] of parsed.entries()) {
+      if (typeof cmd === 'object' && /delay/i.test(cmd.key)) {
+        // A delay (DELAY*2s) is only a pause between commands, nothing is sent to the TV.
+        await sleep(cmd.time * 1000);
+      } else if (typeof cmd === 'object') {
+        await this.ws.hold(cmd.key, cmd.time * 1000);
+      } else {
+        await this.ws.click(cmd);
+      }
+
+      if (i < parsed.length - 1) {
+        await sleep(400);
+      }
+    }
+  }
+
+  public async powerOn(): Promise<void> {
+    if (this.power.isPowering) {
+      throw new TvPoweringError();
+    }
+
+    if (this.device.power) {
+      throw new TvAlreadyOnError();
+    }
+
+    const isSleeping = await this.ping();
+
+    await this.power.withPowerLatch(true, async () => {
+      if (isSleeping) {
+        await this.ws.click('KEY_POWER');
+      } else {
+        await wol(this.device.config.mac, { ...this.device.config.wol, ip: this.device.config.ip }).catch((error) => {
+          throw new Error('Failed to wake up TV', { cause: error });
+        });
+      }
+    });
+  }
+
+  public async powerOff(): Promise<void> {
+    if (this.power.isPowering) {
+      throw new TvPoweringError();
+    }
+
+    if (!this.device.power) {
+      throw new TvAlreadyOffError();
+    }
+
+    const action = () => {
+      if (this.device.isFrame && this.smartthings.isAvailable) {
+        return this.smartthings.setPower(false);
+      }
+
+      if (this.device.isFrame) {
+        return this.ws.hold('KEY_POWER', 3500);
+      }
+
+      return this.ws.click('KEY_POWER');
+    };
+
+    await this.power.withPowerLatch(false, action);
+  }
+
+  private waitPowering(): Promise<void> {
+    return this.power.settled();
+  }
+
+  public destroy(): void {
+    this.ws.destroy();
+    this.frame.destroy();
+  }
+}

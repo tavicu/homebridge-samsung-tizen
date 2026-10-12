@@ -1,7 +1,7 @@
 # yaml-language-server: $schema=https://json.schemastore.org/github-issue-forms.json
 name: Question
 description: Ask how something works or how to set it up.
-title: "[Question] "
+title: '[Question] '
 labels: [question]
 body:
   - type: markdown
@@ -42,7 +42,7 @@ body:
     id: plugin-version
     attributes:
       label: Plugin version
-      placeholder: "6.x.x"
+      placeholder: '6.x.x'
     validations:
       required: true
 

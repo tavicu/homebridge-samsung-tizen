@@ -1,0 +1,150 @@
+<script setup>
+import { computed, onUnmounted, watch } from 'vue';
+import { useConfig } from '../composables/useConfig';
+import { useForm } from '../composables/useForm';
+import { useHomebridge } from '../composables/useHomebridge';
+import { useKeys } from '../composables/useKeys';
+import { useToast } from '../composables/useToast';
+import { normalizeCommand } from '../lib/command';
+import Callout from './Callout.vue';
+import DocsLink from './DocsLink.vue';
+
+const props = defineProps({
+  deviceIndex: {
+    type: Number,
+    default: undefined,
+  },
+});
+
+const isDeviceScoped = computed(() => props.deviceIndex !== undefined);
+
+const { config, updateScoped, cleanConfig } = useConfig();
+const { enableSaveButton, disableSaveButton } = useHomebridge();
+const toast = useToast();
+const { formEl, validated, checkValidity, createForm, isDirty, isSaving, markPristine, withSaving } = useForm();
+const { keyGroups, readKeys, toConfigKeys } = useKeys();
+
+const globalKeys = computed(() => readKeys(config.value.keys));
+
+const storedKeys = computed(() => {
+  if (!isDeviceScoped.value) {
+    return globalKeys.value;
+  }
+
+  return readKeys(config.value.devices?.[props.deviceIndex]?.keys);
+});
+
+const form = createForm(readKeys());
+
+// An empty field falls back to the global key on a device, and to the plugin default globally.
+function placeholder(key) {
+  return (isDeviceScoped.value && globalKeys.value[key.id]) || key.default;
+}
+
+function fillForm() {
+  Object.assign(form, storedKeys.value);
+  markPristine();
+}
+
+async function handleSubmit() {
+  if (!checkValidity()) {
+    return;
+  }
+
+  const nextKeys = cleanConfig(toConfigKeys(form));
+
+  try {
+    await updateScoped('keys', props.deviceIndex, nextKeys);
+
+    markPristine();
+    toast.success('Remote keys updated successfully.');
+  } catch {
+    toast.error('Failed to update remote keys');
+  }
+}
+
+const submit = withSaving(handleSubmit);
+
+watch(isDirty, (dirty) => {
+  if (isDeviceScoped.value) {
+    return;
+  }
+
+  if (dirty) {
+    disableSaveButton();
+  } else {
+    enableSaveButton();
+  }
+});
+
+onUnmounted(() => {
+  if (!isDeviceScoped.value) {
+    enableSaveButton();
+  }
+});
+
+watch(
+  storedKeys,
+  (_keys, previous) => {
+    if (previous === undefined || !isDirty.value) {
+      fillForm();
+    }
+  },
+  { immediate: true },
+);
+</script>
+
+<template>
+  <Callout class="callout-sm mb-3">
+    Leave a field empty to use the default mapping shown in the placeholder.
+    <DocsLink path="keys">Learn more</DocsLink>
+  </Callout>
+
+  <form ref="formEl" class="card rounded shadow" :class="{ 'was-validated': validated }" novalidate @submit.prevent="submit">
+    <template v-for="group in keyGroups" :key="group.id">
+      <div class="card-header">
+        <h6 class="fw-semibold mb-0">{{ group.title }}</h6>
+        <p class="small text-secondary mt-1">{{ group.description }}</p>
+      </div>
+
+      <div class="card-body keys-grid">
+        <div v-for="key in group.keys" :key="key.id">
+          <label :for="`remote-key-${key.id}`" class="form-label">{{ key.label }}</label>
+          <input
+            :id="`remote-key-${key.id}`"
+            v-model="form[key.id]"
+            type="text"
+            class="form-control font-monospace"
+            :placeholder="placeholder(key)"
+            @blur="form[key.id] = normalizeCommand(form[key.id])"
+          />
+        </div>
+      </div>
+    </template>
+
+    <div class="card-footer">
+      <small class="small text-muted">Changes are saved to your config file instantly.</small>
+
+      <div class="card-actions">
+        <button type="button" class="btn btn-outline-secondary" :disabled="!isDirty" @click="fillForm">Reset</button>
+        <button type="submit" class="btn btn-primary" :disabled="isSaving || !isDirty">
+          <span v-if="isSaving" class="spinner-border spinner-border-sm me-2" />
+          Save Keys
+        </button>
+      </div>
+    </div>
+  </form>
+</template>
+
+<style scoped>
+.keys-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .keys-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+</style>

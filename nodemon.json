@@ -1,0 +1,7 @@
+{
+  "watch": ["src"],
+  "ext": "ts",
+  "ignore": [],
+  "exec": "tsc && hb-service run -U ./test/hbConfig --stdout",
+  "signal": "SIGTERM"
+}

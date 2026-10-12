@@ -1,0 +1,38 @@
+import { createApp } from 'vue';
+import App from './App.vue';
+import { useConfig } from './composables/useConfig';
+import { useHomebridge } from './composables/useHomebridge';
+import { isConfigUiXSupported } from './lib/homebridge';
+import './assets/main.css';
+
+async function startApp() {
+  const root = document.querySelector('#app-tizen');
+  if (!root) {
+    return;
+  }
+
+  const { moveModalPadding, showSchemaForm } = useHomebridge();
+
+  if (!isConfigUiXSupported()) {
+    showSchemaForm();
+    return;
+  }
+
+  try {
+    const app = createApp(App);
+
+    const { getConfig } = useConfig();
+
+    await getConfig();
+
+    moveModalPadding(root);
+    app.mount(root);
+  } catch (err) {
+    const alert = document.createElement('div');
+    alert.className = 'alert alert-danger';
+    alert.textContent = `There was an error initializing the app: ${err.message}`;
+    root.replaceChildren(alert);
+  }
+}
+
+startApp();

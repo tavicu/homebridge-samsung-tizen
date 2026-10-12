@@ -1,4 +1,34 @@
-# General
+# Ignore compiled code
+dist
+homebridge-ui/public/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Diagnostic reports (https://nodejs.org/api/report.html)
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Dependency directories
+node_modules/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# OS
 .DS_Store
 .DS_Store?
 ._*
@@ -8,5 +38,5 @@ ehthumbs.db
 Thumbs.db
 Icon
 
-node_modules
-dist*.tgz
+# Test config
+/test/hbConfig

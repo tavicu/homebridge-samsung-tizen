@@ -1,0 +1,100 @@
+<script setup>
+const props = defineProps({
+  state: {
+    type: String,
+    default: 'info',
+    validator: (value) => ['primary', 'secondary', 'danger', 'success', 'info', 'warning'].includes(value),
+  },
+  title: {
+    type: String,
+    default: '',
+  },
+  text: {
+    type: String,
+    default: '',
+  },
+  icon: {
+    type: String,
+    default: '',
+  },
+});
+</script>
+
+<template>
+  <div class="callout d-flex align-items-center gap-3" :class="`callout-${props.state}`">
+    <div class="flex-grow-1">
+      <div v-if="title" class="callout-title fw-semibold" :class="{ 'mb-1': text || $slots.default }">{{ title }}</div>
+
+      <div v-if="text || $slots.default" class="callout-text">
+        <slot>{{ text }}</slot>
+      </div>
+    </div>
+
+    <i v-if="icon" class="fas flex-shrink-0 callout-icon" :class="[icon, `text-${state}`]" />
+  </div>
+</template>
+
+<style scoped>
+.callout {
+  --callout-color: var(--bs-info);
+  --callout-border: var(--bs-border-color, rgba(0, 0, 0, 0.125));
+  --callout-bg: color-mix(in srgb, var(--callout-color) 5%, transparent);
+
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--callout-border);
+  border-left-width: 3px;
+  border-left-color: var(--callout-color);
+  border-radius: 0.4rem;
+  background-color: var(--callout-bg);
+}
+
+.callout-sm {
+  padding: 0.4rem 0.7rem;
+}
+
+.callout-sm .callout-text {
+  line-height: 1.5;
+}
+
+.callout-sm .callout-icon {
+  font-size: 1.2rem;
+}
+
+.callout-text {
+  font-size: 0.825rem;
+}
+
+.callout-icon {
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.callout-primary {
+  --callout-color: var(--bs-primary);
+}
+
+.callout-secondary {
+  --callout-color: var(--bs-secondary);
+}
+
+.callout-success {
+  --callout-color: var(--bs-success);
+}
+
+.callout-danger {
+  --callout-color: var(--bs-danger);
+}
+
+.callout-warning {
+  --callout-color: var(--bs-warning);
+}
+
+.callout-info {
+  --callout-color: var(--bs-info);
+}
+
+.dark-mode .callout {
+  --callout-border: #ffffff1a;
+  --callout-bg: color-mix(in srgb, var(--callout-color) 15%, transparent);
+}
+</style>

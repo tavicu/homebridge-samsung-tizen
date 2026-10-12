@@ -1,0 +1,182 @@
+import { debounce, retry, sleep } from '../lib/tools.js';
+import { FrameEvent, SsdpEvent, TizenDeviceInfo } from '../types/index.js';
+import { Device } from './device.js';
+
+export type PowerProbe = {
+  ping(): Promise<boolean>;
+  getInfo(): Promise<TizenDeviceInfo>;
+};
+
+type Source = 'ssdp' | 'ping' | 'command' | 'frame';
+type Trigger = 'poll' | 'powering' | 'upnp';
+
+const POLL_INTERVAL = 1000 * 45;
+const SSDP_FRESH_LIMIT = 1000 * 90;
+const POWERING_TIMEOUT = 1000 * 3;
+const FRAME_PRIORITY = 1000 * 2;
+
+// A TV that went off keeps answering on port 8001 while in standby, around 17 seconds.
+// Without PowerState there is nothing to tell standby apart from on, so we wait it out.
+const STANDBY_TIMEOUT = 1000 * 20;
+
+export class PowerMonitor {
+  private skipPingUntil = 0;
+  private framePriorityUntil = 0;
+  private latch: { value: boolean; expiresAt: number; timer: NodeJS.Timeout } | null = null;
+
+  constructor(
+    private readonly device: Device,
+    private readonly probe: PowerProbe,
+  ) {
+    this.device.on('ssdp:update', (event, maxAgeSeconds) => {
+      if (Date.now() < this.framePriorityUntil) {
+        return;
+      }
+
+      if (event === SsdpEvent.ALIVE) {
+        void this.handleSsdpAlive(maxAgeSeconds);
+      } else if (event === SsdpEvent.BYEBYE) {
+        this.handleSsdpByebye();
+      }
+    });
+
+    this.device.on('frame:power', (event) => {
+      this.handleFramePower(event);
+    });
+
+    this.device.on('upnp:update', () => {
+      if (this.device.power) {
+        return;
+      }
+
+      void this.confirmViaPing('upnp');
+    });
+
+    setInterval(() => void this.confirmViaPing('poll'), POLL_INTERVAL);
+  }
+
+  public get isPowering(): boolean {
+    return this.latch !== null;
+  }
+
+  public async withPowerLatch(value: boolean, action: () => Promise<void>): Promise<void> {
+    this.latchOptimistic(value);
+
+    try {
+      await action();
+    } catch (error) {
+      this.abortLatch(!value);
+      throw error;
+    }
+  }
+
+  public async settled(): Promise<void> {
+    if (this.latch) {
+      const waitTime = Math.max(0, this.latch.expiresAt - Date.now());
+      await sleep(waitTime);
+    }
+  }
+
+  private async handleSsdpAlive(maxAgeSeconds?: number): Promise<void> {
+    const maxAge = maxAgeSeconds && Number.isFinite(maxAgeSeconds) ? maxAgeSeconds * 1000 : SSDP_FRESH_LIMIT;
+
+    this.skipPingUntil = Date.now() + Math.min(maxAge, SSDP_FRESH_LIMIT);
+
+    try {
+      this.reconcile(await this.isOn(), 'ssdp');
+    } catch (error: any) {
+      this.device.log.debug(`[Power] SSDP check failed: ${error.message || error}`);
+    }
+  }
+
+  private handleSsdpByebye(): void {
+    this.skipPingUntil = this.device.storage.powerStateSupport ? 0 : Date.now() + STANDBY_TIMEOUT;
+    this.reconcile(false, 'ssdp');
+  }
+
+  private handleFramePower(event: FrameEvent): void {
+    if (event === FrameEvent.STANDBY) {
+      this.framePriorityUntil = Date.now() + FRAME_PRIORITY;
+      this.skipPingUntil = Date.now() + (this.device.storage.powerStateSupport ? FRAME_PRIORITY : STANDBY_TIMEOUT);
+      this.reconcile(false, 'frame');
+    } else if (event === FrameEvent.WAKEUP) {
+      this.framePriorityUntil = Date.now() + FRAME_PRIORITY;
+      this.skipPingUntil = Date.now() + SSDP_FRESH_LIMIT;
+      this.reconcile(true, 'frame');
+    }
+  }
+
+  private async confirmViaPing(trigger: Trigger): Promise<void> {
+    if (Date.now() < this.skipPingUntil) {
+      return;
+    }
+
+    try {
+      const reachable = await retry(async () => (await this.probe.ping()) || Promise.reject(), { retries: 1, delay: 1000 }).catch(() => false);
+
+      if (!reachable) {
+        this.reconcile(false, 'ping');
+        return;
+      }
+
+      if (trigger === 'poll' && this.device.power) {
+        return;
+      }
+
+      this.reconcile(await this.isOn(), 'ping');
+    } catch (error: any) {
+      this.device.log.debug(`[Power] Fallback check (${trigger}) failed: ${error.message || error}`);
+    }
+  }
+
+  private async isOn(): Promise<boolean> {
+    if (!this.device.storage.powerStateSupport) {
+      return true;
+    }
+
+    const { device = {} } = await this.probe.getInfo();
+    return device.PowerState === 'on';
+  }
+
+  private reconcile(candidate: boolean, source: Source): void {
+    if (this.latch && candidate !== this.latch.value) {
+      // Ignore the report if the TV is still turning on or off
+      return;
+    }
+
+    this.applyPower(candidate, source);
+  }
+
+  private latchOptimistic(value: boolean): void {
+    this.clearLatch();
+
+    const timeout = !value && !this.device.storage.powerStateSupport ? STANDBY_TIMEOUT : POWERING_TIMEOUT;
+
+    this.latch = {
+      value,
+      expiresAt: Date.now() + timeout,
+      timer: setTimeout(() => {
+        this.latch = null;
+        void this.confirmViaPing('powering');
+      }, timeout),
+    };
+
+    this.applyPower.immediate(value, 'command');
+  }
+
+  private abortLatch(revertTo: boolean): void {
+    this.clearLatch();
+    this.applyPower.immediate(revertTo, 'command');
+  }
+
+  private applyPower = debounce((value: boolean, _source: Source) => {
+    this.device.power = value;
+  }, 300);
+
+  private clearLatch(): void {
+    if (this.latch) {
+      clearTimeout(this.latch.timer);
+      this.latch = null;
+    }
+  }
+}
