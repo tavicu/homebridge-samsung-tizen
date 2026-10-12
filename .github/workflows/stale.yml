@@ -20,7 +20,7 @@ jobs:
           days-before-issue-stale: 30
           days-before-issue-close: 5
           stale-issue-label: stale
-          exempt-issue-labels: pinned,security,keep
+          exempt-issue-labels: keep
           stale-issue-message: >
             This issue has been marked as stale because it has had no activity
             for 30 days. It will be closed in 5 days if there is still no

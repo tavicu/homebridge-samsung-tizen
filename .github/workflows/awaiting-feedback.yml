@@ -1,0 +1,26 @@
+name: Clear awaiting feedback
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  issues: write
+
+jobs:
+  clear:
+    # Only when the reporter answers. The owner's own issues wait on other people, so their comments do not count.
+    if: >-
+      github.event.issue.pull_request == null &&
+      github.event.comment.user.login == github.event.issue.user.login &&
+      github.event.comment.author_association != 'OWNER' &&
+      contains(github.event.issue.labels.*.name, 'awaiting feedback')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Remove the awaiting feedback label
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: gh issue edit "$ISSUE_NUMBER" --remove-label "awaiting feedback"
