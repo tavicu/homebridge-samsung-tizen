@@ -170,7 +170,7 @@ async function loadDocs(root) {
     }
 
     const raw = await readFile(file, 'utf8');
-    const content = stripFrontmatter(raw).trim();
+    const content = absolutizeDocLinks(stripFrontmatter(raw)).trim();
 
     if (!content) {
       continue;
@@ -223,6 +223,11 @@ function toDocsUrl(rel) {
   }
 
   return `${DOCS_BASE}/${slug}.html`;
+}
+
+// The pages link to each other as "/section/page.md", which the model would otherwise turn into dead URLs.
+function absolutizeDocLinks(text) {
+  return text.replaceAll(/\]\(\/([^)#\s]+\.md)(#[^)\s]*)?\)/g, (match, rel, hash = '') => `](${toDocsUrl(rel)}${hash})`);
 }
 
 function stripFrontmatter(text) {
@@ -360,12 +365,18 @@ function extractLinks(text) {
 
 function findUntrustedLinks(markdown, docs, repository) {
   const known = new Set(docs.flatMap((page) => [page.url, ...extractLinks(page.content)]));
-  const roots = [DOCS_BASE, `https://github.com/${repository}`];
+  const pages = new Set([DOCS_BASE, ...docs.map((page) => page.url)]);
+  const repo = `https://github.com/${repository}`;
 
   return extractLinks(markdown).filter((link) => {
-    const underRoot = roots.some((root) => link === root || link.startsWith(`${root}/`) || link.startsWith(`${root}#`));
+    // A link into the documentation site has to be a page that exists, whatever its anchor, or one the pages use themselves.
+    if (link === DOCS_BASE || link.startsWith(`${DOCS_BASE}/`)) {
+      return !pages.has(link.split('#')[0]) && !known.has(link);
+    }
 
-    return !underRoot && !known.has(link) && !LOCAL_LINK.test(link);
+    const inRepo = link === repo || link.startsWith(`${repo}/`) || link.startsWith(`${repo}#`);
+
+    return !inRepo && !known.has(link) && !LOCAL_LINK.test(link);
   });
 }
 
