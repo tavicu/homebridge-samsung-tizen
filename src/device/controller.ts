@@ -181,7 +181,7 @@ export class DeviceController {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: '{}',
-      timeout: 2200,
+      timeout: 10000,
     });
   }
 
