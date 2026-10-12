@@ -104,6 +104,7 @@ async function main() {
   if (untrustedLinks.length) {
     log(`Discarding reply with untrusted links: ${untrustedLinks.join(', ')}`);
     triage.comment_markdown = '';
+    triage.docs_urls = [];
     triage.needs_logs = false;
   }
 
@@ -142,7 +143,8 @@ async function main() {
     return;
   }
 
-  const comment = `${neutralizeMentions(triage.comment_markdown.trim())}\n${BOT_FOOTER}`;
+  const reply = appendDocLinks(neutralizeMentions(triage.comment_markdown.trim()), triage.docs_urls, docs);
+  const comment = `${reply}\n${BOT_FOOTER}`;
 
   await github(token, `/repos/${repository}/issues/${issueNumber}/comments`, {
     method: 'POST',
@@ -378,6 +380,23 @@ function findUntrustedLinks(markdown, docs, repository) {
 
     return !inRepo && !known.has(link) && !LOCAL_LINK.test(link);
   });
+}
+
+// The model sometimes names the pages it relied on without linking them, so add the ones the reply is missing.
+function appendDocLinks(markdown, urls, docs) {
+  const linked = new Set(extractLinks(markdown).map((link) => link.split('#')[0]));
+  const missing = [];
+
+  for (const url of unique(urls)) {
+    const page = docs.find((doc) => doc.url === url.split('#')[0]);
+
+    if (page && !linked.has(page.url)) {
+      linked.add(page.url);
+      missing.push(`- [${page.content.match(/^#\s+(.+)$/m)?.[1].trim() || page.path}](${url})`);
+    }
+  }
+
+  return missing.length ? `${markdown}\n\nDocumentation:\n${missing.slice(0, 3).join('\n')}` : markdown;
 }
 
 // Break @mentions outside code so the reply cannot notify arbitrary users.
