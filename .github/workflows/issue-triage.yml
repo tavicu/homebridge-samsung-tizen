@@ -27,6 +27,7 @@ jobs:
   triage:
     if: github.event_name == 'workflow_dispatch' || (github.event.issue.pull_request == null && github.event.issue.author_association != 'OWNER')
     runs-on: ubuntu-latest
+    timeout-minutes: 5
 
     steps:
       - uses: actions/checkout@v7

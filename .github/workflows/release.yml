@@ -30,9 +30,10 @@ jobs:
         run: npm ci
 
       - name: Check version matches tag
+        env:
+          TAG_NAME: ${{ github.event.release.tag_name }}
         run: |
-          TAG="${{ github.event.release.tag_name }}"
-          TAG="${TAG#v}"
+          TAG="${TAG_NAME#v}"
           PKG="$(node -p "require('./package.json').version")"
           if [ "$TAG" != "$PKG" ]; then
             echo "Tag $TAG does not match package.json version $PKG"

@@ -234,6 +234,7 @@ async function askOpenAI(apiKey, issue, docs, { title, body, secretsDetected }) 
 
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
+    signal: AbortSignal.timeout(120_000),
     headers: {
       Authorization: `Bearer ${apiKey}`,
       'Content-Type': 'application/json',
@@ -328,6 +329,7 @@ async function ensureTopicLabels(token, repository, names) {
 async function github(token, pathname, { method = 'GET', body, allowedStatuses = [] } = {}) {
   const response = await fetch(`https://api.github.com${pathname}`, {
     method,
+    signal: AbortSignal.timeout(30_000),
     headers: {
       Accept: 'application/vnd.github+json',
       Authorization: `Bearer ${token}`,
