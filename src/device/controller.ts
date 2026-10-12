@@ -204,7 +204,10 @@ export class DeviceController {
     const parsed = parseCommands(commands);
 
     for (const [i, cmd] of parsed.entries()) {
-      if (typeof cmd === 'object') {
+      if (typeof cmd === 'object' && /delay/i.test(cmd.key)) {
+        // A delay (DELAY*2s) is only a pause between commands, nothing is sent to the TV.
+        await sleep(cmd.time * 1000);
+      } else if (typeof cmd === 'object') {
         await this.ws.hold(cmd.key, cmd.time * 1000);
       } else {
         await this.ws.click(cmd);
