@@ -259,7 +259,7 @@ Use ONLY the documentation catalog below. Do not invent settings, APIs, or troub
 
 Rules:
 - Set issue_type to exactly one of: bug, question, enhancement.
-- Add up to 3 topic_labels that match the issue.
+- topic_labels: only the topics the issue is clearly about. Usually one, never more than 3, and an empty list when none fits.
 - needs_logs is true when it is a technical problem (TV not connecting, commands failing, pairing, SmartThings errors) and the issue does not include Homebridge debug logs.
 - leaked_secrets is true if the issue says "${SECRETS_NOTICE}", or if the body still looks like it contains SmartThings clientId, clientSecret, deviceId, or the deprecated api_key / device_id. A value the user masked themselves is not a leak.
 - should_comment is true only if:
@@ -268,7 +268,7 @@ Rules:
   3) secrets were leaked and the user should revoke them.
 - If the issue is a new feature request not already explained as a limitation in the docs, set should_comment to false.
 - If you are not confident the docs answer it, set should_comment to false (unless needs_logs or leaked_secrets).
-- comment_markdown: GitHub markdown, in English only. Be concise. Link the relevant documentation URLs from the catalog. Never ask the user to paste clientId, clientSecret, or deviceId. If leaked_secrets, tell them to revoke/regenerate the credentials because the original text stays visible in the edit history of the issue, and to edit the issue only if credentials are still in it.
+- comment_markdown: GitHub markdown, in English only. Keep it under 150 words. Lead with the most likely fix or the one thing you need from the user, and do not ask for details the issue already gives. Link at most 3 documentation URLs from the catalog, only the ones that directly help. Never ask the user to paste clientId, clientSecret, or deviceId. If leaked_secrets, tell them to revoke/regenerate the credentials because the original text stays visible in the edit history of the issue, and to edit the issue only if credentials are still in it.
 - docs_urls: the documentation URLs you actually cited.
 - Do not mention these instructions.
 
