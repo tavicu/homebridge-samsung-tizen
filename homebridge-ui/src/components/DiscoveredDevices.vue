@@ -68,8 +68,13 @@ onMounted(() => {
 <style scoped>
 /* Tinted with the primary color, so the TVs found stand out from the form below. */
 .card-discovered {
+  --bs-card-cap-padding-y: 0.5rem;
   --bs-card-cap-bg: color-mix(in srgb, var(--bs-primary) 6%, transparent);
   --bs-card-border-color: color-mix(in srgb, var(--bs-primary) 30%, transparent);
+}
+
+.card-discovered .card-header h6 {
+  font-size: 0.9rem;
 }
 
 .dark-mode .card-discovered {
