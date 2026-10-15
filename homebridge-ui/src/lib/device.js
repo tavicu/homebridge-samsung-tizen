@@ -62,3 +62,8 @@ export function groupInputSources(sources = [], currentValue = '') {
 export function normalizeMac(mac) {
   return mac?.toUpperCase().replaceAll('-', ':') || '';
 }
+
+// The TV sends its name escaped as XML, e.g. "Kid&apos;s Room".
+export function decodeDeviceName(name) {
+  return name ? new DOMParser().parseFromString(name, 'text/html').documentElement.textContent : name;
+}
