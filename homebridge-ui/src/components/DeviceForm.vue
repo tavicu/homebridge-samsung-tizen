@@ -7,7 +7,9 @@ import { useForm } from '../composables/useForm';
 import { useRouter } from '../composables/useRouter';
 import { useSmartThings } from '../composables/useSmartThings';
 import { useToast } from '../composables/useToast';
+import { normalizeMac } from '../lib/device';
 import Callout from './Callout.vue';
+import DiscoveredDevices from './DiscoveredDevices.vue';
 import DocsLink from './DocsLink.vue';
 import InputsList from './InputsList.vue';
 import KeysForm from './KeysForm.vue';
@@ -30,10 +32,6 @@ const { isTesting, canTest, testConnection } = useDevice();
 const { currentParams, navigateTo } = useRouter();
 const { getDevices } = useSmartThings();
 const toast = useToast();
-
-function normalizeMac(mac) {
-  return mac?.toUpperCase().replaceAll('-', ':') || '';
-}
 
 const isEdit = computed(() => props.action === 'edit');
 
@@ -120,6 +118,18 @@ async function handleTestConnection() {
 
   if (!form.mac.trim() && !result.error && result.mac) {
     form.mac = normalizeMac(result.mac);
+  }
+}
+
+function handleDiscoveredSelect(device) {
+  form.ip = device.ip;
+
+  if (device.mac) {
+    form.mac = normalizeMac(device.mac);
+  }
+
+  if (device.name) {
+    form.name = device.name;
   }
 }
 
@@ -237,13 +247,7 @@ watch(
     </div>
   </div>
 
-  <Callout
-    v-if="!isEdit"
-    class="mb-3"
-    state="info"
-    title="A few details are enough to add your TV"
-    text="We’ll keep this first step simple. After the TV is added, you’ll be able to set up inputs, custom switches, and other settings at your own pace."
-  />
+  <DiscoveredDevices v-if="!isEdit" class="mb-3" :selected-ip="form.ip" @select="handleDiscoveredSelect" />
 
   <Tabs v-if="isEdit" :tabs="tabs" />
 

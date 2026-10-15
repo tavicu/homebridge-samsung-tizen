@@ -58,3 +58,7 @@ export function groupInputSources(sources = [], currentValue = '') {
 
   return { available, other, value: currentValue };
 }
+
+export function normalizeMac(mac) {
+  return mac?.toUpperCase().replaceAll('-', ':') || '';
+}
