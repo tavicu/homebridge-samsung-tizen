@@ -244,7 +244,7 @@ async function copyAuthorizationUrl() {
 
       <div class="mb-2">
         <label for="authorizationCode" class="form-label">Authorization Code</label>
-        <input id="authorizationCode" v-model="state.authorizationCode" type="text" class="form-control" placeholder="e.g. 4euLqN" pattern="[a-zA-Z0-9]+" required />
+        <input id="authorizationCode" v-model="state.authorizationCode" type="text" class="form-control" placeholder="e.g. 4euLqN" pattern="[A-Za-z0-9_\-]+" required />
         <div class="invalid-feedback">Please enter a valid authorization code</div>
       </div>
     </div>
