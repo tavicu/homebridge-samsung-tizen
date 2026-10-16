@@ -1,6 +1,6 @@
 # How to open a new issue
 
-Check this documentation and the [common issues](/troubleshooting/common-issues.md) page first. Search the [existing issues](https://github.com/tavicu/homebridge-samsung-tizen/issues?q=is%3Aissue), including closed ones. The same problem may already have an answer.
+Check this documentation and the [common issues](/troubleshooting/common-issues.md) page first.
 
 Open a new issue from the [Issues page](https://github.com/tavicu/homebridge-samsung-tizen/issues/new/choose) and pick the form that fits:
 
@@ -11,12 +11,12 @@ Open a new issue from the [Issues page](https://github.com/tavicu/homebridge-sam
 The bug report form asks for:
 
 1. Plugin version, for example `6.0.0`
-2. Homebridge and Node.js versions
-3. TV model and year, for example QE55Q80T / 2020
-4. Whether the TV is on the same subnet as Homebridge
-5. What you expected, what happened, and how to repeat it
-6. Debug logs
-7. The relevant part of `config.json`, optional
+2. TV model and year, for example QE55Q80T / 2020
+3. What you expected, what happened, and how to repeat it
+4. Debug logs
+5. The relevant part of `config.json`, optional
+
+The question form asks only for the plugin version and your question.
 
 ::: danger
 Remove `clientId`, `clientSecret` and `deviceId` before you paste the config. Remove tokens and authorization codes from logs.
