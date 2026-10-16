@@ -14,6 +14,11 @@ on:
         required: false
         type: boolean
         default: false
+      dry_run:
+        description: Log the labels and reply instead of changing the issue
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -50,5 +55,6 @@ jobs:
           GITHUB_REPOSITORY: ${{ github.repository }}
           ISSUE_NUMBER: ${{ github.event.issue.number || inputs.issue_number }}
           FORCE_TRIAGE: ${{ inputs.force || false }}
+          DRY_RUN: ${{ inputs.dry_run || false }}
           DOCS_ROOT: docs-src/docs
         run: node .github/scripts/issue-triage.mjs

@@ -4,6 +4,7 @@ import path from 'node:path';
 const DOCS_BASE = 'https://tavicu.github.io/homebridge-samsung-tizen';
 const DOCS_ROOT = process.env.DOCS_ROOT || 'docs-src/docs';
 const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-5-mini';
+const DRY_RUN = process.env.DRY_RUN === 'true';
 const ISSUE_TYPE_LABELS = ['bug', 'question', 'enhancement'];
 // Issues from before the version 6 betas describe settings and versions that no longer exist, so they are not compared.
 const RECENT_ISSUES_SINCE = '2026-09-01';
@@ -94,7 +95,8 @@ async function main() {
     return;
   }
 
-  if (await hasBotComment(token, repository, issueNumber)) {
+  // A dry run changes nothing, so it can run again on an issue the bot already answered.
+  if (!DRY_RUN && (await hasBotComment(token, repository, issueNumber))) {
     log('Already replied to this issue');
     return;
   }
@@ -193,7 +195,7 @@ async function main() {
     body: { body: comment.slice(0, 65000) },
   });
 
-  log('Posted reply');
+  log(DRY_RUN ? 'Dry run, reply not posted' : 'Posted reply');
 }
 
 // The newest issues since RECENT_ISSUES_SINCE, with every maintainer reply, since the diagnosis is often not in the last one.
@@ -453,6 +455,11 @@ async function ensureTopicLabels(token, repository, names) {
 }
 
 async function github(token, pathname, { method = 'GET', body, allowedStatuses = [] } = {}) {
+  if (DRY_RUN && method !== 'GET') {
+    log(`Dry run, skipped ${method} ${pathname}:\n${typeof body?.body === 'string' ? body.body : JSON.stringify(body)}`);
+    return null;
+  }
+
   const response = await fetch(`https://api.github.com${pathname}`, {
     method,
     signal: AbortSignal.timeout(30_000),
