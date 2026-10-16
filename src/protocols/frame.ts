@@ -190,10 +190,11 @@ export class FrameSocket {
       data = JSON.parse(data);
     } catch {}
 
-    const payload = DEBUG_EVENTS.has(data?.event) ? data : response;
-
-    if (DEBUG_EVENTS.has(payload.event)) {
-      this.device.log.debug('[Frame]', JSON.stringify(payload));
+    // Every art app message is logged, so an answer with an event the plugin does not handle still shows up.
+    if (response?.event === 'd2d_service_message' || DEBUG_EVENTS.has(data?.event)) {
+      this.device.log.debug('[Frame]', JSON.stringify(data));
+    } else if (DEBUG_EVENTS.has(response?.event)) {
+      this.device.log.debug('[Frame]', JSON.stringify(response));
     }
   }
 
