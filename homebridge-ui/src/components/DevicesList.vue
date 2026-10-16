@@ -47,7 +47,10 @@ const devices = computed(() => config.value?.devices || []);
       </thead>
       <tbody>
         <tr v-for="(device, index) in devices" :key="index" class="align-middle">
-          <td class="text-body fw-semibold">{{ device.name }}</td>
+          <td>
+            <div class="text-body fw-semibold">{{ device.name }}</div>
+            <div class="d-sm-none small text-secondary">{{ device.ip }}</div>
+          </td>
           <td class="d-xs-none">{{ device.ip }}</td>
           <td class="d-xs-none">{{ device.mac }}</td>
           <td class="text-end">
