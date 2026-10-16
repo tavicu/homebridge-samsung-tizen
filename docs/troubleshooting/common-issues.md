@@ -17,6 +17,7 @@ Turning the TV on uses Wake on LAN, which works even when the Samsung API does n
 ### The pairing prompt is not shown
 
 - The TV has to be on. If the log says `Waiting for the TV to turn on to pair...`, turn the TV on.
+- The TV and Homebridge have to be on the same subnet. From another subnet or VLAN, the TV rejects pairing without showing the prompt, and the log says `Failed to open socket (ms.channel.timeOut)`. The basic API and **Test** can still work. If Homebridge cannot move, give the Homebridge host an address on the TV's subnet, for example with a VLAN interface.
 - The TV may be [incompatible](/installation/index.md#check-compatibility).
 - A previous **Deny** may still be stored. See [Clicked Deny by mistake](/installation/pairing-the-device.md#clicked-deny-by-mistake).
 
