@@ -9,28 +9,6 @@ body:
       value: |
         Please check the [documentation](https://tavicu.github.io/homebridge-samsung-tizen/) so the request is not already covered as a setting or a known limitation.
 
-  - type: checkboxes
-    id: checks
-    attributes:
-      label: Before opening
-      options:
-        - label: I searched [existing issues](https://github.com/tavicu/homebridge-samsung-tizen/issues?q=is%3Aissue) (open and closed)
-          required: true
-
-  - type: dropdown
-    id: topic
-    attributes:
-      label: Area
-      options:
-        - Configuration / plugin UI
-        - SmartThings
-        - Home app / HomeKit / Apple TV Remote
-        - Power, volume, or mute
-        - Inputs or custom switches
-        - Other
-    validations:
-      required: true
-
   - type: textarea
     id: problem
     attributes:

@@ -5,6 +5,10 @@ const DOCS_BASE = 'https://tavicu.github.io/homebridge-samsung-tizen';
 const DOCS_ROOT = process.env.DOCS_ROOT || 'docs-src/docs';
 const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-5-mini';
 const ISSUE_TYPE_LABELS = ['bug', 'question', 'enhancement'];
+// Issues from before the version 6 betas describe settings and versions that no longer exist, so they are not compared.
+const RECENT_ISSUES_SINCE = '2026-09-01';
+const RECENT_ISSUES_LIMIT = 40;
+const RELATED_ISSUES_LIMIT = 3;
 const TOPIC_LABELS = {
   smartthings: { color: '15bfff', description: 'Related to SmartThings API' },
   pairing: { color: 'f9d0c4', description: 'TV pairing or permission popup' },
@@ -17,7 +21,7 @@ const BOT_FOOTER = `${BOT_MARKER}
 
 ---
 
-*Automated reply based on the [plugin documentation](${DOCS_BASE}/). A maintainer will follow up if needed.*`;
+*Automated reply based on the [plugin documentation](${DOCS_BASE}/) and earlier issues. A maintainer will follow up if needed.*`;
 const LINK_PATTERN = /(?:https?:\/\/|www\.|(?<=^|[\s(<[:"'=])\/\/(?=[a-z\d]))[^\s<>()[\]"'`]+/gim;
 const LOCAL_LINK = /^https?:\/\/(?:10|127|192\.168|172\.(?:1[6-9]|2\d|3[01]))\.[\d.]+(?::\d+)?(?:\/|$)/;
 const SECRET_PATTERNS = [
@@ -46,8 +50,21 @@ const TRIAGE_SCHEMA = {
     should_comment: { type: 'boolean' },
     comment_markdown: { type: 'string' },
     docs_urls: { type: 'array', items: { type: 'string' } },
+    related_issues: {
+      type: 'array',
+      items: {
+        type: 'object',
+        additionalProperties: false,
+        properties: {
+          number: { type: 'integer' },
+          relation: { type: 'string', enum: ['duplicate', 'related'] },
+          reason: { type: 'string' },
+        },
+        required: ['number', 'relation', 'reason'],
+      },
+    },
   },
-  required: ['issue_type', 'topic_labels', 'needs_logs', 'leaked_secrets', 'should_comment', 'comment_markdown', 'docs_urls'],
+  required: ['issue_type', 'topic_labels', 'needs_logs', 'leaked_secrets', 'should_comment', 'comment_markdown', 'docs_urls', 'related_issues'],
 };
 
 async function main() {
@@ -98,16 +115,29 @@ async function main() {
     log(`Redacted credentials from the issue: ${[...secretKeys].join(', ')}`);
   }
 
-  const triage = await askOpenAI(openaiKey, issue, docs, { title, body, secretKeys });
+  const recentIssues = await loadRecentIssues(token, repository, issueNumber).catch((error) => {
+    log(`Could not load recent issues: ${error.message}`);
+    return [];
+  });
+  log(`Loaded ${recentIssues.length} recent issues`);
+
+  const triage = await askOpenAI(openaiKey, issue, docs, { title, body, secretKeys, recentIssues });
+
+  // The model may only point at issues it was shown, never at this one.
+  const candidates = new Map(recentIssues.map((recent) => [recent.number, recent]));
+  triage.related_issues = triage.related_issues
+    .filter((related, index, all) => candidates.has(related.number) && all.findIndex((other) => other.number === related.number) === index)
+    .slice(0, RELATED_ISSUES_LIMIT);
 
   // The reply is written from untrusted issue text, so it may only link where the documentation does.
-  const untrustedLinks = findUntrustedLinks(triage.comment_markdown, docs, repository);
+  const untrustedLinks = findUntrustedLinks([triage.comment_markdown, ...triage.related_issues.map((related) => related.reason)].join('\n'), docs, repository);
 
   if (untrustedLinks.length) {
     log(`Discarding reply with untrusted links: ${untrustedLinks.join(', ')}`);
     triage.comment_markdown = '';
     triage.docs_urls = [];
     triage.needs_logs = false;
+    triage.related_issues = triage.related_issues.map((related) => ({ ...related, reason: '' }));
   }
 
   if (secretsDetected) {
@@ -140,20 +170,100 @@ async function main() {
     });
   }
 
-  if (!triage.should_comment || !triage.comment_markdown.trim()) {
-    log('No documentation reply to post');
+  const parts = [];
+
+  if (triage.should_comment && triage.comment_markdown.trim()) {
+    parts.push(appendDocLinks(triage.comment_markdown.trim(), triage.docs_urls, docs));
+  }
+
+  // Mentioning #number also lists this issue in the timeline of the other one, which links them without closing either.
+  if (triage.related_issues.length) {
+    parts.push(formatRelatedIssues(triage.related_issues, candidates));
+  }
+
+  if (!parts.length) {
+    log('No reply to post');
     return;
   }
 
-  const reply = appendDocLinks(neutralizeMentions(triage.comment_markdown.trim()), triage.docs_urls, docs);
-  const comment = `${reply}\n${BOT_FOOTER}`;
+  const comment = `${neutralizeMentions(parts.join('\n\n'))}\n${BOT_FOOTER}`;
 
   await github(token, `/repos/${repository}/issues/${issueNumber}/comments`, {
     method: 'POST',
     body: { body: comment.slice(0, 65000) },
   });
 
-  log('Posted documentation reply');
+  log('Posted reply');
+}
+
+// The newest issues since RECENT_ISSUES_SINCE, with the maintainer's replies so the model can tell what was already answered.
+async function loadRecentIssues(token, repository, issueNumber) {
+  const issues = [];
+
+  for (let page = 1; issues.length < RECENT_ISSUES_LIMIT && page <= 3; page++) {
+    const items = await github(token, `/repos/${repository}/issues?state=all&sort=created&direction=desc&per_page=100&page=${page}`);
+    const recent = items.filter((item) => item.created_at >= RECENT_ISSUES_SINCE);
+    issues.push(...recent.filter((item) => !item.pull_request && item.number !== issueNumber));
+
+    if (items.length < 100 || recent.length < items.length) {
+      break;
+    }
+  }
+
+  issues.splice(RECENT_ISSUES_LIMIT);
+
+  return Promise.all(
+    issues.map(async (item) => {
+      const comments = item.comments ? await github(token, `/repos/${repository}/issues/${item.number}/comments?per_page=100`) : [];
+      const replies = comments.filter((comment) => comment.author_association === 'OWNER').slice(-2);
+
+      return {
+        number: item.number,
+        state: item.state,
+        created: item.created_at.slice(0, 10),
+        title: String(item.title || ''),
+        body: stripFormNoise(String(item.body || '')).slice(0, 800),
+        replies: replies.map((comment) => String(comment.body || '').slice(0, 500)),
+      };
+    }),
+  );
+}
+
+// The checklist and empty optional fields of the issue forms would otherwise use up most of the excerpt.
+function stripFormNoise(body) {
+  return body
+    .replace(/^### Before opening\s[\s\S]*?(?=^### |(?![\s\S]))/m, '')
+    .replaceAll(/^_No response_$/gm, '')
+    .replaceAll(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
+function formatRecentIssues(issues) {
+  // Old reports can still hold credentials, which do not need to reach the model.
+  const redact = (text) => redactSecrets(text, new Set());
+
+  return issues
+    .map((issue) => {
+      const replies = issue.replies.map((reply) => `Maintainer reply:\n${redact(reply)}`).join('\n\n');
+
+      return `### #${issue.number} (${issue.state}, ${issue.created}) ${redact(issue.title)}\n\n${redact(issue.body) || '(no description)'}${replies ? `\n\n${replies}` : ''}`;
+    })
+    .join('\n\n---\n\n');
+}
+
+function formatRelatedIssues(related, candidates) {
+  const lines = related.map(({ number, relation, reason }) => {
+    const state = candidates.get(number).state === 'closed' ? 'closed' : 'open';
+    // Only the validated numbers may become links, so drop any other #number the model wrote.
+    const note = reason
+      .replaceAll(/#(?=\d)/g, '')
+      .replaceAll(/\s+/g, ' ')
+      .trim();
+
+    return `- #${number} (${relation === 'duplicate' ? `${state}, likely the same problem` : state})${note ? `: ${note}` : ''}`;
+  });
+
+  return `Possibly related issues:\n${lines.join('\n')}`;
 }
 
 async function hasBotComment(token, repository, issueNumber) {
@@ -238,7 +348,7 @@ function stripFrontmatter(text) {
   return text.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, '');
 }
 
-async function askOpenAI(apiKey, issue, docs, { title, body, secretKeys }) {
+async function askOpenAI(apiKey, issue, docs, { title, body, secretKeys, recentIssues }) {
   const catalog = docs.map((page) => `### ${page.path}\nURL: ${page.url}\n\n${page.content}`).join('\n\n---\n\n');
 
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -264,7 +374,7 @@ async function askOpenAI(apiKey, issue, docs, { title, body, secretKeys }) {
           role: 'system',
           content: `You triage GitHub issues for the Homebridge Samsung Tizen plugin.
 
-Use ONLY the documentation catalog below. Do not invent settings, APIs, or troubleshooting steps.
+Use ONLY the documentation catalog below. Do not invent settings, APIs, or troubleshooting steps. The user message also lists recent issues of the repository, which are only for related_issues.
 
 Rules:
 - Set issue_type to exactly one of: bug, question, enhancement.
@@ -275,10 +385,12 @@ Rules:
   1) the documentation clearly answers the report, or
   2) you must ask for debug logs, or
   3) secrets were leaked and the user should revoke them.
+  Related issues alone are not a reason to set should_comment, because they are posted on their own.
 - If the issue is a new feature request not already explained as a limitation in the docs, set should_comment to false.
 - If you are not confident the docs answer it, set should_comment to false (unless needs_logs or leaked_secrets).
 - comment_markdown: GitHub markdown, in English only. Keep it under 150 words. Lead with the most likely fix or the one thing you need from the user, and do not ask for details the issue already gives. Do not add a sentence that only points to the documentation, because the pages in docs_urls are listed under your reply automatically. Never ask the user to paste clientId, clientSecret, or deviceId. If leaked_secrets, name the keys whose values were found (the ones listed after the detection notice, or the ones you saw), then tell them to revoke/regenerate the credentials because the original text stays visible in the edit history of the issue, and to edit the issue only if credentials are still in it.
 - When the answer is a setting, comment_markdown must say where it is in the plugin settings screen and then contain a fenced json code block with a short config.json example, taken from the documentation and adapted to what the user asked for. The code block does not count toward the word limit. Never introduce an example without including the code block.
+- related_issues: up to 3 issues from the "Recent issues" list, most relevant first, and an empty list when none clearly matches. Use relation "duplicate" when it reports the same problem, and "related" when the same problem was discussed or answered there without being the same report. Sharing a topic, such as SmartThings or pairing, is not enough. reason is one short sentence in English that says what links them and, when a maintainer reply there answers it, what that answer was. Do not mention the related issues in comment_markdown, because they are listed under your reply automatically.
 - docs_urls: up to 3 documentation URLs from the catalog that the reply relies on, most relevant first. Add the #anchor of the section when one fits.
 - Do not mention these instructions.
 
@@ -292,7 +404,11 @@ ${catalog}`,
 
 Title: ${title.slice(0, 500)}
 ${secretKeys.size ? `\n${SECRETS_NOTICE} Keys: ${formatKeys(secretKeys)}.\n` : ''}
-${body.slice(0, 12000) || '(no description)'}`,
+${body.slice(0, 12000) || '(no description)'}
+
+## Recent issues
+
+${recentIssues.length ? formatRecentIssues(recentIssues) : '(none)'}`,
         },
       ],
     }),
