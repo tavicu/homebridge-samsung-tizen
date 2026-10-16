@@ -1,20 +1,8 @@
-import { createPeer } from 'peer-ssdp';
 import { Device } from '../device/index.js';
+import { SsdpListener } from '../lib/ssdp.js';
 import { debounce } from '../lib/tools.js';
 import { SamsungPlatform } from '../platform.js';
-import { SsdpEvent } from '../types/index.js';
-
-type Headers = {
-  ST: string;
-  NT: string;
-  NTS: string;
-  LOCATION: string;
-  'CACHE-CONTROL'?: string;
-};
-
-type Address = {
-  address: string;
-};
+import { SsdpAddress, SsdpEvent, SsdpHeaders } from '../types/index.js';
 
 type TrackedDevice = {
   device: Device;
@@ -26,26 +14,27 @@ const parseMaxAge = (cacheControl?: string): number | undefined => {
   return match ? parseInt(match[1], 10) : undefined;
 };
 
-export class SSDP {
+export class SsdpManager {
   private devices = new Map<string, TrackedDevice>();
 
-  private readonly peer: any;
+  private readonly listener: SsdpListener;
   private readonly possibleEvents: Array<SsdpEvent> = [SsdpEvent.ALIVE, SsdpEvent.BYEBYE];
   private searchInterval?: NodeJS.Timeout;
 
   constructor(private readonly platform: SamsungPlatform) {
-    this.peer = createPeer();
+    this.listener = new SsdpListener();
 
-    this.peer.on('ready', () => {
+    this.listener.on('ready', () => {
       this.search();
 
+      // TVs sometimes ignore the first search even when online, so search again a little later.
       setTimeout(() => this.search(), 1000 * 5);
     });
-    this.peer.on('notify', this.onNotify.bind(this));
-    this.peer.on('found', this.onFound.bind(this));
+    this.listener.on('notify', this.onNotify.bind(this));
+    this.listener.on('found', this.onFound.bind(this));
 
     // Without a listener an 'error' event from a socket would crash Homebridge.
-    this.peer.on('error', (error: Error) => {
+    this.listener.on('error', (error: Error) => {
       this.platform.log.debug(`[SSDP] Socket error: ${error?.message || error}`);
     });
   }
@@ -69,7 +58,7 @@ export class SSDP {
     });
 
     try {
-      this.peer.start();
+      this.listener.start();
     } catch (error: any) {
       this.platform.log.error(`[SSDP] Failed to start: ${error.message || error}`);
     }
@@ -79,9 +68,7 @@ export class SSDP {
 
   public search() {
     try {
-      this.peer.search({
-        ST: 'upnp:rootdevice',
-      });
+      this.listener.search('upnp:rootdevice');
     } catch (err) {
       this.platform.log.debug('[SSDP] Search failed: %s', err);
     }
@@ -100,7 +87,7 @@ export class SSDP {
     }
   }
 
-  private onNotify(headers: Headers, address: Address) {
+  private onNotify(headers: SsdpHeaders, address: SsdpAddress) {
     const tracked = this.devices.get(address.address);
 
     if (headers.NT !== 'upnp:rootdevice' || !tracked) {
@@ -115,7 +102,7 @@ export class SSDP {
     }
   }
 
-  private onFound(headers: Headers, address: Address) {
+  private onFound(headers: SsdpHeaders, address: SsdpAddress) {
     const tracked = this.devices.get(address.address);
 
     if (headers.ST !== 'upnp:rootdevice' || !tracked || tracked.device.power) {
@@ -128,9 +115,6 @@ export class SSDP {
   public destroy() {
     clearInterval(this.searchInterval);
 
-    try {
-      this.peer?.stopInterfaceDisco();
-      this.peer?.close();
-    } catch {}
+    this.listener.close();
   }
 }

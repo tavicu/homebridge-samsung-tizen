@@ -2,12 +2,12 @@ import { API, APIEvent, IndependentPlatformPlugin, Logging } from 'homebridge';
 import { Device } from './device/index.js';
 import { migrateConfig } from './lib/migrate.js';
 import { Storage } from './lib/storage.js';
-import { SmartThingsManager, SSDP, UPnPManager } from './protocols/index.js';
+import { SmartThingsManager, SsdpManager, UPnPManager } from './protocols/index.js';
 import { PLUGIN_NAME } from './settings.js';
 import { DeviceConfig, PlatformConfig } from './types/index.js';
 
 export class SamsungPlatform implements IndependentPlatformPlugin {
-  private ssdp: SSDP;
+  private ssdp: SsdpManager;
   private upnp: UPnPManager;
   private smartthings: SmartThingsManager;
 
@@ -23,7 +23,7 @@ export class SamsungPlatform implements IndependentPlatformPlugin {
 
     this.storage = new Storage(api, log);
 
-    this.ssdp = new SSDP(this);
+    this.ssdp = new SsdpManager(this);
     this.upnp = new UPnPManager(this);
     this.smartthings = new SmartThingsManager(this);
 

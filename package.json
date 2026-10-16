@@ -70,7 +70,6 @@
     "@homebridge/plugin-ui-utils": "^2.2.6",
     "deepmerge-ts": "^8.0.2",
     "fast-xml-parser": "^5.11.2",
-    "peer-ssdp": "^0.0.5",
     "ws": "^8.22.0"
   },
   "overrides": {},
