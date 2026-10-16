@@ -6,7 +6,16 @@ import { FrameEvent } from '../types/index.js';
 const HEARTBEAT_TIMEOUT = 8 * 1000; // 6 ping + 2 for safety
 const CONNECTION_TIMEOUT = 30 * 1000;
 const ART_MODE_TTL = 2500;
-const DEBUG_EVENTS = new Set(['ms.channel.connect', 'ms.channel.ready', 'ms.channel.unauthorized', 'get_artmode_status', 'art_mode_changed', 'go_to_standby', 'wakeup']);
+const DEBUG_EVENTS = new Set([
+  'ms.channel.connect',
+  'ms.channel.ready',
+  'ms.channel.unauthorized',
+  'get_artmode_status',
+  'artmode_status',
+  'art_mode_changed',
+  'go_to_standby',
+  'wakeup',
+]);
 
 export class FrameSocket {
   private ws: WsClient | null = null;
@@ -201,7 +210,7 @@ export class FrameSocket {
     try {
       const data = JSON.parse(payload);
 
-      if (data.event === 'get_artmode_status') {
+      if (data.event === 'get_artmode_status' || data.event === 'artmode_status') {
         this.lastArtModeUpdate = Date.now();
         this.device.emit('frame:artmode', data.value === 'on');
       } else if (data.event === 'art_mode_changed') {
