@@ -7,7 +7,9 @@ import { useForm } from '../composables/useForm';
 import { useRouter } from '../composables/useRouter';
 import { useSmartThings } from '../composables/useSmartThings';
 import { useToast } from '../composables/useToast';
+import { IP_PATTERN, normalizeMac } from '../lib/device';
 import Callout from './Callout.vue';
+import DiscoveredDevices from './DiscoveredDevices.vue';
 import DocsLink from './DocsLink.vue';
 import InputsList from './InputsList.vue';
 import KeysForm from './KeysForm.vue';
@@ -30,10 +32,6 @@ const { isTesting, canTest, testConnection } = useDevice();
 const { currentParams, navigateTo } = useRouter();
 const { getDevices } = useSmartThings();
 const toast = useToast();
-
-function normalizeMac(mac) {
-  return mac?.toUpperCase().replaceAll('-', ':') || '';
-}
 
 const isEdit = computed(() => props.action === 'edit');
 
@@ -110,7 +108,7 @@ onMounted(async () => {
 });
 
 async function handleTestConnection() {
-  if (!canTest(formEl.value?.ip)) {
+  if (!canTest(form.ip)) {
     return;
   }
 
@@ -120,6 +118,18 @@ async function handleTestConnection() {
 
   if (!form.mac.trim() && !result.error && result.mac) {
     form.mac = normalizeMac(result.mac);
+  }
+}
+
+function handleDiscoveredSelect(device) {
+  form.ip = device.ip;
+
+  if (device.mac) {
+    form.mac = normalizeMac(device.mac);
+  }
+
+  if (device.name) {
+    form.name = device.name;
   }
 }
 
@@ -237,13 +247,7 @@ watch(
     </div>
   </div>
 
-  <Callout
-    v-if="!isEdit"
-    class="mb-3"
-    state="info"
-    title="A few details are enough to add your TV"
-    text="We’ll keep this first step simple. After the TV is added, you’ll be able to set up inputs, custom switches, and other settings at your own pace."
-  />
+  <DiscoveredDevices v-if="!isEdit" class="mb-3" :selected-ip="form.ip" @select="handleDiscoveredSelect" />
 
   <Tabs v-if="isEdit" :tabs="tabs" />
 
@@ -264,17 +268,8 @@ watch(
         <div class="col-md-6">
           <label for="ipAddress" class="form-label">IP Address</label>
           <div class="input-group has-validation">
-            <input
-              id="ipAddress"
-              v-model="form.ip"
-              name="ip"
-              type="text"
-              class="form-control"
-              placeholder="e.g. 192.168.1.100"
-              pattern="^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$"
-              required
-            />
-            <button type="button" class="btn btn-secondary text-nowrap" :disabled="!canTest(formEl?.ip)" @click="handleTestConnection">
+            <input id="ipAddress" v-model="form.ip" type="text" class="form-control" placeholder="e.g. 192.168.1.100" :pattern="IP_PATTERN" required />
+            <button type="button" class="btn btn-secondary text-nowrap" :disabled="!canTest(form.ip)" @click="handleTestConnection">
               <i v-if="isTesting" class="fas fa-spinner fa-spin me-1" />
               {{ isTesting ? 'Testing...' : 'Test' }}
             </button>

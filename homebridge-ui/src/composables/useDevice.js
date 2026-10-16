@@ -1,12 +1,14 @@
 import { ref } from 'vue';
+import { IP_PATTERN } from '../lib/device';
 import { useHomebridge } from './useHomebridge';
 
 export function useDevice() {
   const { serverRequest } = useHomebridge();
   const isTesting = ref(false);
 
-  function canTest(ipInput) {
-    return !isTesting.value && ipInput?.validity.valid === true;
+  // Checks the value, not the input's validity, which Vue does not track and is not updated yet when the IP is set from code.
+  function canTest(ip) {
+    return !isTesting.value && new RegExp(IP_PATTERN).test(ip);
   }
 
   async function getInfo(ip) {

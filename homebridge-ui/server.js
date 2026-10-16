@@ -2,11 +2,13 @@ import { promises as fs } from 'fs';
 import { Buffer } from 'node:buffer';
 import path from 'path';
 import { HomebridgePluginUiServer } from '@homebridge/plugin-ui-utils';
+import { SsdpListener } from '../dist/lib/ssdp.js';
 
 class PluginUiServer extends HomebridgePluginUiServer {
   #storagePath;
   #appsPath;
   #backupDir;
+  #discovery;
 
   constructor() {
     super();
@@ -24,6 +26,7 @@ class PluginUiServer extends HomebridgePluginUiServer {
     this.onRequest('/smartthings/get-device-status', this.stGetDeviceStatus.bind(this));
     this.onRequest('/device/get-info', this.deviceGetInfo.bind(this));
     this.onRequest('/device/get-apps', this.deviceGetApps.bind(this));
+    this.onRequest('/device/discover', this.deviceDiscover.bind(this));
 
     this.ready();
   }
@@ -173,10 +176,21 @@ class PluginUiServer extends HomebridgePluginUiServer {
         reachable: true,
         mac: data?.device?.wifiMac || null,
         tokenSupport: data?.device?.TokenAuthSupport === 'true',
+        name: data?.device?.name?.replace(/^\[TV\]\s*/, '') || null,
+        model: data?.device?.modelName || null,
       };
     } catch {
       return { reachable: false };
     }
+  }
+
+  async deviceDiscover() {
+    // A second request while a search is running waits for that one instead of opening another listener.
+    this.#discovery ??= this.#discover().finally(() => {
+      this.#discovery = undefined;
+    });
+
+    return this.#discovery;
   }
 
   async deviceGetApps({ mac } = {}) {
@@ -188,6 +202,54 @@ class PluginUiServer extends HomebridgePluginUiServer {
     } catch {
       return [];
     }
+  }
+
+  async #discover() {
+    // Older TVs announce RemoteControlReceiver, newer ones only the RenderingControl service the plugin uses for the volume.
+    // RenderingControl alone is not enough: on older TVs the media renderer that has it restarts every few seconds and can miss a search.
+    const targets = ['urn:samsung.com:device:RemoteControlReceiver:1', 'urn:schemas-upnp-org:service:RenderingControl:1'];
+
+    // Only searches, so port 1900 stays free for Homebridge.
+    const listener = new SsdpListener({ notifications: false });
+    const probes = new Map();
+
+    const probe = async (ip) => {
+      const { reachable, name, model, mac, tokenSupport } = await this.deviceGetInfo({ ip });
+
+      // A device that does not answer on the Tizen API is not a TV this plugin can control.
+      if (!reachable) {
+        return null;
+      }
+
+      const device = { ip, name, model, mac, tokenSupport };
+
+      // Sent to the UI right away, so the TV shows up while the search is still running.
+      this.pushEvent('device:found', device);
+
+      return device;
+    };
+
+    // Other media players answer for RenderingControl too, so only devices that name Samsung in their SERVER header are asked for their info, once per IP.
+    // SSDP gives no name or MAC address.
+    listener.on('found', (headers, { address }) => {
+      if (targets.includes(headers.ST) && /samsung/i.test(headers.SERVER || '') && !probes.has(address)) {
+        probes.set(address, probe(address));
+      }
+    });
+
+    listener.on('ready', () => targets.forEach((target) => listener.search(target)));
+
+    // Devices answer within the 2 seconds the search allows them (MX), there is no message that says all of them did.
+    try {
+      listener.start();
+      await new Promise((resolve) => setTimeout(resolve, 1000 * 3));
+    } finally {
+      listener.close();
+    }
+
+    const devices = await Promise.all(probes.values());
+
+    return devices.filter(Boolean);
   }
 
   #resolveRedirectUrl(redirectUrl) {

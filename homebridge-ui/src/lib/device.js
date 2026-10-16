@@ -1,5 +1,7 @@
 const DIGITAL_TV_NAME = 'Digital TV';
 
+export const IP_PATTERN = '^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$';
+
 export const INPUT_TYPES = [
   { id: 'input', name: 'Input' },
   { id: 'app', name: 'Application' },
@@ -57,4 +59,13 @@ export function groupInputSources(sources = [], currentValue = '') {
   }
 
   return { available, other, value: currentValue };
+}
+
+export function normalizeMac(mac) {
+  return mac?.toUpperCase().replaceAll('-', ':') || '';
+}
+
+// The TV sends its name escaped as XML, e.g. "Kid&apos;s Room".
+export function decodeDeviceName(name) {
+  return name ? new DOMParser().parseFromString(name, 'text/html').documentElement.textContent : name;
 }

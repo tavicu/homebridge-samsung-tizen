@@ -70,12 +70,20 @@ p:last-child {
 }
 
 .btn {
-  --bs-btn-disabled-opacity: 0.25;
+  --bs-btn-disabled-opacity: 0.5;
 
   font-size: 0.875rem;
   border-radius: 0.4rem;
   text-transform: none;
   line-height: 1.5;
+}
+
+/* Config UI X makes every disabled button #333, which flashed black when the button was enabled again. Keep each button's own colors. */
+.btn:disabled,
+.btn.disabled {
+  color: var(--bs-btn-disabled-color);
+  background-color: var(--bs-btn-disabled-bg);
+  border-color: var(--bs-btn-disabled-border-color);
 }
 
 /* Keeps a loading spinner vertically centered with the button label. */
@@ -242,6 +250,10 @@ p:last-child {
 
 .card .table {
   --bs-table-border-color: var(--card-table-border);
+}
+
+.card .table-compact {
+  --bs-card-spacer-y: 0.35rem;
 }
 
 .card th,
