@@ -3,7 +3,7 @@ import path from 'node:path';
 
 const DOCS_BASE = 'https://tavicu.github.io/homebridge-samsung-tizen';
 const DOCS_ROOT = process.env.DOCS_ROOT || 'docs-src/docs';
-const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-5-mini';
+const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-6.1-sol';
 const DRY_RUN = process.env.DRY_RUN === 'true';
 const ISSUE_TYPE_LABELS = ['bug', 'question', 'enhancement'];
 // Issues from before the version 6 betas describe settings and versions that no longer exist, so they are not compared.
