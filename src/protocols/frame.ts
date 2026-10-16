@@ -202,7 +202,8 @@ export class FrameSocket {
     try {
       const data = JSON.parse(payload);
 
-      if (data.event === 'get_artmode_status') {
+      // Some Frame TVs (2022, firmware 2.0.25) answer get_artmode_status with an artmode_status event.
+      if (data.event === 'get_artmode_status' || data.event === 'artmode_status') {
         this.lastArtModeUpdate = Date.now();
         this.device.emit('frame:artmode', data.value === 'on');
       } else if (data.event === 'art_mode_changed') {
