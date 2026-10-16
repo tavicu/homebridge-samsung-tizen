@@ -1,5 +1,20 @@
 # Change Log
 
+## 6.1.0
+
+**New**
+
+- **Automatic discovery.** When you add a device in the plugin settings, the plugin automatically searches your network for compatible Samsung devices and suggests the ones it finds above the form. Choose **Use** to fill in the device's name, IP and MAC address. Devices already in your config are left out, and devices that do not support token authentication are marked as not supported.
+
+**Improved**
+
+- The plugin no longer uses `peer-ssdp`, which had not been updated in 11 years, to follow the TV's power state. Its own SSDP listener picks up network interface changes, retries when port 1900 is busy, and writes each socket error to the log only once.
+
+**Fixed**
+
+- Some Frame TVs answer the Art Mode status request with a differently named event, which the plugin did not recognize. After Homebridge restarted, these TVs showed as on in Home while they were in Art Mode, until Art Mode was turned off and on again. The plugin now listens for both events.
+- The SmartThings wizard no longer rejects authorization codes that contain an underscore or a hyphen.
+
 ## 6.0.0
 
 Version 6 is a full rewrite of the plugin in TypeScript. It is backwards compatible: your existing TVs stay in Home, you don't have to add them again, and your current config keeps working as it is.
