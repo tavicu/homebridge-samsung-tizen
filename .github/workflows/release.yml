@@ -44,7 +44,9 @@ jobs:
         run: |
           VERSION="$(node -p "require('./package.json').version")"
           if [[ "$VERSION" == *-* ]]; then
-            npm publish --provenance --access public --tag beta
+            # The dist-tag is the prerelease name, so 6.0.1-beta.0 goes to "beta" and 6.0.1-debug.0 to "debug".
+            PRERELEASE="${VERSION#*-}"
+            npm publish --provenance --access public --tag "${PRERELEASE%%.*}"
           else
             npm publish --provenance --access public
           fi
