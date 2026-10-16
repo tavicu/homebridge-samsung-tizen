@@ -196,7 +196,7 @@ async function main() {
   log('Posted reply');
 }
 
-// The newest issues since RECENT_ISSUES_SINCE, with the maintainer's replies so the model can tell what was already answered.
+// The newest issues since RECENT_ISSUES_SINCE, with every maintainer reply, since the diagnosis is often not in the last one.
 async function loadRecentIssues(token, repository, issueNumber) {
   const issues = [];
 
@@ -215,7 +215,7 @@ async function loadRecentIssues(token, repository, issueNumber) {
   return Promise.all(
     issues.map(async (item) => {
       const comments = item.comments ? await github(token, `/repos/${repository}/issues/${item.number}/comments?per_page=100`) : [];
-      const replies = comments.filter((comment) => comment.author_association === 'OWNER').slice(-2);
+      const replies = comments.filter((comment) => comment.author_association === 'OWNER');
 
       return {
         number: item.number,
