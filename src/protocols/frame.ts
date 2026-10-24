@@ -57,6 +57,10 @@ export class FrameSocket {
     return this.send('set_artmode_status', { value: value ? 'on' : 'off' });
   }
 
+  public getArtModeStatus(): Promise<void> {
+    return this.send('get_artmode_status');
+  }
+
   public refreshArtMode = throttle(() => {
     if (!this.device.power || Date.now() - this.lastArtModeUpdate < ART_MODE_TTL) {
       return;

@@ -10,6 +10,11 @@ import { TizenApplication, TizenDeviceInfo } from '../types/index.js';
 import { Device } from './device.js';
 import { PowerMonitor } from './power.js';
 
+// A Frame woken from being fully off takes tens of seconds before its Art Mode service answers.
+const COLD_START_ART_MODE_TIMEOUT = 1000 * 45;
+const ART_MODE_REPLY_TIMEOUT = 1000 * 4;
+const ART_MODE_RETRY_DELAY = 1000 * 2;
+
 export class DeviceController {
   private ws: WebSocket;
   private upnp: UPnPClient;
@@ -17,6 +22,7 @@ export class DeviceController {
   private power: PowerMonitor;
   private frame: FrameSocket;
   private sleepTimeout: NodeJS.Timeout | null = null;
+  private artModeRequest = 0;
 
   constructor(
     private device: Device,
@@ -186,12 +192,74 @@ export class DeviceController {
   }
 
   public async setArtMode(value: boolean): Promise<void> {
+    const coldStart = !this.device.power;
+    const token = ++this.artModeRequest;
+
     if (!this.device.power && !this.power.isPowering) {
       await this.powerOn();
     }
 
     await this.waitPowering();
-    return this.frame.setArtMode(value);
+
+    if (!coldStart) {
+      return this.frame.setArtMode(value);
+    }
+
+    // A TV that was off needs far longer than the power latch before its Art Mode service answers, so a single request right after
+    // waking it is lost (or the TV settles on its last input). Keep asking in the background until the TV confirms, so the
+    // HomeKit write itself still returns promptly.
+    void this.confirmArtMode(value, token);
+  }
+
+  private async confirmArtMode(value: boolean, token: number): Promise<void> {
+    const deadline = Date.now() + COLD_START_ART_MODE_TIMEOUT;
+    let lastError: any;
+
+    while (token === this.artModeRequest && Date.now() < deadline) {
+      const confirmed = this.waitForArtMode(value, ART_MODE_REPLY_TIMEOUT);
+
+      try {
+        await this.frame.setArtMode(value);
+        // The TV may say nothing if it was already in the requested state, so ask for the state as well.
+        await this.frame.getArtModeStatus();
+      } catch (error: any) {
+        lastError = error;
+      }
+
+      if (await confirmed) {
+        return;
+      }
+
+      await sleep(ART_MODE_RETRY_DELAY);
+    }
+
+    if (token === this.artModeRequest) {
+      const reason = lastError ? `: ${lastError.message}` : '';
+      this.device.log.warn(`[Frame] The TV did not confirm Art Mode ${value ? 'on' : 'off'} after waking up${reason}`);
+    }
+  }
+
+  private waitForArtMode(value: boolean, timeout: number): Promise<boolean> {
+    return new Promise((resolve) => {
+      let cleanup = () => {};
+
+      const onEvent = (current: boolean) => {
+        if (current === value) {
+          cleanup();
+          resolve(true);
+        }
+      };
+      const timer = setTimeout(() => {
+        cleanup();
+        resolve(false);
+      }, timeout);
+
+      cleanup = () => {
+        clearTimeout(timer);
+        this.device.off('frame:artmode', onEvent);
+      };
+      this.device.on('frame:artmode', onEvent);
+    });
   }
 
   public refreshArtMode(): void {
