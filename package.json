@@ -1,7 +1,7 @@
 {
   "name": "homebridge-samsung-tizen",
   "displayName": "Homebridge Samsung Tizen",
-  "version": "6.1.0",
+  "version": "6.1.1",
   "description": "Homebridge plugin for Samsung TV's (2017 and later)",
   "license": "MIT",
   "author": "Octavian Ruda",
