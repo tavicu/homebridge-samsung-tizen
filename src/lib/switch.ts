@@ -76,7 +76,8 @@ const OPTION_DEFINITIONS: Array<SwitchOptionDefinition> = [
     key: 'mute',
     offable: true,
     build: ({ config, device }) => ({
-      get: async () => device.mute === config.mute,
+      // Samsung TVs report mute when they go to standby, so the state only counts while the TV is on.
+      get: async () => device.power && device.mute === config.mute,
       set: async (switchValue: boolean) => {
         await device.setMute(switchValue === config.mute);
       },
