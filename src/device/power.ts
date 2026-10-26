@@ -1,3 +1,4 @@
+import { trace } from '../lib/logger.js';
 import { debounce, retry, sleep } from '../lib/tools.js';
 import { FrameEvent, SsdpEvent, TizenDeviceInfo } from '../types/index.js';
 import { Device } from './device.js';
@@ -30,8 +31,11 @@ export class PowerMonitor {
   ) {
     this.device.on('ssdp:update', (event, maxAgeSeconds) => {
       if (Date.now() < this.framePriorityUntil) {
+        trace(this.device.log, 'Power', `SSDP ${event} ignored (Frame event has priority)`);
         return;
       }
+
+      trace(this.device.log, 'Power', `SSDP ${event} (max-age: ${maxAgeSeconds ?? 'none'})`);
 
       if (event === SsdpEvent.ALIVE) {
         void this.handleSsdpAlive(maxAgeSeconds);
@@ -41,6 +45,7 @@ export class PowerMonitor {
     });
 
     this.device.on('frame:power', (event) => {
+      trace(this.device.log, 'Power', `Frame ${event}`);
       this.handleFramePower(event);
     });
 
@@ -108,11 +113,19 @@ export class PowerMonitor {
 
   private async confirmViaPing(trigger: Trigger): Promise<void> {
     if (Date.now() < this.skipPingUntil) {
+      if (trigger !== 'poll') {
+        trace(this.device.log, 'Power', `Ping (${trigger}) skipped for another ${this.skipPingUntil - Date.now()}ms`);
+      }
+
       return;
     }
 
     try {
       const reachable = await retry(async () => (await this.probe.ping()) || Promise.reject(), { retries: 1, delay: 1000 }).catch(() => false);
+
+      if (trigger !== 'poll' || !reachable || !this.device.power) {
+        trace(this.device.log, 'Power', `Ping (${trigger}): port 8001 ${reachable ? 'reachable' : 'not reachable'}`);
+      }
 
       if (!reachable) {
         this.reconcile(false, 'ping');
@@ -135,13 +148,19 @@ export class PowerMonitor {
     }
 
     const { device = {} } = await this.probe.getInfo();
+    trace(this.device.log, 'Power', `PowerState: ${device.PowerState}`);
     return device.PowerState === 'on';
   }
 
   private reconcile(candidate: boolean, source: Source): void {
     if (this.latch && candidate !== this.latch.value) {
       // Ignore the report if the TV is still turning on or off
+      trace(this.device.log, 'Power', `Ignored power ${candidate} from ${source} (latch is ${this.latch.value})`);
       return;
+    }
+
+    if (candidate !== this.device.power) {
+      trace(this.device.log, 'Power', `Power ${candidate} from ${source}`);
     }
 
     this.applyPower(candidate, source);
@@ -152,10 +171,13 @@ export class PowerMonitor {
 
     const timeout = !value && !this.device.storage.powerStateSupport ? STANDBY_TIMEOUT : POWERING_TIMEOUT;
 
+    trace(this.device.log, 'Power', `Latch ${value} for ${timeout}ms`);
+
     this.latch = {
       value,
       expiresAt: Date.now() + timeout,
       timer: setTimeout(() => {
+        trace(this.device.log, 'Power', 'Latch expired');
         this.latch = null;
         void this.confirmViaPing('powering');
       }, timeout),
@@ -165,6 +187,7 @@ export class PowerMonitor {
   }
 
   private abortLatch(revertTo: boolean): void {
+    trace(this.device.log, 'Power', `Latch aborted, power back to ${revertTo}`);
     this.clearLatch();
     this.applyPower.immediate(revertTo, 'command');
   }

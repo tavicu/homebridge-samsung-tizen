@@ -1,5 +1,6 @@
 import WsClient, { RawData } from 'ws';
 import { Device } from '../device/index.js';
+import { trace } from '../lib/logger.js';
 import { sleep, throttle } from '../lib/tools.js';
 import { FrameEvent } from '../types/index.js';
 
@@ -71,6 +72,7 @@ export class FrameSocket {
     }
 
     if (!this.device.power) {
+      trace(this.device.log, 'Frame', `${request} not sent: TV is not powered on`);
       throw new Error('TV is not powered on');
     }
 
@@ -80,6 +82,7 @@ export class FrameSocket {
 
     return new Promise((resolve, reject) => {
       if (this.ws?.readyState !== WsClient.OPEN) {
+        trace(this.device.log, 'Frame', `${request} not sent: socket is not open`);
         return reject(new Error('Socket is not open'));
       }
 
@@ -98,7 +101,13 @@ export class FrameSocket {
         },
       });
 
-      this.ws.send(payload, () => resolve());
+      this.ws.send(payload, (error) => {
+        if (error) {
+          trace(this.device.log, 'Frame', `${request} write failed: ${error.message}`);
+        }
+
+        resolve();
+      });
     });
   }
 
@@ -125,6 +134,9 @@ export class FrameSocket {
   private connect(): Promise<void> {
     this.disconnect();
 
+    const startedAt = Date.now();
+    trace(this.device.log, 'Frame', 'Connecting');
+
     const socket = new WsClient(`${this.url}&token=${this.device.storage.token || ''}`, {
       servername: '',
       handshakeTimeout: 1000,
@@ -139,8 +151,11 @@ export class FrameSocket {
         this.forgetSocket(socket);
 
         if (settled) {
+          trace(this.device.log, 'Frame', `Socket lost after connecting: ${error.message}`);
           return;
         }
+
+        trace(this.device.log, 'Frame', `Connection failed after ${Date.now() - startedAt}ms: ${error.message}`);
 
         settled = true;
         clearTimeout(timer);
@@ -176,6 +191,7 @@ export class FrameSocket {
           this.handleDebug(response);
 
           if (response.event === 'ms.channel.connect' || response.event === 'ms.channel.ready') {
+            trace(this.device.log, 'Frame', `${response.event} after ${Date.now() - startedAt}ms`);
             this.id = response.data?.id || this.id || null;
             succeed();
             this.refreshArtMode();
@@ -220,6 +236,8 @@ export class FrameSocket {
         this.device.emit('frame:power', FrameEvent.STANDBY);
       } else if (data.event === 'wakeup') {
         this.device.emit('frame:power', FrameEvent.WAKEUP);
+      } else {
+        trace(this.device.log, 'Frame', `Other event: ${payload.slice(0, 300)}`);
       }
     } catch {}
   }
@@ -244,7 +262,10 @@ export class FrameSocket {
   private startHeartbeat() {
     clearTimeout(this.heartbeatTimeout);
 
-    this.heartbeatTimeout = setTimeout(() => this.disconnect(), HEARTBEAT_TIMEOUT);
+    this.heartbeatTimeout = setTimeout(() => {
+      trace(this.device.log, 'Frame', 'Heartbeat timeout, disconnecting');
+      this.disconnect();
+    }, HEARTBEAT_TIMEOUT);
   }
 
   public destroy(): void {

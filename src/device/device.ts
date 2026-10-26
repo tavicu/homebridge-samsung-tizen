@@ -4,7 +4,7 @@ import { Logging } from 'homebridge';
 import { FrameAccessory, SwitchAccessory, TelevisionAccessory } from '../accessories/index.js';
 import { Cache } from '../lib/cache.js';
 import { withSwitchIdentifiers } from '../lib/identifiers.js';
-import { createDeviceLogger } from '../lib/logger.js';
+import { createDeviceLogger, trace } from '../lib/logger.js';
 import { debounce } from '../lib/tools.js';
 import { SamsungPlatform } from '../platform.js';
 import { DeviceConfig, DeviceEvents, DeviceOptions, DeviceState, DeviceStorage, TizenApplication, TizenDeviceInfo } from '../types/index.js';
@@ -105,7 +105,11 @@ export class Device extends EventEmitter<DeviceEvents> {
       this.state.artmode = value;
     });
 
-    this.on('state:update', (prop) => {
+    this.on('state:update', (prop, value) => {
+      if (prop === 'artmode') {
+        trace(this.log, 'State', `artmode: ${value}`);
+      }
+
       if (prop === 'power') {
         this.controller.clearSleep();
       }

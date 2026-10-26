@@ -15,3 +15,11 @@ export function createDeviceLogger(log: Logging, name: string): Logging {
 
   return logger;
 }
+
+// Debug build: the Homebridge log only shows seconds, so every trace line carries its own time in milliseconds.
+export function trace(log: Logging, scope: string, message: string): void {
+  const now = new Date();
+  const time = `${now.toTimeString().slice(0, 8)}.${String(now.getMilliseconds()).padStart(3, '0')}`;
+
+  log.debug(`[Trace ${time}] [${scope}] ${message}`);
+}

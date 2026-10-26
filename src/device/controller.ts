@@ -1,5 +1,6 @@
 import { IgnorableError, TvAlreadyOffError, TvAlreadyOnError, TvOfflineError, TvPoweringError } from '../errors.js';
 import { request } from '../lib/http.js';
+import { trace } from '../lib/logger.js';
 import { parseCommands } from '../lib/parsers.js';
 import { isPortReachable, sleep } from '../lib/tools.js';
 import { wol } from '../lib/wol.js';
@@ -186,12 +187,21 @@ export class DeviceController {
   }
 
   public async setArtMode(value: boolean): Promise<void> {
+    trace(this.device.log, 'ArtMode', `Request ${value ? 'on' : 'off'} (power: ${this.device.power}, powering: ${this.power.isPowering}, artmode: ${this.device.artmode})`);
+
     if (!this.device.power && !this.power.isPowering) {
       await this.powerOn();
     }
 
     await this.waitPowering();
-    return this.frame.setArtMode(value);
+
+    try {
+      await this.frame.setArtMode(value);
+      trace(this.device.log, 'ArtMode', 'set_artmode_status sent');
+    } catch (error: any) {
+      trace(this.device.log, 'ArtMode', `set_artmode_status failed: ${error.message || error}`);
+      throw error;
+    }
   }
 
   public refreshArtMode(): void {
@@ -229,6 +239,8 @@ export class DeviceController {
     }
 
     const isSleeping = await this.ping();
+
+    trace(this.device.log, 'Power', `Power on with ${isSleeping ? 'KEY_POWER (port 8001 reachable)' : 'Wake-on-LAN (port 8001 not reachable)'}`);
 
     await this.power.withPowerLatch(true, async () => {
       if (isSleeping) {
