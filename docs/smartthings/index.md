@@ -8,6 +8,12 @@ Connect SmartThings when you want the features that Samsung only offers through 
 SmartThings is not local. Homebridge sends those requests to the SmartThings API, so the server needs internet access, and the features stop working while SmartThings is down.
 :::
 
+::: warning Paid API plan
+From December 15, 2026, Samsung requires a paid SmartThings API plan for every request to the SmartThings API. Without one, SmartThings answers `402 Payment Required` and the SmartThings features stop working. Everything else in the plugin keeps working on your local network.
+
+For personal use, the plan is the Developer Plan ($4.99 a month in the US). It is not available in every country yet. See [SmartThings API plans](https://developer.smartthings.com/smartthingsapi) for the price and where you can subscribe.
+:::
+
 Personal access tokens (`api_key` in version 5) are no longer accepted. You create your own SmartThings app once, enter its client ID and client secret in the plugin settings, and authorize it. After that the plugin refreshes the access token on its own.
 
 The setup has three parts:
@@ -23,6 +29,7 @@ Do not post `clientSecret`, tokens or an authorization code in a public issue or
 ## Before you start
 
 - The TV is added in the SmartThings app on your phone, and you can control it from there.
+- You subscribed to a [SmartThings API plan](https://developer.smartthings.com/console/service-integrations/manage-plans) with the same Samsung account. It is needed to create the app, and it includes 100,000 API calls a month. The limit is per account, so every app on that account shares it, Home Assistant for example. The plugin keeps its requests to SmartThings as few as it can.
 - You have a computer with a browser to run the SmartThings CLI. It does not have to be the Homebridge server. The CLI opens a browser window to sign in, so a headless server such as a Raspberry Pi without a desktop is not a good fit.
 
 ::: tip
@@ -61,7 +68,7 @@ Run:
 smartthings smartapps:create
 ```
 
-The first time, the CLI opens a browser window. Sign in with your Samsung account and allow the CLI to access it. Then go back to the terminal and answer the prompts:
+The first time, the CLI opens a browser window. Sign in with your Samsung account and allow the CLI to access it, then go back to the terminal. If your account has more than one organization, the CLI first asks which one to use: choose the one that has the API plan. Then answer the prompts:
 
 | Prompt                 | Answer                                                         |
 | :--------------------- | :------------------------------------------------------------- |
@@ -81,6 +88,10 @@ Select only `r:devices:*` and `x:devices:*`. The second one starts with `x:`, no
 In the scope list, press Space on each scope to select it, then Enter. For **Redirect URIs**, **Finish editing Redirect URIs** is preselected, so first move up to **Add Redirect URI**, enter the URL, then choose **Finish editing Redirect URIs**. For **CORS Domains**, choose **Finish editing CORS Domains** without adding any. Then choose **Finish and create API Access Smart App**.
 
 The CLI prints the **OAuth Client ID** and **OAuth Client Secret**. Copy both and keep them somewhere safe. You need them in the next step.
+
+::: tip The CLI says the app requires a paid plan
+`Creating or modifying a Smart App requires a paid plan` means the account you signed in with has no active SmartThings API plan. Subscribe from the link the CLI shows, then run the command again.
+:::
 
 ::: tip Lost the client secret?
 Run `smartthings smartapps:oauth:generate` and choose the app. SmartThings creates a new client ID and secret. Run the wizard in the plugin settings again with the new values.
