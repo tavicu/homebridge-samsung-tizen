@@ -44,7 +44,27 @@ const form = createForm({
   commands: [createCommand()],
 });
 
+// The name last filled from a picked source or app. The next pick replaces it, but never a name the user typed.
+let suggestedName = '';
+
+function suggestName(name) {
+  if (!form.name || form.name === suggestedName) {
+    form.name = name;
+    suggestedName = name;
+  }
+}
+
+// A name suggested for the previous type does not fit the new one.
+function clearSuggestedName() {
+  if (suggestedName && form.name === suggestedName) {
+    form.name = '';
+  }
+
+  suggestedName = '';
+}
+
 function fillForm(input = {}) {
+  suggestedName = '';
   form.name = input.name || '';
   form.type = input.type || '';
   form.valueInput = input.type === 'input' ? String(input.value || '') : '';
@@ -185,7 +205,7 @@ watch(
 
       <div class="mb-3">
         <label for="type" class="form-label">Input Type</label>
-        <select id="type" v-model="form.type" class="form-select" required>
+        <select id="type" v-model="form.type" class="form-select" required @change="clearSuggestedName">
           <option disabled value="">Choose input type ...</option>
           <option v-for="inputType in INPUT_TYPES" :key="inputType.id" :value="inputType.id">{{ inputType.name }}</option>
         </select>
@@ -198,7 +218,7 @@ watch(
 
       <div v-if="form.type === 'input'">
         <label for="value-input" class="form-label">Input Source</label>
-        <InputSourceSelect id="value-input" v-model="form.valueInput" :device-index="deviceIndex" placeholder="Choose input source ..." required />
+        <InputSourceSelect id="value-input" v-model="form.valueInput" :device-index="deviceIndex" placeholder="Choose input source ..." required @pick="suggestName" />
         <div class="invalid-feedback">Please choose an input source.</div>
         <SmartThingsNotice class="mt-2" :device-index="deviceIndex" />
       </div>
@@ -206,7 +226,7 @@ watch(
       <div v-if="form.type === 'app'">
         <label for="value-app" class="form-label">Application ID</label>
 
-        <ApplicationSelect id="value-app" v-model="form.valueApp" :device-index="deviceIndex" required />
+        <ApplicationSelect id="value-app" v-model="form.valueApp" :device-index="deviceIndex" required @pick="suggestName" />
         <div class="invalid-feedback">Please enter a valid application ID.</div>
         <small class="form-text text-muted">
           You can find a list of available application IDs in the

@@ -24,6 +24,8 @@ const props = defineProps({
   },
 });
 
+const emit = defineEmits(['pick']);
+
 const { config } = useConfig();
 const { getInputSources } = useSmartThings();
 const sources = ref([]);
@@ -48,10 +50,19 @@ watch(
   },
   { immediate: true },
 );
+
+// Only a choice the user makes, so the form can suggest its name.
+function onChange(event) {
+  const source = [...grouped.value.available, ...grouped.value.other].find((item) => item.id === event.target.value);
+
+  if (source) {
+    emit('pick', source.label || source.name);
+  }
+}
 </script>
 
 <template>
-  <select v-model="value" class="form-select" :required="required">
+  <select v-model="value" class="form-select" :required="required" @change="onChange">
     <option value="" :disabled="required">{{ placeholder }}</option>
     <template v-if="grouped.available.length">
       <optgroup label="Available">

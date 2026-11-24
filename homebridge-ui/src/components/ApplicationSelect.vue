@@ -22,6 +22,8 @@ const props = defineProps({
   },
 });
 
+const emit = defineEmits(['pick']);
+
 const apps = useApps(() => props.deviceIndex);
 
 const appSelect = computed({
@@ -30,6 +32,12 @@ const appSelect = computed({
   },
   set(selected) {
     value.value = selected === 'other' ? '' : selected;
+
+    const app = apps.value.find((item) => String(item.id) === selected);
+
+    if (app) {
+      emit('pick', app.name);
+    }
   },
 });
 </script>

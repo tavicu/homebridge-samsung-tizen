@@ -41,9 +41,13 @@ export function groupInputSources(sources = [], currentValue = '') {
       return { id: item.id, name: DIGITAL_TV_NAME };
     }
 
+    // The TV reports what is plugged in (e.g. "PlayStation 5") or only the id, which the default name says better.
+    const label = item.name === item.id ? DEFAULT_INPUT_SOURCES.find((source) => source.id === item.id)?.name || item.name : item.name;
+
     return {
       id: item.id,
       name: item.name.includes('(') || item.name === item.id ? item.name : `${item.name} (${item.id})`,
+      label,
     };
   });
 
