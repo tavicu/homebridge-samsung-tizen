@@ -375,6 +375,9 @@ export class SmartThingsClient {
           soundMode: parseStateValue(soundModeSource?.soundMode),
         };
       } catch (error: any) {
+        // A failed read waits like a successful one, instead of being sent and logged again on every poll.
+        this.lastUpdate = Date.now();
+
         // Rejected authorization and 402 make SmartThings unavailable, and the manager already logged why.
         if (this.isAvailable) {
           this.device.log.error(`[SmartThings] Error updating status for device ${this.device.config.name}`, error);
