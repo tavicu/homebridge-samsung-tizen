@@ -378,10 +378,13 @@ export class SmartThingsClient {
         // A failed read waits like a successful one, instead of being sent and logged again on every poll.
         this.lastUpdate = Date.now();
 
-        // Rejected authorization and 402 make SmartThings unavailable, and the manager already logged why.
-        if (this.isAvailable) {
+        if (error.cause?.status === 403) {
+          // The TV is no longer in the SmartThings account, for example while it is removed and added again.
+          this.device.log.warn('[SmartThings] SmartThings no longer gives access to this TV. Check if it is still available in the SmartThings app.');
+        } else if (this.isAvailable) {
           this.device.log.error(`[SmartThings] Error updating status for device ${this.device.config.name}`, error);
         } else {
+          // Rejected authorization and 402 make SmartThings unavailable, and the manager already logged why.
           this.device.log.debug(`[SmartThings] Error updating status for device ${this.device.config.name}: ${error.message}`);
         }
       } finally {
