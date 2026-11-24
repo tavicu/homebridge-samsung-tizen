@@ -52,6 +52,7 @@ Several behaviors described below look like bugs when the code is read on its ow
 - Protocols do not touch HomeKit. They emit events on the `Device` (`ssdp:update`, `upnp:update`, `frame:artmode`, `frame:power`, `apps:update`, `paired`), and `Device` / `PowerMonitor` turn them into state.
 - `paired` fires once the plugin has a token: at startup when one is stored, otherwise after the user allows the pairing prompt on the TV. Pairing is tried while the TV is on and retried every time it turns on. The poller and the Frame socket start after `paired`, and the Frame switches are created then if the TV was not known as a Frame yet.
 - `Cache` (`lib/cache.ts`) dedupes and caches TV reads for a short time (device info 2.5 s, app state 3 s) and is flushed on every power change. SmartThings status is cached 2.5 s on its own.
+- SmartThings answers 402 Payment Required when the account has no paid API plan, while the token still refreshes. A 402 pauses SmartThings for 1 hour for every TV (`isAvailable` false, one warning per pause), so reads stop and actions fall back to the local way where there is one.
 
 ## HomeKit gets an answer within 2.5 s
 

@@ -18,6 +18,7 @@ const OAUTH_TOKEN_URL = 'https://api.smartthings.com/oauth/token';
 const MAX_STATE_AGE = 24 * 60 * 60 * 1000;
 const REQUEST_TIMEOUT = 5 * 1000;
 const RETRY_DELAYS = [60 * 1000, 5 * 60 * 1000, 15 * 60 * 1000, 30 * 60 * 1000, 60 * 60 * 1000];
+const PAYMENT_PAUSE = 60 * 60 * 1000;
 
 function parseStateValue(attr?: SmartThingsAttribute): string | null {
   const value = attr?.value || null;
@@ -46,6 +47,7 @@ export class SmartThingsManager {
   private clientSecret: string | undefined;
 
   private available = false;
+  private pausedUntil = 0;
 
   private refreshPromise: Promise<void> | null = null;
   private refreshTimer: NodeJS.Timeout | null = null;
@@ -57,6 +59,11 @@ export class SmartThingsManager {
   }
 
   public get isAvailable(): boolean {
+    // Checked first: the token is still valid while paused, so the reload below would make SmartThings available again.
+    if (Date.now() < this.pausedUntil) {
+      return false;
+    }
+
     // A new authorization from the configuration interface comes with a valid token
     if (!this.available && this.storage) {
       void this.storage.reload().then(() => this.hasValidToken() && this.authenticate());
@@ -193,6 +200,20 @@ export class SmartThingsManager {
     this.platform.log.debug('[SmartThings] Access token refreshed successfully');
   }
 
+  // 402 Payment Required applies to the whole account, so every request for every TV would get it until a plan is active.
+  private pauseForPayment(): void {
+    // Requests that were already on their way get a 402 too.
+    if (Date.now() < this.pausedUntil) {
+      return;
+    }
+
+    this.pausedUntil = Date.now() + PAYMENT_PAUSE;
+    this.platform.log.warn(
+      '[SmartThings] SmartThings answered 402 Payment Required, which Samsung returns when the account has no active SmartThings API plan. ' +
+        'SmartThings is paused for 1 hour and everything else keeps working on the local network. Restart Homebridge to try again sooner.',
+    );
+  }
+
   public async send<T>(config: SmartThingsRequestConfig, isRetry = false): Promise<T> {
     if (!this.isAvailable) {
       throw new SmartThingsNotAvailable();
@@ -225,6 +246,10 @@ export class SmartThingsManager {
       if (error.status === 401 && !isRetry) {
         await this.refreshToken();
         return this.send<T>(config, true);
+      }
+
+      if (error.status === 402) {
+        this.pauseForPayment();
       }
 
       const apiError = error.data?.error;
@@ -324,8 +349,13 @@ export class SmartThingsClient {
           pictureMode: parseStateValue(pictureModeSource?.pictureMode),
           soundMode: parseStateValue(soundModeSource?.soundMode),
         };
-      } catch (error) {
-        this.device.log.error(`[SmartThings] Error updating status for device ${this.device.config.name}`, error);
+      } catch (error: any) {
+        // Rejected authorization and 402 make SmartThings unavailable, and the manager already logged why.
+        if (this.isAvailable) {
+          this.device.log.error(`[SmartThings] Error updating status for device ${this.device.config.name}`, error);
+        } else {
+          this.device.log.debug(`[SmartThings] Error updating status for device ${this.device.config.name}: ${error.message}`);
+        }
       } finally {
         this.updatePromise = null;
       }
