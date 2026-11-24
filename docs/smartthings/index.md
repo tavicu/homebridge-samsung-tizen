@@ -49,36 +49,41 @@ On Linux or any system with Node.js:
 npm install --global @smartthings/cli
 ```
 
+::: warning CLI version 3.0 or later
+The commands below need version 3.0 of the CLI or later, released in November 2026. Older versions only have `smartthings apps:create`, which SmartThings replaced. If you installed the CLI before, update it: `brew upgrade smartthings` on macOS, the latest `smartthings.msi` on Windows, or the same `npm install` command again.
+:::
+
 ### Create the app
 
 Run:
 
 ```bash
-smartthings apps:create
+smartthings smartapps:create
 ```
 
 The first time, the CLI opens a browser window. Sign in with your Samsung account and allow the CLI to access it. Then go back to the terminal and answer the prompts:
 
-| Prompt             | Answer                                                          |
-| :----------------- | :-------------------------------------------------------------- |
-| **App Type**       | `OAuth-In App`                                                  |
-| **Display Name**   | `Homebridge Samsung-Tizen` (any name is fine)                   |
-| **Description**    | `Monitor and control Samsung Smart TVs via SmartThings API`     |
-| **Icon Image URL** | Leave empty                                                     |
-| **Target URL**     | `https://tavicu.github.io/homebridge-samsung-tizen/token.html`  |
-| **Scopes**         | Only `r:devices:*` and `x:devices:*`                            |
-| **Redirect URI**   | `https://tavicu.github.io/homebridge-samsung-tizen/token.html`  |
+| Prompt                 | Answer                                                         |
+| :--------------------- | :------------------------------------------------------------- |
+| **Display Name**       | `Homebridge Samsung-Tizen` (any name is fine)                  |
+| **Description**        | `Monitor and control Samsung Smart TVs via SmartThings API`    |
+| **Icon Image URL**     | Leave empty                                                    |
+| **Target URL**         | `https://tavicu.github.io/homebridge-samsung-tizen/token.html` |
+| **Privacy Policy URL** | Leave empty                                                    |
+| **Scopes**             | Only `r:devices:*` and `x:devices:*`                           |
+| **Redirect URIs**      | `https://tavicu.github.io/homebridge-samsung-tizen/token.html` |
+| **CORS Domains**       | Leave empty                                                    |
 
 ::: warning Scopes
 Select only `r:devices:*` and `x:devices:*`. The second one starts with `x:`, not `w:`. The plugin only reads the TV status and sends commands. It does not need any other access to your account.
 :::
 
-When you have added the Redirect URI, choose **Finish editing Redirect URIs**, then **Finish and create OAuth-In SmartApp**.
+In the scope list, press Space on each scope to select it, then Enter. For **Redirect URIs**, **Finish editing Redirect URIs** is preselected, so first move up to **Add Redirect URI**, enter the URL, then choose **Finish editing Redirect URIs**. For **CORS Domains**, choose **Finish editing CORS Domains** without adding any. Then choose **Finish and create API Access Smart App**.
 
 The CLI prints the **OAuth Client ID** and **OAuth Client Secret**. Copy both and keep them somewhere safe. You need them in the next step.
 
 ::: tip Lost the client secret?
-Run `smartthings apps:oauth:generate` and choose the app. SmartThings creates a new client ID and secret. Run the wizard in the plugin settings again with the new values.
+Run `smartthings smartapps:oauth:generate` and choose the app. SmartThings creates a new client ID and secret. Run the wizard in the plugin settings again with the new values.
 :::
 
 ## Connect from Homebridge UI
@@ -180,7 +185,7 @@ The code was wrong, expired, or already used. Choose **Try again** and use a fre
 
 If it keeps failing, check the app you created:
 
-- **App Type** is `OAuth-In App`.
+- The app is on the Samsung account you sign in with. `smartthings smartapps` lists the apps on your account.
 - **Redirect URI** is exactly `https://tavicu.github.io/homebridge-samsung-tizen/token.html`. If you used another one, enter it under **Advanced settings** in the first step of the wizard.
 - The client ID and secret belong to that app. If you generated new ones, use the new pair.
 
