@@ -74,7 +74,7 @@ So "the plugin answers HomeKit before the TV has finished" and "the timeout hide
 - A command latches the expected power (`withPowerLatch`): 3 s, or 20 s for power off without `PowerState`. While latched, reports that disagree are ignored, commands wait for the latch with `waitPowering()`, and another power command gets `TvPoweringError`. A failed action reverts the latch.
 - Frame events take priority over SSDP for 2 s.
 - Power on: port 8001 reachable → the TV is in standby, send `KEY_POWER` on the remote socket. Not reachable → the TV is fully off (deep sleep), send Wake-on-LAN.
-- Power off: Frame with SmartThings → SmartThings; Frame without it → hold `KEY_POWER` 3.5 s (a short press only toggles Art Mode); other TVs → `KEY_POWER`.
+- Power off: Frame with SmartThings → SmartThings; Frame without it, or when SmartThings fails with anything but a timeout (402 without a paid API plan, no internet) → hold `KEY_POWER` 3.5 s (a short press only toggles Art Mode); other TVs → `KEY_POWER`.
 
 ## Inputs, switches, volume
 
@@ -82,7 +82,7 @@ So "the plugin answers HomeKit before the TV has finished" and "the timeout hide
 - An app counts as active when the REST API reports it `visible`. SmartThings reports an app as a channel name with a dot, which is not treated as a source, and ignores state older than 24 h.
 - Custom switches combine options (`power`, `sleep`, `mute`, `volume`, `app`, `input`, `channel`, `picture_mode`, `sound_mode`, `command`), run in order. A switch wakes the TV only when `power` is set. Without it, turning it on while the TV is off turns it back off with a warning. Turning a switch off only acts on `mute` and `sleep`, the others have no matching TV action. A switch with nothing to read back (only `command`, `volume` or `power`) snaps back off after 500 ms.
 - Command syntax (`lib/parsers.ts`): a comma list of keys, `KEY*3` repeats, `KEY*2.5s` holds, `DELAY*2s` pauses. Keys are sent 400 ms apart. `keys` in the config overrides the remote keys used in Control Center (`lib/remote.ts`).
-- Channels use SmartThings when available, otherwise the digits and `KEY_ENTER`.
+- Channels use SmartThings when available, otherwise (or when it fails) the digits and `KEY_ENTER`.
 - The sleep timer runs inside the plugin (`setTimeout`). It is cleared on every power change and does not survive a Homebridge restart.
 - Samsung TVs report mute when they go to standby, so mute switches and the volume slider stay off while the TV is off.
 - Volume in HomeKit is absolute 0-100 (UPnP). The Control Center volume buttons send `KEY_VOLUP`/`KEY_VOLDOWN`. `Volume.Slider.Enable` adds a Lightbulb whose brightness is the volume and whose on/off follows mute, for scenes and automations. Changes to it while the TV is off are ignored.

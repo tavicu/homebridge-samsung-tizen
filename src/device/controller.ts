@@ -1,5 +1,5 @@
 import { IgnorableError, TvAlreadyOffError, TvAlreadyOnError, TvOfflineError, TvPoweringError } from '../errors.js';
-import { request } from '../lib/http.js';
+import { isTimeout, request } from '../lib/http.js';
 import { parseCommands } from '../lib/parsers.js';
 import { isPortReachable, sleep } from '../lib/tools.js';
 import { wol } from '../lib/wol.js';
@@ -158,13 +158,18 @@ export class DeviceController {
     }
 
     if (this.smartthings.isAvailable) {
-      await this.smartthings.setTvChannel(channel);
-    } else {
-      const commands = channelStr.split('').map((char) => `KEY_${char}`);
-      commands.push('KEY_ENTER');
-
-      await this.device.sendCommand(commands);
+      try {
+        return await this.smartthings.setTvChannel(channel);
+      } catch (error: any) {
+        // Typing the number again is harmless even if SmartThings did change the channel.
+        this.device.log.warn(`[SmartThings] Could not change the channel (${error.message}). Sending the number keys instead.`);
+      }
     }
+
+    const commands = channelStr.split('').map((char) => `KEY_${char}`);
+    commands.push('KEY_ENTER');
+
+    await this.device.sendCommand(commands);
   }
 
   public async getApplication(appId: string | number): Promise<TizenApplication> {
@@ -250,9 +255,18 @@ export class DeviceController {
       throw new TvAlreadyOffError();
     }
 
-    const action = () => {
+    const action = async () => {
       if (this.device.isFrame && this.smartthings.isAvailable) {
-        return this.smartthings.setPower(false);
+        try {
+          return await this.smartthings.setPower(false);
+        } catch (error: any) {
+          // After a timeout the TV may already be going to standby, where KEY_POWER would wake it.
+          if (isTimeout(error)) {
+            throw error;
+          }
+
+          this.device.log.warn(`[SmartThings] Could not power off the TV (${error.message}). Holding the power key instead.`);
+        }
       }
 
       if (this.device.isFrame) {

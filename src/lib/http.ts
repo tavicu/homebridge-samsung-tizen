@@ -15,6 +15,17 @@ const parseBody = (text: string): unknown => {
   }
 };
 
+// A timed out request may still have reached the server, unlike a refused or failed one.
+export const isTimeout = (error: any): boolean => {
+  for (let current = error; current; current = current.cause) {
+    if (current.name === 'TimeoutError') {
+      return true;
+    }
+  }
+
+  return false;
+};
+
 export const request = async <T>(url: string, { timeout, ...init }: RequestOptions = {}): Promise<T> => {
   let response: Response;
   let text: string;
