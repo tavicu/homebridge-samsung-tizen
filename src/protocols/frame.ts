@@ -1,21 +1,14 @@
 import WsClient, { RawData } from 'ws';
 import { Device } from '../device/index.js';
+import { trace } from '../lib/logger.js';
 import { sleep, throttle } from '../lib/tools.js';
 import { FrameEvent } from '../types/index.js';
 
 const HEARTBEAT_TIMEOUT = 8 * 1000; // 6 ping + 2 for safety
 const CONNECTION_TIMEOUT = 30 * 1000;
 const ART_MODE_TTL = 2500;
-const DEBUG_EVENTS = new Set([
-  'ms.channel.connect',
-  'ms.channel.ready',
-  'ms.channel.unauthorized',
-  'get_artmode_status',
-  'artmode_status',
-  'art_mode_changed',
-  'go_to_standby',
-  'wakeup',
-]);
+// Debug build (#791): read-only requests sent once per connection, to see which parts of the art-app API the TV answers.
+const PROBE_REQUESTS = ['get_api_version', 'api_version', 'get_device_info', 'get_artmode_status'];
 
 export class FrameSocket {
   private ws: WsClient | null = null;
@@ -31,6 +24,8 @@ export class FrameSocket {
     this.url = `wss://${this.device.config.ip}:8002/api/v2/channels/com.samsung.art-app?name=${this.name}`;
 
     this.device.once('paired', () => {
+      trace(this.device.log, 'Frame', `Paired, Frame support: ${this.isSupported}`);
+
       if (!this.isSupported) {
         return;
       }
@@ -42,7 +37,7 @@ export class FrameSocket {
   }
 
   public get isSupported(): boolean {
-    return !!this.device.storage.frameSupport;
+    return this.device.isFrame;
   }
 
   public start(): void {
@@ -71,6 +66,7 @@ export class FrameSocket {
     }
 
     if (!this.device.power) {
+      trace(this.device.log, 'Frame', `${request} not sent: TV is not powered on`);
       throw new Error('TV is not powered on');
     }
 
@@ -80,6 +76,7 @@ export class FrameSocket {
 
     return new Promise((resolve, reject) => {
       if (this.ws?.readyState !== WsClient.OPEN) {
+        trace(this.device.log, 'Frame', `${request} not sent: socket is not open`);
         return reject(new Error('Socket is not open'));
       }
 
@@ -98,7 +95,15 @@ export class FrameSocket {
         },
       });
 
-      this.ws.send(payload, () => resolve());
+      trace(this.device.log, 'Frame', `Send: ${data}`);
+
+      this.ws.send(payload, (error) => {
+        if (error) {
+          trace(this.device.log, 'Frame', `${request} write failed: ${error.message}`);
+        }
+
+        resolve();
+      });
     });
   }
 
@@ -114,6 +119,7 @@ export class FrameSocket {
     this.connectionPromise = this.connect()
       .then(async () => {
         await sleep(250);
+        this.probe();
       })
       .finally(() => {
         this.connectionPromise = null;
@@ -122,8 +128,17 @@ export class FrameSocket {
     return this.connectionPromise;
   }
 
+  private probe(): void {
+    for (const request of PROBE_REQUESTS) {
+      this.send(request).catch((error) => trace(this.device.log, 'Frame', `Probe ${request} failed: ${error.message}`));
+    }
+  }
+
   private connect(): Promise<void> {
     this.disconnect();
+
+    const startedAt = Date.now();
+    trace(this.device.log, 'Frame', 'Connecting');
 
     const socket = new WsClient(`${this.url}&token=${this.device.storage.token || ''}`, {
       servername: '',
@@ -139,8 +154,11 @@ export class FrameSocket {
         this.forgetSocket(socket);
 
         if (settled) {
+          trace(this.device.log, 'Frame', `Socket lost after connecting: ${error.message}`);
           return;
         }
+
+        trace(this.device.log, 'Frame', `Connection failed after ${Date.now() - startedAt}ms: ${error.message}`);
 
         settled = true;
         clearTimeout(timer);
@@ -163,7 +181,11 @@ export class FrameSocket {
         fail(new Error('Timeout: TV accepted socket but never sent ready event'));
       }, CONNECTION_TIMEOUT);
 
-      socket.on('close', () => fail(new Error('Socket closed during connection')));
+      socket.on('open', () => trace(this.device.log, 'Frame', `WebSocket open after ${Date.now() - startedAt}ms`));
+      socket.on('close', (code, reason) => {
+        trace(this.device.log, 'Frame', `Socket closed (code ${code}${reason?.length ? `, reason ${reason.toString()}` : ''})`);
+        fail(new Error('Socket closed during connection'));
+      });
       socket.on('error', fail);
       socket.on('ping', () => this.startHeartbeat());
 
@@ -176,6 +198,7 @@ export class FrameSocket {
           this.handleDebug(response);
 
           if (response.event === 'ms.channel.connect' || response.event === 'ms.channel.ready') {
+            trace(this.device.log, 'Frame', `${response.event} after ${Date.now() - startedAt}ms`);
             this.id = response.data?.id || this.id || null;
             succeed();
             this.refreshArtMode();
@@ -187,11 +210,14 @@ export class FrameSocket {
             this.device.log.error('[Frame] TV rejected the WebSocket connection (unauthorized)');
             fail(new Error(`Failed to open socket (${response.event})`));
           }
-        } catch {}
+        } catch {
+          trace(this.device.log, 'Frame', `Message that is not JSON: ${data.toString().slice(0, 500)}`);
+        }
       });
     });
   }
 
+  // Debug build (#791): every message from the art-app channel, not only the known events.
   private handleDebug(response: any): void {
     let data = response?.data;
 
@@ -199,11 +225,7 @@ export class FrameSocket {
       data = JSON.parse(data);
     } catch {}
 
-    const payload = DEBUG_EVENTS.has(data?.event) ? data : response;
-
-    if (DEBUG_EVENTS.has(payload.event)) {
-      this.device.log.debug('[Frame]', JSON.stringify(payload));
-    }
+    trace(this.device.log, 'Frame', `Received ${response?.event}: ${JSON.stringify(data ?? null).slice(0, 1000)}`);
   }
 
   private handleMessage(payload: string): void {
@@ -244,7 +266,10 @@ export class FrameSocket {
   private startHeartbeat() {
     clearTimeout(this.heartbeatTimeout);
 
-    this.heartbeatTimeout = setTimeout(() => this.disconnect(), HEARTBEAT_TIMEOUT);
+    this.heartbeatTimeout = setTimeout(() => {
+      trace(this.device.log, 'Frame', 'Heartbeat timeout, disconnecting');
+      this.disconnect();
+    }, HEARTBEAT_TIMEOUT);
   }
 
   public destroy(): void {

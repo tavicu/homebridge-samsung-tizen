@@ -128,8 +128,22 @@ export class Device extends EventEmitter<DeviceEvents> {
   }
 
   public get isFrame(): boolean {
-    return !!this.storage.frameSupport;
+    return !!this.storage.frameSupport || this.isForcedFrame;
   }
+
+  // Debug build (#791): the S95H reports FrameTVSupport false but has Art Mode, so it is treated as a Frame to see if it answers the art-app API.
+  private get isForcedFrame(): boolean {
+    const forced = /S95H/i.test(this.storage.model || '');
+
+    if (forced && !this.forcedFrameLogged) {
+      this.forcedFrameLogged = true;
+      this.log.debug(`[Debug] Frame support forced for ${this.storage.model} (FrameTVSupport reported: ${this.storage.frameSupport})`);
+    }
+
+    return forced;
+  }
+
+  private forcedFrameLogged = false;
 
   public getInfo(): Promise<TizenDeviceInfo> {
     return this.controller.getInfo();

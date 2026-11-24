@@ -1,5 +1,6 @@
 import { IgnorableError, TvAlreadyOffError, TvAlreadyOnError, TvOfflineError, TvPoweringError } from '../errors.js';
 import { isTimeout, request } from '../lib/http.js';
+import { trace } from '../lib/logger.js';
 import { parseCommands } from '../lib/parsers.js';
 import { isPortReachable, sleep } from '../lib/tools.js';
 import { wol } from '../lib/wol.js';
@@ -191,12 +192,19 @@ export class DeviceController {
   }
 
   public async setArtMode(value: boolean): Promise<void> {
+    trace(this.device.log, 'Frame', `Art Mode ${value ? 'on' : 'off'} requested (power: ${this.device.power}, artmode: ${this.device.artmode})`);
+
     if (!this.device.power && !this.power.isPowering) {
       await this.powerOn();
     }
 
     await this.waitPowering();
-    return this.frame.setArtMode(value);
+
+    // Errors after the 2.5 s race are swallowed, so log them here.
+    return this.frame.setArtMode(value).catch((error) => {
+      trace(this.device.log, 'Frame', `Art Mode ${value ? 'on' : 'off'} failed: ${error.message}`);
+      throw error;
+    });
   }
 
   public refreshArtMode(): void {
@@ -270,9 +278,11 @@ export class DeviceController {
       }
 
       if (this.device.isFrame) {
+        trace(this.device.log, 'Power', 'Power off: holding KEY_POWER 3.5s');
         return this.ws.hold('KEY_POWER', 3500);
       }
 
+      trace(this.device.log, 'Power', 'Power off: KEY_POWER');
       return this.ws.click('KEY_POWER');
     };
 
