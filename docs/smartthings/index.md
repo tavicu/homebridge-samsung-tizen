@@ -204,6 +204,18 @@ If it keeps failing, check the app you created:
 
 The token is no longer accepted. The plugin refreshes it and repeats the request once. If the log still shows `[SmartThings] Authorization was rejected`, run the wizard again.
 
+### SmartThings returns 402
+
+`[SmartThings] 402 Payment Required` in the log means SmartThings refuses every request from the account. The answer does not say why, but it is one of these:
+
+- The account has no active SmartThings API plan, or the payment for it did not go through.
+- The plan's monthly limit of API calls is used up. The limit is per account, so every app on that account counts, Home Assistant for example.
+- The plan is on a different Samsung account than the one you created the app with and authorized.
+
+Check the plan and the API usage in the [Developer Center](https://developer.smartthings.com/console/service-integrations).
+
+The plugin pauses SmartThings for 1 hour for every TV and then tries again. Restart Homebridge to try sooner, for example right after you subscribe. Everything that runs on the local network keeps working, and while SmartThings is paused, a Frame is powered off and channels are changed the local way.
+
 ### SmartThings returns 403
 
 The app is missing `r:devices:*` or `x:devices:*`, or the `deviceId` on the TV is not a device on the account you authorized. Edit the TV and pick it again from the list.
