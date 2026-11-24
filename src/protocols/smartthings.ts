@@ -19,6 +19,8 @@ const MAX_STATE_AGE = 24 * 60 * 60 * 1000;
 const REQUEST_TIMEOUT = 5 * 1000;
 const RETRY_DELAYS = [60 * 1000, 5 * 60 * 1000, 15 * 60 * 1000, 30 * 60 * 1000, 60 * 60 * 1000];
 const PAYMENT_PAUSE = 60 * 60 * 1000;
+// A status read is two API calls (refresh, then status), and the paid plan has a monthly call limit.
+const STATUS_INTERVAL = 60 * 1000;
 
 function parseStateValue(attr?: SmartThingsAttribute): string | null {
   const value = attr?.value || null;
@@ -276,6 +278,7 @@ export class SmartThingsClient {
   private soundModes: SmartThingsModeMap[] = [];
 
   private lastUpdate = 0;
+  private lastCommand = 0;
   private updatePromise: Promise<SmartThingsClientState> | null = null;
 
   constructor(
@@ -289,6 +292,13 @@ export class SmartThingsClient {
     const apiBaseUrl = `https://api.smartthings.com/v1/devices/${this.deviceId}`;
     this.apiStatusUrl = `${apiBaseUrl}/status`;
     this.apiCommandUrl = `${apiBaseUrl}/commands`;
+
+    // The source and modes may have changed while the TV was off.
+    this.device.on('state:update', (prop) => {
+      if (prop === 'power') {
+        this.lastUpdate = 0;
+      }
+    });
   }
 
   public get isAvailable(): boolean {
@@ -314,12 +324,19 @@ export class SmartThingsClient {
     return this.command({ capability: 'refresh', command: 'refresh' });
   }
 
+  // Counts as a read: one right after the command could still get the old value from the TV and keep it for a minute.
+  private keep(changes: Partial<SmartThingsClientState>): void {
+    this.state = { ...this.state, ...changes };
+    this.lastCommand = Date.now();
+    this.lastUpdate = Date.now();
+  }
+
   public async getStatus(): Promise<SmartThingsClientState> {
     if (!this.isAvailable) {
       return this.state;
     }
 
-    if (Date.now() - this.lastUpdate < 2500) {
+    if (Date.now() - this.lastUpdate < STATUS_INTERVAL) {
       return this.state;
     }
 
@@ -328,9 +345,17 @@ export class SmartThingsClient {
     }
 
     this.updatePromise = (async () => {
+      const startedAt = Date.now();
+
       try {
         await this.refresh();
         const response = await this.send<SmartThingsDeviceStatus>({ endpoint: this.apiStatusUrl });
+
+        // A command sent while this read was running changed the TV after the status was taken.
+        if (this.lastCommand >= startedAt) {
+          return this.state;
+        }
+
         const main = response.components?.main;
         const mediaInputSource = main?.['samsungvd.mediaInputSource'] || main?.mediaInputSource;
         const pictureModeSource = main?.['custom.picturemode'];
@@ -437,23 +462,29 @@ export class SmartThingsClient {
     return this.command({ capability: 'switch', command: value ? 'on' : 'off' });
   }
 
-  public setInputSource(value: string): Promise<void> {
-    return this.command({ capability: 'samsungvd.mediaInputSource', command: 'setInputSource', arguments: [value] });
+  public async setInputSource(value: string): Promise<void> {
+    await this.command({ capability: 'samsungvd.mediaInputSource', command: 'setInputSource', arguments: [value] });
+    this.keep({ inputSource: value, tvChannelName: null });
   }
 
-  public setPictureMode(value: string): Promise<void> {
+  public async setPictureMode(value: string): Promise<void> {
     const pictureMode = this.pictureModes.find((mode) => mode.id === value)?.name || value;
 
-    return this.command({ capability: 'custom.picturemode', command: 'setPictureMode', arguments: [pictureMode] });
+    await this.command({ capability: 'custom.picturemode', command: 'setPictureMode', arguments: [pictureMode] });
+    this.keep({ pictureMode });
   }
 
-  public setSoundMode(value: string): Promise<void> {
+  public async setSoundMode(value: string): Promise<void> {
     const soundMode = this.soundModes.find((mode) => mode.id === value)?.name || value;
 
-    return this.command({ capability: 'custom.soundmode', command: 'setSoundMode', arguments: [soundMode] });
+    await this.command({ capability: 'custom.soundmode', command: 'setSoundMode', arguments: [soundMode] });
+    this.keep({ soundMode });
   }
 
-  public setTvChannel(value: string | number): Promise<void> {
-    return this.command({ capability: 'tvChannel', command: 'setTvChannel', arguments: [value + ''] });
+  public async setTvChannel(value: string | number): Promise<void> {
+    await this.command({ capability: 'tvChannel', command: 'setTvChannel', arguments: [value + ''] });
+
+    // Changing the channel moves the TV to the tuner.
+    this.keep({ inputSource: 'dtv', tvChannel: value + '', tvChannelName: null });
   }
 }
