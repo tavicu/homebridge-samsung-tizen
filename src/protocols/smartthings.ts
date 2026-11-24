@@ -467,7 +467,9 @@ export class SmartThingsClient {
 
   public async setInputSource(value: string): Promise<void> {
     await this.command({ capability: 'samsungvd.mediaInputSource', command: 'setInputSource', arguments: [value] });
-    this.keep({ inputSource: value, tvChannelName: null });
+
+    // The tuner's channel comes with the next read, and without one the tuner would not count as the selected input.
+    this.keep({ inputSource: value, tvChannel: this.state.tvChannel || 'unknown', tvChannelName: null });
   }
 
   public async setPictureMode(value: string): Promise<void> {
