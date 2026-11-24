@@ -202,7 +202,7 @@ export class SmartThingsManager {
     this.platform.log.debug('[SmartThings] Access token refreshed successfully');
   }
 
-  // 402 Payment Required applies to the whole account, so every request for every TV would get it until a plan is active.
+  // 402 Payment Required applies to the whole account, so every request for every TV would get it until a plan is active or its monthly quota resets.
   private pauseForPayment(): void {
     // Requests that were already on their way get a 402 too.
     if (Date.now() < this.pausedUntil) {
@@ -211,8 +211,8 @@ export class SmartThingsManager {
 
     this.pausedUntil = Date.now() + PAYMENT_PAUSE;
     this.platform.log.warn(
-      '[SmartThings] SmartThings answered 402 Payment Required, which Samsung returns when the account has no active SmartThings API plan. ' +
-        'SmartThings is paused for 1 hour and everything else keeps working on the local network. Restart Homebridge to try again sooner.',
+      '[SmartThings] 402 Payment Required: no active API plan, or its monthly call limit is used up (see https://developer.smartthings.com/console/service-integrations). ' +
+        'SmartThings is paused for 1 hour.',
     );
   }
 
