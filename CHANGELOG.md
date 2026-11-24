@@ -1,5 +1,16 @@
 # Change Log
 
+## 6.2.0
+
+**Improved**
+
+- **Fewer SmartThings requests.** The plugin now reads SmartThings much less often. From December 15, 2026, Samsung requires a paid SmartThings API plan, which has a monthly limit of API calls per account, shared by every app on that account. A single TV used to come close to it.
+- **402 Payment Required.** SmartThings answers 402 when the account has no active API plan or its monthly call limit is used up. The plugin now pauses SmartThings for 1 hour for every TV and writes one warning with a link to check the plan and usage, instead of an error on every poll. Everything that works on the local network keeps working.
+- **Local fallback.** When SmartThings fails, for example without a paid plan or without internet, The Frame is turned off by holding the power key and channels are changed by typing the number, instead of leaving the TV on or the channel unchanged.
+- **Clearer SmartThings errors.** A TV that is removed from SmartThings and added again gets a 403 for a while. The log now shows a short warning to check that the TV is still in the SmartThings app, instead of an error with a stack trace, and a failed read is no longer repeated and logged on every poll.
+- **Input names in the settings.** When you pick a source or an app for an input with an empty name, the settings fill in its name, such as the device the TV reports on an HDMI port, or HDMI 2 when it only reports the id. A name you typed is never replaced.
+- Dependencies were updated to their latest compatible versions.
+
 ## 6.1.0
 
 **New**
