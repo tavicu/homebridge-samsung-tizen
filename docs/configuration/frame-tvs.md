@@ -4,6 +4,19 @@ A Frame is detected automatically when the plugin pairs with the TV. You do not 
 
 Samsung does not allow a full power off through the local API. When SmartThings is connected and the TV has a `deviceId`, turning the Frame fully off uses SmartThings. Without it, the plugin holds the power key. Newer Frames only switch Art Mode on that hold, so a full power off may not work until SmartThings is set up. See [SmartThings features](/smartthings/features.md#frame-power-off).
 
+::: tip Other TVs with Art Mode
+Some TVs that are not a Frame also have Art Mode, such as the S95H, but the TV does not report it, so the plugin does not detect it. Add `Frame.Enable` to the TV's `options` in `config.json` to treat it as a Frame. Everything on this page then applies to that TV.
+
+```json
+{
+  "name": "S95H",
+  "ip": "10.20.30.40",
+  "mac": "A0:B1:C2:D3:E4:F5",
+  "options": ["Frame.Enable"]
+}
+```
+:::
+
 ## Default tile
 
 By default the Home tile follows Art Mode. It does not cut power.
