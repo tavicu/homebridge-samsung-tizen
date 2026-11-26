@@ -128,7 +128,7 @@ export class Device extends EventEmitter<DeviceEvents> {
   }
 
   public get isFrame(): boolean {
-    return !!this.storage.frameSupport;
+    return !!this.storage.frameSupport || this.hasOption('Frame.Enable');
   }
 
   public getInfo(): Promise<TizenDeviceInfo> {

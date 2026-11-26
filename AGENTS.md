@@ -43,7 +43,7 @@ Several behaviors described below look like bugs when the code is read on its ow
 ## Config
 
 - Platform-level `keys`, `inputs`, `switches` and `wol` are shared by every TV and merged with the TV's own (`deepmerge`: arrays are concatenated, the TV's values win for keys).
-- Options per TV: `Device.Disable`, `Volume.Slider.Enable`, `Switch.DeviceName.Disable`, `Frame.RealPowerMode`, `Frame.ArtSwitch.Disable`, `Frame.PowerSwitch.Disable`.
+- Options per TV: `Device.Disable`, `Volume.Slider.Enable`, `Switch.DeviceName.Disable`, `Frame.Enable`, `Frame.RealPowerMode`, `Frame.ArtSwitch.Disable`, `Frame.PowerSwitch.Disable`.
 - Version 5 configs are brought to the version 6 shape in memory by `lib/migrate.ts`. `config.json` is never written: the log tells the user what to change. Old picture mode names are mapped in `lib/switch.ts`. Existing configs must keep working.
 
 ## State and events
@@ -90,7 +90,7 @@ So "the plugin answers HomeKit before the TV has finished" and "the timeout hide
 
 ## The Frame
 
-- `frameSupport` comes from `FrameTVSupport` in device info. The Frame gets an Art Mode switch and a Power switch (each can be hidden with `Frame.ArtSwitch.Disable` / `Frame.PowerSwitch.Disable`).
+- `frameSupport` comes from `FrameTVSupport` in device info. `Frame.Enable` treats a TV as a Frame when it has Art Mode but reports `FrameTVSupport` false, such as the S95H (#791): its art-app socket answers like a Frame's. It is left out of the settings UI on purpose (only in the schema `enum`, so the value is valid) and is mentioned in the docs' Frame section. The Frame gets an Art Mode switch and a Power switch (each can be hidden with `Frame.ArtSwitch.Disable` / `Frame.PowerSwitch.Disable`).
 - By default the TV tile means "on and not in Art Mode": turning it off enters Art Mode, turning it on leaves Art Mode, waking the TV first if it is fully off. `Frame.RealPowerMode` makes the tile control real power.
 - Art Mode state comes from `artmode_status` / `get_artmode_status` replies (different firmwares send different ones) and `art_mode_changed` events, read in `FrameSocket.handleMessage`. It is asked for when the socket opens and on each poll, at most every 2.5 s.
 - The art-app socket connects after `paired` and every time the TV turns on. It sends two events when it opens: `ms.channel.connect` when the connection is accepted, and `ms.channel.ready` when the Art app on the TV is running and can take requests. The plugin treats the socket as open on the first of the two. `CONNECTION_TIMEOUT` is 30 s.

@@ -160,7 +160,15 @@
               "type": "array",
               "items": {
                 "type": "string",
-                "enum": ["Device.Disable", "Volume.Slider.Enable", "Switch.DeviceName.Disable", "Frame.RealPowerMode", "Frame.ArtSwitch.Disable", "Frame.PowerSwitch.Disable"]
+                "enum": [
+                  "Device.Disable",
+                  "Volume.Slider.Enable",
+                  "Switch.DeviceName.Disable",
+                  "Frame.Enable",
+                  "Frame.RealPowerMode",
+                  "Frame.ArtSwitch.Disable",
+                  "Frame.PowerSwitch.Disable"
+                ]
               }
             },
             "inputs": {

@@ -80,4 +80,4 @@ export type DeviceConfig = {
 };
 
 export type DeviceOptions =
-  'Device.Disable' | 'Volume.Slider.Enable' | 'Switch.DeviceName.Disable' | 'Frame.RealPowerMode' | 'Frame.ArtSwitch.Disable' | 'Frame.PowerSwitch.Disable';
+  'Device.Disable' | 'Volume.Slider.Enable' | 'Switch.DeviceName.Disable' | 'Frame.Enable' | 'Frame.RealPowerMode' | 'Frame.ArtSwitch.Disable' | 'Frame.PowerSwitch.Disable';

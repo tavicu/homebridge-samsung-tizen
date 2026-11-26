@@ -42,7 +42,7 @@ export class FrameSocket {
   }
 
   public get isSupported(): boolean {
-    return !!this.device.storage.frameSupport;
+    return this.device.isFrame;
   }
 
   public start(): void {
